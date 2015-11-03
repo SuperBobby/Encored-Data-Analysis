@@ -8,7 +8,6 @@ RS_raw_hcc = read.csv("realsense/hcc.csv")
 
 
 getRealSenseTable = function(data){
-                
         # convert data format
         joined = as.POSIXct(data$joined/1000, format="%Y-%m-%d", origin='1970-01-01', tz="ROK")
         leaved = as.POSIXct(data$leaved/1000, format="%Y-%m-%d", origin='1970-01-01', tz="ROK")

@@ -113,7 +113,7 @@ show.pattern = function(raw_data, target, label, start_date, weeks, ymax, return
         }
 }
 
-avg.peak.base.plot = function(data, target, label, start_date, weekend_index = c(3,4), weeks = 4, average_only = F, ylims){
+avg.peak.base.plot = function(data, target, label, start_date, weeks = 4, average_only = F, ylims){
         
         unit = 96
         sub_data = data[,-1] # remove timestamp column
