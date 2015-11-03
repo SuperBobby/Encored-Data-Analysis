@@ -15,35 +15,31 @@ getRealSenseTable = function(data){
         duration = as.numeric(data$leaved - data$joined)
         
         basic_table = data.frame(joined, duration)
-        
         basic_table = basic_table[order(joined, leaved),]
         
         # duration pre-processing ###############################
         duration[duration > 600000] = 0
         
-        
-        # second 
+        # second
         second(basic_table$joined) = 0
         
-        # minite 
+        # minite
         minute(basic_table$joined)[minute(basic_table$joined) < 15] = 0
         minute(basic_table$joined)[minute(basic_table$joined) >= 15 & minute(basic_table$joined) < 30] = 15
         minute(basic_table$joined)[minute(basic_table$joined) >= 30 & minute(basic_table$joined) < 45] = 30
         minute(basic_table$joined)[minute(basic_table$joined) >= 45] = 45
         
-        
         # aggregation
-        # counting = rle(as.numeric(basic_table$joined))$lengths
-        # timestamp = joined[cumsum(counting)]
-        
         basic_table$joined = as.factor(basic_table$joined)
-        # timestamp = unique(as.character(basic_table$joined))
         counting = count(basic_table, "joined")
         avg_duration = aggregate(duration ~ joined, data = basic_table, mean)
         
         return_table = merge(counting, avg_duration)
+        return_table$joined = as.POSIXct(return_table$joined, origin='1970-01-01', tz="ROK")
+        return_table$duration = return_table$duration/1000
         
         return(return_table)
 }
 
-tmp_marg = getRealSenseTable(RS_raw_hcc)
+RS_marg = getRealSenseTable(RS_raw_marg)
+RS_hcc = getRealSenseTable(RS_raw_hcc)
