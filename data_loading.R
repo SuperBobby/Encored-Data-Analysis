@@ -1,4 +1,4 @@
-source("codes/getSNUdata.R")
+source("Encored-Data-Analysis/getSNUdata.R")
 
 ###########################################
 ## Default data tables 
@@ -19,7 +19,7 @@ ux_defalut_table_hours <- getSNUData.feeder("ux",   "hours", start, end, verbose
 ## Update the default data tables
 ###########################################
 update_start = "2014-09-01"
-update_end = "2015-11-03"
+update_end = "2015-11-04"
 marg_defalut_table_15min <- loadSNUData(marg_defalut_table_15min, "marg", update_start, update_end, verbose = T)
  hcc_defalut_table_15min <- loadSNUData( hcc_defalut_table_15min, "hcc",  update_start, update_end, verbose = T)
   ux_defalut_table_15min <- loadSNUData(  ux_defalut_table_15min, "ux",   update_start, update_end, verbose = T)
