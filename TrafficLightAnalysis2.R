@@ -45,6 +45,7 @@ getSavingRate <- function(x, shift, verbose=T) {
   return(return_table)
 }
 
+
 plotTrafficLightHeatmap <- function(x, firstCut, secondCut, startDate, endDate) {
   
   if(missing(firstCut)){
@@ -58,16 +59,21 @@ plotTrafficLightHeatmap <- function(x, firstCut, secondCut, startDate, endDate) 
   
   x$section <- cut(x$SavingRate,breaks = c(-Inf,firstCut,secondCut,Inf),right = FALSE)
   x$hour<-rep(x=1:24)
-  x$date<-as.factor(format(temp$timestamp, "%Y%m%d"))
+  x$date<-as.factor(format(x$timestamp, "%Y%m%d"))
+  x$date<-factor(x$date,levels=rev(levels(x$date)))
   
   startRow = which(x$timestamp==paste(startDate,"00:00:00"))
   endRow = which(x$timestamp==paste(endDate,"23:00:00"))
+  
+  print(startRow)
+  print(endRow)
   
   p <- ggplot(data = x[startRow:endRow,], aes(x = hour, y = date)) + 
     geom_tile(aes(fill = section),colour="white") +
     scale_fill_manual(breaks=c("\\[-Inf,1)", "\\[1,1.2)", "\\[1.2,Inf)"), 
                       values = c("#3e721f", "#f7cb00", "#a50a0a")) +
-    scale_x_discrete(limits=c(1:24))
+    scale_x_discrete(limits=c(1:24)) +
+    scale_y_discrete()
   
   print(p)
 }
@@ -75,8 +81,6 @@ plotTrafficLightHeatmap <- function(x, firstCut, secondCut, startDate, endDate) 
 
 ## Implements ########################################################
 
-# start = "2015-09-14"
-# cut = "2015-09-28"
 start = "2014-10-01"
 cut = "2015-11-01"
 
@@ -94,10 +98,55 @@ marg_hours_saving_rate = getSavingRate(marg_hours_acc, 24*7) # 24*7 : compare wi
 hcc_hours_saving_rate = getSavingRate(hcc_hours_acc, 24*7)
 ux_hours_saving_rate = getSavingRate(ux_hours_acc, 24*7)
 
+
 fst = 1.0
 snd = 1.20
+
+# marg_hours_saving_rate2 <- marg_hours_saving_rate
+# marg_hours_saving_rate2$section <- cut(marg_hours_saving_rate$SavingRate,breaks = c(-Inf,1.0,1.2,Inf),right = FALSE) # rate <1.0 , 1.0 <= rate <1.2 , 1.2< rate
+# 
+# 
+# temp<-marg_hours_saving_rate2
+# temp$hour<-rep(x=1:24)
+# temp$date<-as.factor(format(temp$timestamp, "%Y%m%d"))
+# 
+# 
+# temp2<-temp2[order(-temp2[,5],temp2[,1]),] #temp2[,5] : date, temp2[,1]: timestamp
+# 
+# 
+# p <- ggplot(data =  temp[8593:nrow(temp),], aes(x = hour, y = date)) + 
+#   geom_tile(aes(fill = section),colour="white") +
+#   scale_fill_manual(breaks=c("\\[-Inf,1)", "\\[1,1.2)", "\\[1.2,Inf)"), 
+#                               values = c("#3e721f", "#f7cb00", "#a50a0a")) +
+#   scale_x_discrete(limits=c(1:24)) +
+#   scale_y_discrete()
+# 
+
+temp3<-marg_hours_saving_rate
+temp3$section <- cut(temp3$SavingRate,breaks = c(-Inf,1.0,1.2,Inf),right = FALSE)
+temp3$hour<-rep(x=1:24)
+temp3$date<-as.factor(format(temp3$timestamp, "%Y%m%d"))
+temp3$date<-factor(temp3$date,levels=rev(levels(temp3$date)))
+
+temp3<-temp3[nrow(temp3):1,]
+
+p2 <- ggplot(data =  temp3[8593:9336,], aes(x = hour, y = date)) + 
+  geom_tile(aes(fill = section),colour="white") +
+  scale_fill_manual(breaks=c("\\[-Inf,1)", "\\[1,1.2)", "\\[1.2,Inf)"), 
+                    values = c("#3e721f", "#f7cb00", "#a50a0a")) +
+  scale_x_discrete(limits=c(1:24)) +
+  scale_y_discrete()
 
 plotTrafficLightHeatmap(marg_hours_saving_rate, fst, snd, "2015-10-01", "2015-10-31")
 plotTrafficLightHeatmap(hcc_hours_saving_rate, fst, snd, "2015-10-01", "2015-10-31")
 plotTrafficLightHeatmap(ux_hours_saving_rate, fst, snd, "2015-10-01", "2015-10-31")
 
+temp3<-temp2
+temp3$date <- factor(temp3$date,levels = rev(levels(temp3$date)),ordered = TRUE)
+
+temp3$date <- reorder(temp3$date, temp3$timestamp)
+
+temp3$date <- factor(temp3$date, levels=sort(temp3$date), decreasing=TRUE)
+
+which(temp3$timestamp=="2015-10-01 00:00:00")
+which(temp3$timestamp=="2015-10-31 23:00:00")
