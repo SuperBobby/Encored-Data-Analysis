@@ -5,38 +5,40 @@
 ###############################
 source("getSNUdata.R")
 
-barplot.withError = function(data, main_title, y_range){
-        
-        means  = sapply(data, mean, na.rm=T)
-        stDevs = sapply(data, sd, na.rm=T)
-        
-        peak = quantile(data, 0.95, na.rm = T)
-        base = quantile(data, 0.05, na.rm = T)
-        print(paste("peak(95th percentiles):", peak))
-        print(paste("base( 5th percentiles):", base))
-        
-        n = length(means)
-        avg = mean(stack(data)$values, na.rm=T) * 96 
-        mp = barplot(means, 
-                     col=rep(topo.colors(n/4), each = 4),
-                     main=main_title,
-                     ylim=y_range,
-                     xlab=paste("average usage/day:", round(avg,2)),
-                     ylab="Usage (kW/15min)")
-        box()
-        
-        segments(mp, means - stDevs, mp, means + stDevs, lwd=2)
-        segments(mp - 0.1, means - stDevs, mp + 0.1, means - stDevs, lwd=2)
-        segments(mp - 0.1, means + stDevs, mp + 0.1, means + stDevs, lwd=2)
-        
-        lines(c(-4,116), c(base,base), col="blue")
-        text(x = -2, y = base*1.05, labels = round(base,2), lty = 2, offset=0.3)
-        
-        lines(c(-4,116), c(peak,peak), col="red")
-        text(x = -2, y = peak*1.05, labels = round(peak,2), lty = 2, offset=0.3)
-}
+
 
 show.pattern = function(raw_data, target, label, start_date, weeks, ymax, return_data = F){
+        
+        barplot.withError = function(data, main_title, y_range){
+                
+                means  = sapply(data, mean, na.rm=T)
+                stDevs = sapply(data, sd, na.rm=T)
+                
+                peak = quantile(data, 0.95, na.rm = T)
+                base = quantile(data, 0.05, na.rm = T)
+                print(paste("peak(95th percentiles):", peak))
+                print(paste("base( 5th percentiles):", base))
+                
+                n = length(means)
+                avg = mean(stack(data)$values, na.rm=T) * 96 
+                mp = barplot(means, 
+                             col=rep(topo.colors(n/4), each = 4),
+                             main=main_title,
+                             ylim=y_range,
+                             xlab=paste("average usage/day:", round(avg,2)),
+                             ylab="Usage (kW/15min)")
+                box()
+                
+                segments(mp, means - stDevs, mp, means + stDevs, lwd=2)
+                segments(mp - 0.1, means - stDevs, mp + 0.1, means - stDevs, lwd=2)
+                segments(mp - 0.1, means + stDevs, mp + 0.1, means + stDevs, lwd=2)
+                
+                lines(c(-4,116), c(base,base), col="blue")
+                text(x = -2, y = base*1.05, labels = round(base,2), lty = 2, offset=0.3)
+                
+                lines(c(-4,116), c(peak,peak), col="red")
+                text(x = -2, y = peak*1.05, labels = round(peak,2), lty = 2, offset=0.3)
+        }
         
         data = raw_data
         unit = 96
@@ -274,7 +276,7 @@ avg.peak.base.plot( hcc_defalut_table_15min, target="sum", label = "HCC", "2015-
 avg.peak.base.plot(  ux_defalut_table_15min, target="sum", label = "UX", "2015-09-07", weeks = 8)
 
 
-show.pattern(marg_defalut_table_15min, target="sum", label = "MARG", "2015-09-07", weeks = 4, return_data=F, ymax=2)
+show.pattern(marg_defalut_table_15min, target="sum", label = "MARG", "2015-09-07", weeks = 2, return_data=F, ymax=2)
 show.pattern(marg_defalut_table_15min, target="sum", label = "MARG", "2015-10-05", weeks = 4, return_data=F, ymax=2)
 
 show.pattern( hcc_defalut_table_15min, target="sum", label = "HCC",  "2015-09-07", weeks = 4, return_data=F, ymax=1)
