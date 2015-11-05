@@ -102,7 +102,7 @@ ux_hours_saving_rate = getSavingRate(ux_hours_acc, 24*7)
 fst = 1.0
 snd = 1.20
 
-plotTrafficLightHeatmap(marg_hours_saving_rate, fst, snd, "2015-10-01", "2015-10-31")
+plotTrafficLightHeatmap(marg_hours_saving_rate, fst, snd, "2015-09-01", "2015-09-30")
 plotTrafficLightHeatmap(hcc_hours_saving_rate, fst, snd, "2015-10-01", "2015-10-31")
 plotTrafficLightHeatmap(ux_hours_saving_rate, fst, snd, "2015-10-01", "2015-10-31")
 
