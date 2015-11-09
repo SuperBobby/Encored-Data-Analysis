@@ -122,8 +122,8 @@ resolution_set = c("quarters", "hours")
 # lab = lab_set[1]
 # resolution = resolution_set[2]
 
-start = "2015-09-14"
-cut = "2015-09-28"
+start = "2015-10-19"
+cut = "2015-11-02"
 
 
 # data loading from mongodb
@@ -138,7 +138,6 @@ ux_hours_acc = accumulateUsage(ux_hours, 24)
 marg_hours_saving_rate = getSavingRate(marg_hours_acc, 24*7) # 24*7 : compare with 1 week before usage
 hcc_hours_saving_rate = getSavingRate(hcc_hours_acc, 24*7)
 ux_hours_saving_rate = getSavingRate(ux_hours_acc, 24*7)
-
 
 fst = 1.0
 snd = 1.20
