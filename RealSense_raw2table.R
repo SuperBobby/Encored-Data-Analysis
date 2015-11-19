@@ -5,7 +5,7 @@ library(plyr)
 # raw data loading
 RS_raw_marg = read.csv("realsense/marg.csv")
 RS_raw_hcc = read.csv("realsense/hcc.csv")
-
+RS_raw_ux = read.csv("realsense/ux.csv")
 
 getRealSenseTable = function(data){
         # convert data format
@@ -42,3 +42,4 @@ getRealSenseTable = function(data){
 
 RS_marg = getRealSenseTable(RS_raw_marg)
 RS_hcc = getRealSenseTable(RS_raw_hcc)
+RS_ux = getRealSenseTable(RS_raw_ux)

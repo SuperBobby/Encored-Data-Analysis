@@ -269,23 +269,27 @@ avg.peak.base.plot = function(data, target, label, start_date, weeks = 4, averag
 ##################
 ### analysis  ####
 ##################
-avg.peak.base.plot(marg_defalut_table_15min, target="sum", label = "MARG", "2015-09-07", weeks = 9)
-avg.peak.base.plot( hcc_defalut_table_15min, target="sum", label = "HCC", "2015-09-07", weeks = 9)
-avg.peak.base.plot(  ux_defalut_table_15min, target="sum", label = "UX", "2015-09-07", weeks = 9)
+avg.peak.base.plot(marg_defalut_table_15min, target="sum", label = "MARG", "2015-09-07", weeks = 11)
+avg.peak.base.plot( hcc_defalut_table_15min, target="sum", label = "HCC", "2015-09-07", weeks = 11)
+avg.peak.base.plot(  ux_defalut_table_15min, target="sum", label = "UX", "2015-09-07", weeks = 11)
 
-avg.peak.base.plot(marg_defalut_table_15min, target="computer", label = "MARG", "2015-09-07", weeks = 9)
-avg.peak.base.plot(marg_defalut_table_15min, target="light", label = "MARG", "2015-09-07", weeks = 9)
-avg.peak.base.plot(marg_defalut_table_15min, target="hvac", label = "MARG", "2015-09-07", weeks = 9)
+avg.peak.base.plot(marg_defalut_table_15min, target="computer", label = "MARG", "2015-09-07", weeks = 10)
+avg.peak.base.plot(marg_defalut_table_15min, target="light", label = "MARG", "2015-09-07", weeks = 10)
+avg.peak.base.plot(marg_defalut_table_15min, target="hvac", label = "MARG", "2015-09-07", weeks = 10)
+
 
 
 show.pattern(marg_defalut_table_15min, target="sum", label = "MARG", "2015-09-07", weeks = 4, return_data=F, ymax=2)
-show.pattern(marg_defalut_table_15min, target="sum", label = "MARG", "2015-10-05", weeks = 5, return_data=F, ymax=2)
+show.pattern(marg_defalut_table_15min, target="sum", label = "MARG", "2015-10-05", weeks = 6, return_data=F, ymax=2)
+show.pattern(marg_defalut_table_15min, target="sum", label = "MARG", "2015-11-02", weeks = 3, return_data=F, ymax=2)
 
 show.pattern( hcc_defalut_table_15min, target="sum", label = "HCC",  "2015-09-07", weeks = 4, return_data=F, ymax=1)
-show.pattern( hcc_defalut_table_15min, target="sum", label = "HCC",  "2015-10-05", weeks = 5, return_data=F, ymax=1)
+show.pattern( hcc_defalut_table_15min, target="sum", label = "HCC",  "2015-10-05", weeks = 4, return_data=F, ymax=1)
+show.pattern( hcc_defalut_table_15min, target="sum", label = "HCC",  "2015-11-02", weeks = 3, return_data=F, ymax=1)
 
 show.pattern(  ux_defalut_table_15min, target="sum", label = "UX",   "2015-09-07", weeks = 4, return_data=F, ymax=0.8)
 show.pattern(  ux_defalut_table_15min, target="sum", label = "UX",   "2015-10-05", weeks = 5, return_data=F, ymax=0.8)
+show.pattern(  ux_defalut_table_15min, target="sum", label = "UX",   "2015-11-02", weeks = 3, return_data=F, ymax=0.8)
 
 
 
