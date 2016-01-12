@@ -6,6 +6,7 @@ dashboard_data_raw = read.csv("data/lab_display_state_log.csv", header = F)
 names(dashboard_data_raw) = c("timestamp", "location", "status")
 
 dashboard_data_raw$timestamp = as.POSIXct(dashboard_data_raw$timestamp/1000, format="%Y-%m-%d", origin='1970-01-01', tz="ROK")
+tail(dashboard_data_raw, 200)
 
 dashboard_data_loaded = subset(dashboard_data_raw, subset=dashboard_data_raw$status == "loaded")
 
@@ -28,12 +29,31 @@ dashboard_data_loaded_MARG = dashboard_data_loaded_MARG[valid_marg_index,]
 dashboard_data_loaded_HCC  = dashboard_data_loaded_HCC[valid_hcc_index,]
 dashboard_data_loaded_UX   = dashboard_data_loaded_UX[valid_ux_index,]
 
-qplot(dashboard_data_loaded_MARG$timestamp, dashboard_data_loaded_MARG$Mins)
-qplot(dashboard_data_loaded_HCC$timestamp, dashboard_data_loaded_HCC$Mins)
-qplot(dashboard_data_loaded_UX$timestamp, dashboard_data_loaded_UX$Mins)
+head(dashboard_data_loaded_MARG)
+tail(dashboard_data_loaded_MARG)
 
 
+### plotting ###
+marg_plot <- ggplot(data=dashboard_data_loaded_MARG, aes(x=timestamp)) +
+        geom_point(aes(y=Mins), col="red", alpha=0.5) +
+        scale_x_datetime(labels = date_format("%m/%d"), breaks = date_breaks("day")) + 
+        theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
+hcc_plot <- ggplot(data=dashboard_data_loaded_HCC, aes(x=timestamp)) +
+        geom_point(aes(y=Mins), col="green", alpha=0.5) +
+        scale_x_datetime(labels = date_format("%m/%d"), breaks = date_breaks("day")) + 
+        theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ux_plot <- ggplot(data=dashboard_data_loaded_UX, aes(x=timestamp)) +
+        geom_point(aes(y=Mins), col="blue", alpha=0.5) + 
+        scale_x_datetime(labels = date_format("%m/%d"), breaks = date_breaks("day")) + 
+        theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+grid.arrange(marg_plot, hcc_plot, ux_plot)
+
+# qplot(dashboard_data_loaded_MARG$timestamp, dashboard_data_loaded_MARG$Mins)
+# qplot(dashboard_data_loaded_HCC$timestamp, dashboard_data_loaded_HCC$Mins)
+# qplot(dashboard_data_loaded_UX$timestamp, dashboard_data_loaded_UX$Mins)
 
 
 test_func <- function(Hours, Mins){

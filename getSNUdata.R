@@ -2,14 +2,12 @@
 source("Encored-Data-Analysis/Encored public functions.R")
 
 require("rjson")
-library(ggplot2)
-library("gridExtra")
 library("scales")
 library(reshape2)
 library(timeDate)
 
 ## Functions #########################################################
-getSNUData.sum <- function(lab = c("marg", "hcc", "ux"), 
+getSNUData.total <- function(lab = c("marg", "hcc", "ux"), 
                            resolution = c("quarters", "hours"),
                            start, cut, verbose=T) {
         
@@ -81,7 +79,7 @@ getSNUData.feeder <- function(lab = c("marg", "hcc", "ux"),
         usage_light = numeric(0)
         usage_hvac  = numeric(0)
         usage_etc   = numeric(0)
-        usage_sum   = numeric(0)
+        usage_total   = numeric(0)
         
         if(resolution == "quarters") {
                 timestamp_gap = 60 * 15
@@ -95,7 +93,7 @@ getSNUData.feeder <- function(lab = c("marg", "hcc", "ux"),
                 light = 0
                 hvac  = 0
                 etc   = 0
-                sum   = 0
+                total   = 0
                 
                 query = paste("http://localhost:3000/api/labs/", lab, "/energy/", resolution, 
                               ".json?base_time=", query_timestamp, "000&limit=1", sep="")
@@ -108,9 +106,8 @@ getSNUData.feeder <- function(lab = c("marg", "hcc", "ux"),
                         light = 0
                         hvac  = 0
                         etc   = 0
-                        sum   = 0  
+                        total   = 0  
                 } else {
-                        
                         for(i in 1:length(dat[[1]]$feeders)){
                                 if(dat[[1]]$feeders[[i]]$description == "computer"){
                                         com = com + dat[[1]]$feeders[[i]]$value
@@ -125,27 +122,19 @@ getSNUData.feeder <- function(lab = c("marg", "hcc", "ux"),
                                         return()
                                 }
                         }        
-                        sum  = dat[[1]]$sum
-                }
-                
-                #                 print(query)                
-                #                 print(query_timestamp)
-                #                 print(com)
-                #                 print(light)
-                #                 print(hvac)
-                #                 print(etc)
-                #                 print(sum)       
+                        total  = dat[[1]]$sum
+                }     
                 
                 timestamp   = c(timestamp, query_timestamp)
                 usage_com   = c(usage_com, com)
                 usage_light = c(usage_light, light)
                 usage_hvac  = c(usage_hvac, hvac)
                 usage_etc   = c(usage_etc, etc)
-                usage_sum   = c(usage_sum, sum)
+                usage_total   = c(usage_total, total)
                 
                 if(verbose) {
                         print(paste(as.POSIXct(query_timestamp, format="%Y-%m-%d", origin='1970-01-01', tz="ROK"), 
-                                    ":", sum, "kW/h"))
+                                    ":", total, "kW/h"))
                 }
                 
                 query_timestamp = query_timestamp + timestamp_gap
@@ -161,17 +150,16 @@ getSNUData.feeder <- function(lab = c("marg", "hcc", "ux"),
                                   light    = usage_light, 
                                   hvac     = usage_hvac, 
                                   etc      = usage_etc, 
-                                  sum      = usage_sum, 
+                                  total      = usage_total, 
                                   day      = day, 
                                   weekday  = weekday)
         
-        #         names(return_table)[2] = paste(lab, "_", resolution, sep="")
-        #         print(summary(return_table))
-        
+        row.names(return_table) = NULL
         return(return_table)
 }
 
-loadSNUData <- function(default_data, 
+
+reviseSNUData <- function(default_data, 
                         lab = c("marg", "hcc", "ux"),
                         start, cut, verbose=T) {
         
@@ -232,6 +220,114 @@ loadSNUData <- function(default_data,
         return(return_data)
 }
 
+
+getSNUData.feeder.day <- function(lab = c("marg", "hcc", "ux"), start, cut, verbose=T) {
+        
+        start_timestamp = as.numeric(as.POSIXct(start, format="%Y-%m-%d"))
+        end_timestamp = as.numeric(as.POSIXct(cut, format="%Y-%m-%d"))
+        
+        loop_timestamp = start_timestamp
+        
+        timestamp   = numeric(0)
+        usage_com   = numeric(0)
+        usage_light = numeric(0)
+        usage_hvac  = numeric(0)
+        usage_etc   = numeric(0)
+        usage_total   = numeric(0)
+        
+        timestamp_gap = 60 * 60 * 24
+        
+        while(loop_timestamp < end_timestamp){
+                
+                com   = 0
+                light = 0
+                hvac  = 0
+                etc   = 0
+                total   = 0
+                
+                query_timestamp = as.POSIXct(loop_timestamp, format="%Y-%m-%d", origin='1970-01-01', tz="ROK")
+                query = paste("http://localhost:3000/api/labs/", lab, "/energy/daily.json?day_from=", query_timestamp, sep="")
+                
+                #print(query)
+                
+                rd = readLines(query, warn="F")
+                dat <- fromJSON(rd)
+                
+                if(length(dat)==0){
+                        com   = 0
+                        light = 0
+                        hvac  = 0
+                        etc   = 0
+                        total   = 0  
+                } else {
+                        
+                        for(i in 1:length(dat[[1]]$feeders)){
+                                if(dat[[1]]$feeders[[i]]$description == "computer"){
+                                        com = com + dat[[1]]$feeders[[i]]$value
+                                } else if(dat[[1]]$feeders[[i]]$description == "light"){
+                                        light = light + dat[[1]]$feeders[[i]]$value
+                                } else if(dat[[1]]$feeders[[i]]$description == "hvac"){
+                                        hvac = hvac + dat[[1]]$feeders[[i]]$value
+                                } else if(dat[[1]]$feeders[[i]]$description == "unclassified"){
+                                        etc = etc + dat[[1]]$feeders[[i]]$value
+                                } else {
+                                        print("The feeder data is not classfied appropriatly")
+                                        return()
+                                }
+                        }        
+                        total  = dat[[1]]$sum
+                }
+                
+                #                 print(query)                
+                #                 print(query_timestamp)
+                #                 print(com)
+                #                 print(light)
+                #                 print(hvac)
+                #                 print(etc)
+                #                 print(total)       
+                
+                timestamp   = c(timestamp, query_timestamp)
+                usage_com   = c(usage_com, com)
+                usage_light = c(usage_light, light)
+                usage_hvac  = c(usage_hvac, hvac)
+                usage_etc   = c(usage_etc, etc)
+                usage_total   = c(usage_total, total)
+                
+                if(verbose) {
+                        print(paste(as.POSIXct(query_timestamp, format="%Y-%m-%d", origin='1970-01-01', tz="ROK"), 
+                                    ":", total, "kW/h"))
+                }
+                
+                loop_timestamp = loop_timestamp + timestamp_gap 
+                
+        }
+        
+        timestamp = as.POSIXct(timestamp, format="%Y-%m-%d", origin='1970-01-01', tz="ROK")        
+        day = weekdays(timestamp, abbreviate = T)
+        weekday = isWeekday(timestamp + 9*60*60)
+        
+        return_table = data.frame(timestamp, 
+                                  computer = usage_com, 
+                                  light    = usage_light, 
+                                  hvac     = usage_hvac, 
+                                  etc      = usage_etc, 
+                                  total      = usage_total, 
+                                  day      = day, 
+                                  weekday  = weekday)
+        
+        #         names(return_table)[2] = paste(lab, "_", resolution, sep="")
+        #         print(summary(return_table))
+        row.names(return_table) = NULL
+        return(return_table)
+}
+
+
+cutTail <- function(data, n){
+        len = nrow(data)
+        index = 1:(len-n)
+        return(data[index,])
+}
+
 df.viewer = function(df, n=20){
         rows_for_a_page = n
         n_pages = round(nrow(df) / n) + 1
@@ -254,3 +350,5 @@ df.viewer = function(df, n=20){
                 i = i + 1
         }
 }
+
+

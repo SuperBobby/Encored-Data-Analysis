@@ -250,6 +250,12 @@ missing.to.NA = function(data, indicator, threshold) {
         return(data)
 }
 
+set_KOR_timpstamp <- function(data){
+        data[,2] = as.POSIXct(data[,2]/1000, format="%Y-%m-%d", origin='1970-01-01', tz="ROK")
+        data[,3] = as.POSIXct(data[,3]/1000, format="%Y-%m-%d", origin='1970-01-01', tz="ROK")
+        return(data)
+}
+
 ######################
 ### MARG functions ###
 ######################

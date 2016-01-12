@@ -1,6 +1,6 @@
 #install.packages("rjson")
 require("rjson")
-source("getSNUdata.R")
+source("Encored-Data-Analysis/getSNUdata.R")
 library(ggplot2)
 library(reshape2)
 
@@ -123,7 +123,7 @@ resolution_set = c("quarters", "hours")
 # resolution = resolution_set[2]
 
 start = "2015-10-19"
-cut = "2015-11-02"
+cut = "2015-11-30"
 
 
 # data loading from mongodb
