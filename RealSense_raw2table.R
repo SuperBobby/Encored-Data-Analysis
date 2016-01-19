@@ -94,17 +94,20 @@ grid.arrange(marg_plot, hcc_plot, ux_plot)
 marg_plot <- ggplot(data=RS_total, aes(x=timestamp)) +
         geom_point(aes(y=marg_duration ), col="red", alpha=0.5) +
         scale_x_datetime(labels = date_format("%m/%d"), breaks = date_breaks("day")) + 
-        theme(axis.text.x = element_text(angle = 90, hjust = 1))
+        theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+        scale_y_continuous(limits = c(1, 10))
 
 hcc_plot <- ggplot(data=RS_total, aes(x=timestamp)) +
         geom_point(aes(y=hcc_duration ), col="green", alpha=0.5) +
         scale_x_datetime(labels = date_format("%m/%d"), breaks = date_breaks("day")) + 
-        theme(axis.text.x = element_text(angle = 90, hjust = 1))
+        theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+        scale_y_continuous(limits = c(1, 10))
 
 ux_plot <- ggplot(data=RS_total, aes(x=timestamp)) +
         geom_point(aes(y=ux_duration ), col="blue", alpha=0.5) + 
         scale_x_datetime(labels = date_format("%m/%d"), breaks = date_breaks("day")) + 
-        theme(axis.text.x = element_text(angle = 90, hjust = 1))
+        theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+        scale_y_continuous(limits = c(1, 10))
 
 
 grid.arrange(marg_plot, hcc_plot, ux_plot)

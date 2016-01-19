@@ -33,10 +33,13 @@ bar.box.plot <- function(data, lab, tg_fedr, srt, end) {
         grid.arrange(bar, box)
 }
 
+day_end = "2016-01-19"
+bar.box.plot(marg_defalut_table_hours, "marg", "total", "2015-09-01", day_end)
+bar.box.plot(hcc_defalut_table_hours, "hcc", "total", "2015-09-01", day_end)
+bar.box.plot(ux_defalut_table_hours, "ux", "total", "2015-09-01", day_end)
 
-bar.box.plot(marg_defalut_table_hours, "marg", "total", "2015-09-01", "2016-01-12")
-bar.box.plot(hcc_defalut_table_hours, "hcc", "total", "2015-09-01", "2016-01-12")
-bar.box.plot(ux_defalut_table_hours, "ux", "total", "2015-09-01", "2016-01-12")
+
+
 
 
 
@@ -44,9 +47,9 @@ bar.box.plot(ux_defalut_table_hours, "ux", "total", "2015-09-01", "2016-01-12")
 bar.box.plot(marg_defalut_table_hours, "hcc", "computer", "2015-09-01", "2016-01-12")
 
 
-bar.box.plot(marg_defalut_table_hours, "marg", "computer", "2015-11-01", "2016-01-12")
-bar.box.plot(marg_defalut_table_hours, "marg", "total", "2015-11-01", "2016-01-12")
+bar.box.plot(marg_defalut_table_hours, "marg", "computer", "2015-11-01", day_end)
+bar.box.plot(marg_defalut_table_hours, "marg", "hvac", "2015-11-01", day_end)
 
-bar.box.plot(hcc_defalut_table_hours, "marg", "total", "2015-11-01", "2016-01-12")
-bar.box.plot(ux_defalut_table_hours, "marg", "total", "2015-11-01", "2016-01-12")
+bar.box.plot(hcc_defalut_table_hours, "marg", "total", "2015-11-01", day_end)
+bar.box.plot(ux_defalut_table_hours, "marg", "total", "2015-11-01", day_end)
 

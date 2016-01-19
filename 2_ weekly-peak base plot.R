@@ -171,8 +171,8 @@ avg.peak.base.plot = function(data, target, label, start_date, weeks = 4, averag
 ##################
 ### analysis  ####
 ##################
-from_date = "2015-11-02"
-plot_weeks = 10
+from_date = "2015-10-05"
+plot_weeks = 15
 
 avg.peak.base.plot(marg_defalut_table_15min, target="total", label = "MARG", from_date, weeks = plot_weeks)
 avg.peak.base.plot( hcc_defalut_table_15min, target="total", label = "HCC",  from_date, weeks = plot_weeks)
