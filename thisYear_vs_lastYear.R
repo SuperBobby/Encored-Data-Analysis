@@ -9,18 +9,18 @@ lastYear_winter_ux_hours <- reviseSNUData(ux_defalut_table_hours, "ux", "2014-12
 thisYear_winter_ux_hours <- reviseSNUData(ux_defalut_table_hours, "ux", "2015-12-01", "2016-01-09", verbose = T)
 
 
-## 95th percentile
-quantile(lastYear_winter_marg_hours$total, .95) * 1.1   # 9.916728 --> 10.0
-quantile(thisYear_winter_marg_hours$total, .95)         # 7.118
-
-quantile(lastYear_winter_hcc_hours$total, .95) * 1.1    # 5.452001 --> 5.5
-quantile(thisYear_winter_hcc_hours$total, .95)          # 4.41065
-
-quantile(lastYear_winter_ux_hours$total, .95) * 1.1     # 2.633891 --> 2.6
-quantile(thisYear_winter_ux_hours$total, .95)           # 2.6078 
-
-# quantile(lastYear_winter_marg_hours$total, 1.0) # 9.015208 
-# quantile(thisYear_winter_marg_hours$total, .95) # 7.118
+# ## 95th percentile
+# quantile(lastYear_winter_marg_hours$total, .95) * 1.1   # 9.916728 --> 10.0
+# quantile(thisYear_winter_marg_hours$total, .95)         # 7.118
+# 
+# quantile(lastYear_winter_hcc_hours$total, .95) * 1.1    # 5.452001 --> 5.5
+# quantile(thisYear_winter_hcc_hours$total, .95)          # 4.41065
+# 
+# quantile(lastYear_winter_ux_hours$total, .95) * 1.1     # 2.633891 --> 2.6
+# quantile(thisYear_winter_ux_hours$total, .95)           # 2.6078 
+# 
+# # quantile(lastYear_winter_marg_hours$total, 1.0) # 9.015208 
+# # quantile(thisYear_winter_marg_hours$total, .95) # 7.118
 
 
 ## 90th percentile

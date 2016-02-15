@@ -6,8 +6,8 @@ source("Encored-Data-Analysis/getSNUdata.R")
 last_start = "2014-12-01"
 last_end   = "2015-03-01"
 
-this_start = "2015-12-01"
-this_end   = "2016-01-08"
+this_start = "2016-01-01"
+this_end   = "2016-01-30"
 
 marg_lastSeason_day = getSNUData.feeder.day("marg", last_start, last_end)
  hcc_lastSeason_day = getSNUData.feeder.day( "hcc", last_start, last_end)
