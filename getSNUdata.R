@@ -1,5 +1,5 @@
 #install.packages("rjson")
-source("Encored-Data-Analysis/Encored public functions.R")
+# source("Encored-Data-Analysis/Encored public functions.R")
 
 require("rjson")
 library("scales")
