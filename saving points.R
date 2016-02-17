@@ -169,13 +169,17 @@ plot.daily.points <- function(lab = c("marg", "hcc", "ux"), data, start, end, we
         return(plot_df)
 }
 
-day_start = "2015-10-12"
+# day_start = "2015-10-12"
 # day_start = "2016-02-01"
+day_start = "2016-01-01"
 day_end   = "2016-02-15"
 
-marg_point_table = plot.daily.points("marg", marg_defalut_table_15min, day_start, day_end, week_span=6, set_df = 3, plot_type="weeks", verbose=F)
-hcc_point_table = plot.daily.points("hcc", hcc_defalut_table_15min, day_start, day_end, week_span=6, set_df = 3, plot_type="weeks", verbose=F)
-ux_point_table = plot.daily.points("ux", ux_defalut_table_15min, day_start, day_end, week_span=6, set_df = 3, plot_type="weeks", verbose=F)
+marg_point_table = plot.daily.points("marg", marg_defalut_table_15min, day_start, day_end, 
+                                     week_span=8, set_df = 3, plot_type="days", verbose=F)
+hcc_point_table = plot.daily.points("hcc", hcc_defalut_table_15min, day_start, day_end, 
+                                    week_span=6, set_df = 3, plot_type="weeks", verbose=F)
+ux_point_table = plot.daily.points("ux", ux_defalut_table_15min, day_start, day_end, 
+                                   week_span=6, set_df = 3, plot_type="weeks", verbose=F)
 
 
 

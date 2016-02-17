@@ -58,6 +58,110 @@ save(RS_marg, file ="data/RS_marg.RData")
 save( RS_hcc, file ="data/RS_hcc.RData")
 save(  RS_ux, file ="data/RS_ux.RData")
 
+
+library(data.table)
+
+dt_marg = data.table(RS_marg)
+dt_hcc = data.table(RS_hcc)
+dt_ux = data.table(RS_ux)
+
+###$$$$$$$$$$$$$$$$$
+threshold = 2
+
+dt_marg[, ':='(date = as.Date(joined))]
+
+dt_marg[duration > threshold]
+
+tmp = dt_marg[, .(du_sum = sum(duration)), by=date]
+plot(tmp)
+ggplot(tmp, aes(x=date, y=du_sum, label=du_sum)) +
+        geom_line() +
+        geom_point() +
+        geom_text(vjust = 0, nudge_y = 1) +
+        scale_x_date(date_labels = "%y-%b-%d", breaks = date_breaks("days")) +
+        theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+        ggtitle("MARG RealSense daily duration sum")
+
+
+
+
+
+
+marg <- ggplot(tmp, aes(x=date, y=day_freq_sum, label=day_freq_sum)) +
+        geom_line() +
+        geom_point() +
+        geom_text(vjust = 0, nudge_y = 1) +
+        scale_x_date(date_labels = "%y-%b-%d", breaks = date_breaks("days")) +
+        theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+        ggtitle("MARG RealSense daily freq")
+
+
+dt_hcc[, ':='(date = as.Date(joined))]
+tmp = dt_hcc[, .(day_freq_sum = sum(freq)), by=date]
+hcc <- ggplot(tmp, aes(x=date, y=day_freq_sum, label=day_freq_sum)) +
+        geom_line() +
+        geom_point() +
+        geom_text(vjust = 0, nudge_y = 1) +
+        scale_x_date(date_labels = "%y-%b-%d", breaks = date_breaks("days")) +
+        theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+        ggtitle("HCC RealSense daily freq")
+
+
+dt_ux[, ':='(date = as.Date(joined))]
+tmp = dt_ux[, .(day_freq_sum = sum(freq)), by=date]
+ux <- ggplot(tmp, aes(x=date, y=day_freq_sum, label=day_freq_sum)) +
+        geom_line() +
+        geom_point() +
+        geom_text(vjust = 0, nudge_y = 1) +
+        scale_x_date(date_labels = "%y-%b-%d", breaks = date_breaks("days")) +
+        theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+        ggtitle("UX RealSense daily freq")
+
+grid.arrange(marg, hcc, ux)
+
+###$$$$$$$$$$$$$$$$$$
+
+
+dt_marg[, ':='(date = as.Date(joined))]
+tmp = dt_marg[, .(day_duration_mean = round(mean(duration))), by=date]
+marg <- ggplot(tmp, aes(x=date, y=day_duration_mean, label=day_duration_mean)) +
+        geom_line() +
+        geom_point() +
+        geom_text(vjust = 0, nudge_y = 1) +
+        scale_x_date(date_labels = "%y-%b-%d", breaks = date_breaks("days")) +
+        theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+        ggtitle("MARG RealSense daily duration")
+
+
+dt_hcc[, ':='(date = as.Date(joined))]
+tmp = dt_hcc[, .(day_duration_mean = round(mean(duration))), by=date]
+hcc <- ggplot(tmp, aes(x=date, y=day_duration_mean, label=day_duration_mean)) +
+        geom_line() +
+        geom_point() +
+        geom_text(vjust = 0, nudge_y = 1) +
+        scale_x_date(date_labels = "%y-%b-%d", breaks = date_breaks("days")) +
+        theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+        ggtitle("HCC RealSense daily duration")
+
+
+dt_ux[, ':='(date = as.Date(joined))]
+tmp = dt_ux[, .(day_duration_mean = round(mean(duration))), by=date]
+ux <- ggplot(tmp, aes(x=date, y=day_duration_mean, label=day_duration_mean)) +
+        geom_line() +
+        geom_point() +
+        geom_text(vjust = 0, nudge_y = 1) +
+        scale_x_date(date_labels = "%y-%b-%d", breaks = date_breaks("days")) +
+        theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+        ggtitle("UX RealSense daily duration")
+
+grid.arrange(marg, hcc, ux)
+
+
+##$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+
+        
+
 ##################
 
 

@@ -148,7 +148,6 @@ trace.spline.ref <- function(lab, data, date_from, weekday_, week_long, week_spa
                         week_index = c(week_index, target_week_index)
                         #console.log
                         print(paste(target_week_index, theDate, feeder, fit$y[week_span+1], fit$data$y[week_span+1]))
-                        
                 }
                 ref_df = cbind(ref_df, spline_returns)
                 avg_df = cbind(avg_df, fit_y_data)
