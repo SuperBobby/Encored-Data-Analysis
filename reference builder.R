@@ -20,24 +20,26 @@ get.spline.ref <- function(data, date, weekday_, week_span=6, set_df = 3) {
                   week_index    = rep(1:(round(nrow(dt)/(96*7))), each=96*7, len=nrow(dt)),
                   quarter_index = rep(1:96, len=nrow(dt)))]
         # View(dt)
+        # print(dt)
         
         # yearAgo_ts = target_ts - 365*24*60*60
         
-        #         print((dt[unix_ts == target_ts]$week_index))
-        #         print((dt[unix_ts == yearAgo_ts]$week_index))
+                # print((dt[unix_ts == target_ts]$week_index))
+                # print((dt[unix_ts == yearAgo_ts]$week_index))
         
-        this_week_index = dt[unix_ts == target_ts]$week_index
-        yearAgo_week_index = this_week_index - 52  # A year == 52 weeks
+        target_week_index = dt[unix_ts == target_ts]$week_index
+        print(dt[unix_ts == target_ts])
+        # yearAgo_week_index = this_week_index - 52  # A year == 52 weeks
         
         print(paste("Input date :", target_date))
-        print(paste("This week index :", this_week_index))
-        print(paste("A year ago week index :", yearAgo_week_index))
-        print(paste("Subset span :", (yearAgo_week_index-week_span), "~", (yearAgo_week_index+week_span), "( week span:", week_span, ")"))
+        # print(paste("This week index :", this_week_index))
+        print(paste("A year ago week index :", target_week_index))
+        print(paste("Subset span :", (target_week_index-week_span), "~", (target_week_index+week_span), "( week span:", week_span, ")"))
         
         # yearAgo_week_index = dt[unix_ts == yearAgo_ts]$week_index
         # dt[week_index == yearAgo_week_index]
         
-        subset_dt = dt[week_index >= (yearAgo_week_index-week_span) & week_index <= (yearAgo_week_index+week_span)]
+        subset_dt = dt[week_index >= (target_week_index-week_span) & week_index <= (target_week_index+week_span)]
         
         weekday_mean_table = subset_dt[weekday == weekday_, .(computer = mean(computer),
                                                               light    = mean(light),
@@ -76,8 +78,9 @@ get.spline.ref <- function(data, date, weekday_, week_span=6, set_df = 3) {
         par(mfrow=c(1,1))
         names(result_df) <- c("index",feeders)
         
-        print(paste("ref date:",date))
-        return(toJSON(result_df))
+        # print(paste("ref date:",date))
+        print(toJSON(result_df))
+        return(result_df)
 }
 
 trace.spline.ref <- function(lab, data, date_from, weekday_, week_long, week_span = 6, set_df = 3, with_temp = F, with_cloud = F){
@@ -201,9 +204,9 @@ trace.spline.ref <- function(lab, data, date_from, weekday_, week_long, week_spa
 
 ###########################################
 ## get reference
-target_date = "2016-2-9"
-get.spline.ref(marg_defalut_table_15min, target_date, weekday_=T)
-get.spline.ref(marg_defalut_table_15min, target_date, weekday_=F)
+target_date = "2015-2-23"
+marg_ref_weekday <- get.spline.ref(marg_defalut_table_15min, target_date, weekday_=T)
+marg_ref_weekend <- get.spline.ref(marg_defalut_table_15min, target_date, weekday_=F)
 
 get.spline.ref(hcc_defalut_table_15min, target_date, weekday_=T)
 get.spline.ref(hcc_defalut_table_15min, target_date, weekday_=F)

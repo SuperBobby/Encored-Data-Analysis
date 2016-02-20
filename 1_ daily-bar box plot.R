@@ -18,7 +18,7 @@ bar.box.plot <- function(data, lab, tg_fedr, srt, end) {
         
         revised_data[,"timestamp"] = as.factor(tmst)
         
-        title_text = paste(lab, tg_fedr, srt, "~", end)
+        title_text = paste(toupper(lab), tg_fedr, srt, "~", end)
         
         bar <- ggplot(data= revised_data, aes_string("timestamp", tg_fedr)) +
                 stat_summary(aes(fill = factor(weekday)), fun.y=sum, geom="bar") +
@@ -33,8 +33,9 @@ bar.box.plot <- function(data, lab, tg_fedr, srt, end) {
         grid.arrange(bar, box)
 }
 
-day_start = "2016-1-1"
-day_end = "2016-02-17"
+
+day_start = "2015-12-1"
+day_end = "2016-02-19"
 bar.box.plot(marg_defalut_table_hours, "marg", "total", day_start, day_end)
 bar.box.plot(hcc_defalut_table_hours, "hcc", "total", day_start, day_end)
 bar.box.plot(ux_defalut_table_hours, "ux", "total", day_start, day_end)

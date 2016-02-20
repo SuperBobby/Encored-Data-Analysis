@@ -1,6 +1,6 @@
 ## last Season
-last_season_start = "2014-12-01"
-last_season_end = "2015-03-01"
+last_season_start = "2015-11-01"
+last_season_end = "2016-02-01"
 marg_lastSeason_15min <- reviseSNUData(marg_defalut_table_15min, "marg", last_season_start, last_season_end, verbose = T)
  hcc_lastSeason_15min <- reviseSNUData( hcc_defalut_table_15min, "hcc",  last_season_start, last_season_end, verbose = T)
   ux_lastSeason_15min <- reviseSNUData(  ux_defalut_table_15min, "ux",   last_season_start, last_season_end, verbose = T)
@@ -25,12 +25,13 @@ weekDAY = cbind(weekDAY, new_index_weekDAY)
 weekEND = cbind(weekEND, new_index_weekEND)
 
 weekDAY_aggregated = aggregate(. ~ new_index_weekDAY,  weekDAY[,c(2,3,4,5,6,9)], mean)
-cumsum(weekDAY_aggregated)
+# cumsum(weekDAY_aggregated)
 
 weekEND_aggregated = aggregate(. ~ new_index_weekEND,  weekEND[,c(2,3,4,5,6,9)], mean)
-cumsum(weekEND_aggregated)
+# cumsum(weekEND_aggregated)
 
-
+weekDAY_aggregated$hvac = c(marg_ref_weekday$hvac[1], diff(marg_ref_weekday$hvac))
+weekEND_aggregated$hvac = c(marg_ref_weekend$hvac[1], diff(marg_ref_weekend$hvac))
 
 library(jsonlite)
 toJSON(weekDAY_aggregated)
@@ -52,7 +53,10 @@ weekDAY = cbind(weekDAY, new_index_weekDAY)
 weekEND = cbind(weekEND, new_index_weekEND)
 
 weekDAY_aggregated = aggregate(. ~ new_index_weekDAY,  weekDAY[,c(2,3,4,5,6,9)], mean)
+cumsum(weekDAY_aggregated)
+
 weekEND_aggregated = aggregate(. ~ new_index_weekEND,  weekEND[,c(2,3,4,5,6,9)], mean)
+cumsum(weekEND_aggregated)
 
 library(jsonlite)
 toJSON(weekDAY_aggregated)
@@ -75,7 +79,10 @@ weekDAY = cbind(weekDAY, new_index_weekDAY)
 weekEND = cbind(weekEND, new_index_weekEND)
 
 weekDAY_aggregated = aggregate(. ~ new_index_weekDAY,  weekDAY[,c(2,3,4,5,6,9)], mean)
+cumsum(weekDAY_aggregated)
+
 weekEND_aggregated = aggregate(. ~ new_index_weekEND,  weekEND[,c(2,3,4,5,6,9)], mean)
+cumsum(weekEND_aggregated)
 
 toJSON(weekDAY_aggregated)
 toJSON(weekEND_aggregated)

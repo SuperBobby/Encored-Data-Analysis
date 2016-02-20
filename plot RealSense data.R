@@ -6,6 +6,7 @@ library(scales)
 library(reshape2)
 library(gridExtra)
 library(data.table)
+library(timeDate)
 
 make.RealSense.Table = function(data){
         # convert data format
@@ -14,7 +15,16 @@ make.RealSense.Table = function(data){
         duration = as.numeric(data$leaved - data$joined)
         
         basic_table = data.frame(joined, duration)
-        basic_table = basic_table[order(joined, leaved),]
+
+#         basic_table = basic_table[basic_table$duration > threshold, ]
+#         basic_table = basic_table[basic_table$duration < threshold2, ]
+        # print(nrow(basic_table))
+        print(paste("range:", range(duration)))
+        
+        # after = nrow(basic_table)
+        
+        # print(paste((after/before)*100), "%")
+        # basic_table = basic_table[order(joined, leaved),]
         
         # set every timestamp second to '0'
         second(basic_table$joined) = 0
@@ -43,9 +53,9 @@ time2string <- function(input){
 
 #####################
 # raw data loading
-RS_adsl_raw = read.csv("realsense/adsl.csv")
+# RS_adsl_raw = read.csv("realsense/adsl.csv")
 RS_marg_raw = read.csv("realsense/marg.csv")
-RS_ux_raw = read.csv("realsense/hcc.csv")
+RS_hcc_raw = read.csv("realsense/hcc.csv")
 RS_ux_raw = read.csv("realsense/ux.csv")
 
 RS_marg_table = make.RealSense.Table(RS_marg_raw)
@@ -127,7 +137,7 @@ plot.RealSense.data <- function(lab, data, ylim, date_cut, type) {
                 # thresholding
                 # sub_dt[which(sub_dt$day_duration_sum > max_threshold), "day_duration_sum"] = NA                
                 
-                # print(sub_dt)
+                print(sub_dt)
                 
                 plotting <- ggplot(sub_dt, aes(x=date, y=day_duration_sum, label=day_duration_sum)) +
                         geom_line() +
@@ -152,9 +162,9 @@ date_cut = "2015-10-30"
 # date_cut = "2015-12-31"
 type = "duration_sum" # freq, duration_mean, duration_sum
 
-marg <- plot.RealSense.data("MARG", RS_marg_table, ylim = 500, "2015-10-07", "duration_sum")
-hcc <- plot.RealSense.data("HCC", RS_hcc_table, ylim = 500, "2015-10-28", "duration_sum")
-ux <- plot.RealSense.data("UX", RS_ux_table, ylim = 500, "2015-09-30", "duration_sum")
+marg <- plot.RealSense.data("MARG", RS_marg_table, ylim = 600, "2015-10-07", "duration_sum")
+hcc <- plot.RealSense.data("HCC", RS_hcc_table, ylim = 600, "2015-10-28", "duration_sum")
+ux <- plot.RealSense.data("UX", RS_ux_table, ylim = 600, "2015-09-30", "duration_sum")
 
 grid.arrange(marg, hcc, ux)
 

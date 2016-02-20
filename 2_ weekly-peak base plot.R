@@ -172,16 +172,14 @@ avg.peak.base.plot = function(data, target, label, start_date, weeks = 4, averag
 ### analysis  ####
 ##################
 from_date = "2015-11-02"
-plot_weeks = 15
+plot_weeks = 16
 
-# from_date = "2014-09-08"
-# plot_weeks = 75
+from_date = "2014-09-08"
+plot_weeks = 75
 
 avg.peak.base.plot(marg_defalut_table_15min, target="total", label = "MARG", from_date, weeks = plot_weeks)
 avg.peak.base.plot( hcc_defalut_table_15min, target="total", label = "HCC",  from_date, weeks = plot_weeks)
 avg.peak.base.plot(  ux_defalut_table_15min, target="total", label = "UX",   from_date, weeks = plot_weeks)
-
-
 
 
 avg.peak.base.plot(marg_defalut_table_15min, target="computer", label = "MARG", from_date, weeks = plot_weeks)
@@ -190,4 +188,10 @@ avg.peak.base.plot(marg_defalut_table_15min, target="hvac",     label = "MARG", 
 
 
 
+avg.peak.base.plot(hcc_defalut_table_15min, target="computer", label = "HCC", from_date, weeks = plot_weeks)
+avg.peak.base.plot(hcc_defalut_table_15min, target="light",    label = "HCC", from_date, weeks = plot_weeks)
+
+
+avg.peak.base.plot(ux_defalut_table_15min, target="computer", label = "UX", from_date, weeks = plot_weeks)
+avg.peak.base.plot(ux_defalut_table_15min, target="light",    label = "UX", from_date, weeks = plot_weeks)
 
