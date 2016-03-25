@@ -1,45 +1,60 @@
+source("Encored-Data-Analysis/getSNUdata.R")
+
 # data table 
-lastYear_winter_marg_hours <- reviseSNUData(marg_defalut_table_hours, "marg", "2014-12-01", "2015-03-01", verbose = T)
-thisYear_winter_marg_hours <- reviseSNUData(marg_defalut_table_hours, "marg", "2015-12-01", "2016-01-09", verbose = T)
+lastYear_season_marg_hours <- reviseSNUData(marg_defalut_table_hours, "marg", "2015-12-01", "2016-02-27", verbose = T)
+# thisYear_season_marg_hours <- reviseSNUData(marg_defalut_table_hours, "marg", "2015-12-01", "2016-01-09", verbose = T)
 
-lastYear_winter_hcc_hours <- reviseSNUData(hcc_defalut_table_hours, "hcc", "2014-12-01", "2015-03-01", verbose = T)
-thisYear_winter_hcc_hours <- reviseSNUData(hcc_defalut_table_hours, "hcc", "2015-12-01", "2016-01-09", verbose = T)
+lastYear_season_hcc_hours <- reviseSNUData(hcc_defalut_table_hours, "hcc", "2015-12-01", "2016-02-27", verbose = T)
+# thisYear_season_hcc_hours <- reviseSNUData(hcc_defalut_table_hours, "hcc", "2015-12-01", "2016-01-09", verbose = T)
 
-lastYear_winter_ux_hours <- reviseSNUData(ux_defalut_table_hours, "ux", "2014-12-01", "2015-03-01", verbose = T)
-thisYear_winter_ux_hours <- reviseSNUData(ux_defalut_table_hours, "ux", "2015-12-01", "2016-01-09", verbose = T)
+lastYear_season_ux_hours <- reviseSNUData(ux_defalut_table_hours, "ux", "2015-12-01", "2016-02-27", verbose = T)
+# thisYear_season_ux_hours <- reviseSNUData(ux_defalut_table_hours, "ux", "2015-12-01", "2016-01-09", verbose = T)
 
 
 # ## 95th percentile
-# quantile(lastYear_winter_marg_hours$total, .95) * 1.1   # 9.916728 --> 10.0
-# quantile(thisYear_winter_marg_hours$total, .95)         # 7.118
+# quantile(lastYear_season_marg_hours$total, .95) * 1.1   # 9.916728 --> 10.0
+# quantile(thisYear_season_marg_hours$total, .95)         # 7.118
 # 
-# quantile(lastYear_winter_hcc_hours$total, .95) * 1.1    # 5.452001 --> 5.5
-# quantile(thisYear_winter_hcc_hours$total, .95)          # 4.41065
+# quantile(lastYear_season_hcc_hours$total, .95) * 1.1    # 5.452001 --> 5.5
+# quantile(thisYear_season_hcc_hours$total, .95)          # 4.41065
 # 
-# quantile(lastYear_winter_ux_hours$total, .95) * 1.1     # 2.633891 --> 2.6
-# quantile(thisYear_winter_ux_hours$total, .95)           # 2.6078 
+# quantile(lastYear_season_ux_hours$total, .95) * 1.1     # 2.633891 --> 2.6
+# quantile(thisYear_season_ux_hours$total, .95)           # 2.6078 
 # 
-# # quantile(lastYear_winter_marg_hours$total, 1.0) # 9.015208 
-# # quantile(thisYear_winter_marg_hours$total, .95) # 7.118
+# # quantile(lastYear_season_marg_hours$total, 1.0) # 9.015208 
+# # quantile(thisYear_season_marg_hours$total, .95) # 7.118
 
 
-## 90th percentile
-quantile(lastYear_winter_marg_hours$total, .90) * 1.1   # 6.845204 --> 7
-quantile(thisYear_winter_marg_hours$total, .90)         # 6.172
+## 90th percentiles : Winter (2014.12 ~ 2015.2)
+quantile(lastYear_season_marg_hours$total, .90) * 1.1   # 6.845204 --> 6.8
+quantile(thisYear_season_marg_hours$total, .90)         # 6.172
 
-quantile(lastYear_winter_hcc_hours$total, .90) * 1.1    # 4.955059 --> 5
-quantile(thisYear_winter_hcc_hours$total, .90)          # 3.9055
+quantile(lastYear_season_hcc_hours$total, .90) * 1.1    # 4.955059 --> 5.0
+quantile(thisYear_season_hcc_hours$total, .90)          # 3.9055
 
-quantile(lastYear_winter_ux_hours$total, .90) * 1.1     # 2.358736 --> 2.5
-quantile(thisYear_winter_ux_hours$total, .90)           #  2.4435
+quantile(lastYear_season_ux_hours$total, .90) * 1.1     # 2.358736 --> 2.4
+quantile(thisYear_season_ux_hours$total, .90)           #  2.4435
+
+
+## 90th percentiles : Spring (2015.3 ~ 2015.5)
+quantile(lastYear_season_marg_hours$total, .90) * 1.1   # 4.195287 --> 4.2
+quantile(lastYear_season_hcc_hours$total, .90) * 1.1    # 2.9051 --> 2.9
+quantile(lastYear_season_ux_hours$total, .90) * 1.1     # 2.553993 --> 2.6
+
+
+## 90th percentiles : Last 3 months (2015.12 ~ 2016.2)
+quantile(lastYear_season_marg_hours$total, .90) * 1.1   # 5.94913 --> 5.9
+quantile(lastYear_season_hcc_hours$total, .90) * 1.1    # 3.02665 --> 3.0
+quantile(lastYear_season_ux_hours$total, .90) * 1.1     # 2.66365 --> 2.7
+
 
 
 
 ### LastYear vs ThisYear
 
 ## MARG
-lastYear_winter_marg_15min <- reviseSNUData(marg_defalut_table_15min, "marg", "2014-12-01", "2015-03-01", verbose = T)
-thisYear_winter_marg_15min <- reviseSNUData(marg_defalut_table_15min, "marg", "2015-12-01", "2016-01-06", verbose = T)
+lastYear_season_marg_15min <- reviseSNUData(marg_defalut_table_15min, "marg", "2014-12-01", "2015-03-01", verbose = T)
+thisYear_season_marg_15min <- reviseSNUData(marg_defalut_table_15min, "marg", "2015-12-01", "2016-01-06", verbose = T)
 
 # weekDAY vs weekEND
 weekDAY.vs.weekEND <- function(data) {
@@ -51,26 +66,26 @@ weekDAY.vs.weekEND <- function(data) {
         print(paste("weekEND", mean(weekEND$total)))
 }
 
-weekDAY.vs.weekEND(lastYear_winter_marg_15min)
+weekDAY.vs.weekEND(lastYear_season_marg_15min)
 [1] "weekDAY 0.822951928044872"
 [1] "weekEND 0.7218912975"
-weekDAY.vs.weekEND(thisYear_winter_marg_15min)
+weekDAY.vs.weekEND(thisYear_season_marg_15min)
 [1] "weekDAY 0.958700806891026"
 [1] "weekEND 0.772461458333333"
 
 
-weekDAY.vs.weekEND(lastYear_winter_hcc_15min)
+weekDAY.vs.weekEND(lastYear_season_hcc_15min)
 [1] "weekDAY 0.631999643589744"
 [1] "weekEND 0.503465277916667"
-weekDAY.vs.weekEND(thisYear_winter_hcc_15min)
+weekDAY.vs.weekEND(thisYear_season_hcc_15min)
 [1] "weekDAY 0.656088963333333"
 [1] "weekEND 0.533945833333333"
 
 
-weekDAY.vs.weekEND(lastYear_winter_ux_15min)
+weekDAY.vs.weekEND(lastYear_season_ux_15min)
 [1] "weekDAY 0.299478010416667"
 [1] "weekEND 0.20316178875"
-weekDAY.vs.weekEND(thisYear_winter_ux_15min)
+weekDAY.vs.weekEND(thisYear_season_ux_15min)
 [1] "weekDAY 0.3320739225"
 [1] "weekEND 0.252071875"
 
@@ -95,7 +110,7 @@ eachDAY.of.week <- function(data){
         print(mean(Sun$total))
 }
 
-eachDAY.of.week(lastYear_winter_marg_15min)
+eachDAY.of.week(lastYear_season_marg_15min)
 [1] 0.8926314
 [1] 0.8098206
 [1] 0.7541812
@@ -104,7 +119,7 @@ eachDAY.of.week(lastYear_winter_marg_15min)
 ___________________
 [1] 0.6609803
 [1] 0.7878782
-eachDAY.of.week(thisYear_winter_marg_15min)
+eachDAY.of.week(thisYear_season_marg_15min)
 [1] 0.9645625
 [1] 1.016722
 [1] 0.9232234
@@ -115,7 +130,7 @@ ___________________
 [1] 0.7905062
 
 
-eachDAY.of.week(lastYear_winter_hcc_15min)
+eachDAY.of.week(lastYear_season_hcc_15min)
 [1] 0.6754294
 [1] 0.6738894
 [1] 0.6429694
@@ -124,7 +139,7 @@ eachDAY.of.week(lastYear_winter_hcc_15min)
 ___________________
 [1] 0.4979144
 [1] 0.5094787
-eachDAY.of.week(thisYear_winter_hcc_15min)
+eachDAY.of.week(thisYear_season_hcc_15min)
 [1] 0.6658479
 [1] 0.6722521
 [1] 0.7400781
@@ -135,7 +150,7 @@ ___________________
 [1] 0.5973854
 
 
-eachDAY.of.week(lastYear_winter_ux_15min)
+eachDAY.of.week(lastYear_season_ux_15min)
 [1] 0.3448405
 [1] 0.32114
 [1] 0.2965545
@@ -144,7 +159,7 @@ eachDAY.of.week(lastYear_winter_ux_15min)
 ___________________
 [1] 0.200995
 [1] 0.2055092
-eachDAY.of.week(thisYear_winter_ux_15min)
+eachDAY.of.week(thisYear_season_ux_15min)
 [1] 0.4190125
 [1] 0.3420646
 [1] 0.3720259

@@ -30,15 +30,30 @@ bar.box.plot <- function(data, lab, tg_fedr, srt, end) {
                 geom_boxplot(aes(fill = factor(weekday))) +
                 theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
+        x11()
         grid.arrange(bar, box)
 }
 
 
-day_start = "2015-12-1"
-day_end = "2016-02-19"
+day_start = as.POSIXct("2016-1-1")
+day_end = as.POSIXct("2016-03-15")
+timetravel = (365 * 24 * 60 * 60) 
+aDay = 24 * 60 * 60
+
 bar.box.plot(marg_defalut_table_hours, "marg", "total", day_start, day_end)
 bar.box.plot(hcc_defalut_table_hours, "hcc", "total", day_start, day_end)
 bar.box.plot(ux_defalut_table_hours, "ux", "total", day_start, day_end)
+
+
+bar.box.plot(hcc_defalut_table_hours, "hcc", "computer", day_start, day_end)
+
+
+bar.box.plot(marg_defalut_table_hours, "marg", "total", day_start-timetravel, day_end-timetravel)
+bar.box.plot(hcc_defalut_table_hours, "hcc", "total", day_start-timetravel, day_end-timetravel+aDay*28)
+bar.box.plot(ux_defalut_table_hours, "ux", "total", day_start-timetravel, day_end-timetravel+aDay*28)
+
+
+
 
 
 bar.box.plot(marg_defalut_table_hours, "marg", "computer", day_start, day_end)

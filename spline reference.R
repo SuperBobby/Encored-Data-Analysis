@@ -204,9 +204,7 @@ trace.spline.ref <- function(lab, data, date_from, weekday_, week_long, week_spa
 
 ###########################################
 ## get reference
-target_date = "2015-2-23"
-marg_ref_weekday <- get.spline.ref(marg_defalut_table_15min, target_date, weekday_=T)
-marg_ref_weekend <- get.spline.ref(marg_defalut_table_15min, target_date, weekday_=F)
+target_date = "2015-3-2"
 
 get.spline.ref(hcc_defalut_table_15min, target_date, weekday_=T)
 get.spline.ref(hcc_defalut_table_15min, target_date, weekday_=F)
@@ -237,27 +235,66 @@ trace.spline.ref("UX", ux_defalut_table_15min, from,
 
 
 
+##########################################
+## Last 12 weeks
 
-{# 
-# #### sample plotting ####
 # 
-# tmp = matrix(weekday_mean_table$hvac, nrow=96)
-# tmp_df = data.frame(index=1:13, value=colSums(tmp))
+# ## MARG
 # 
-# fit = smooth.spline(x=tmp_df$index, y=tmp_df$value, df=set_df)
-# fit2 = smooth.spline(x=tmp_df$index, y=tmp_df$value, cv=T)
+# data = marg_lastSeason_15min
 # 
-# fit$y[7]
-# fit2$y[7]
-# fit$df
-# fit2$df
+# marg_defalut_table_15min
+# hcc_defalut_table_15min
+# ux_defalut_table_15min
 # 
-# plot(tmp_df, cex=.5, col="gray")
-# title("Smoothing Spline of MARG (HVAC)")
-# lines(fit, col="red", lwd=2)
-# lines(fit2, col="blue", lwd=2)
-# legend("topright", legend = c(paste("df", fit$df), paste("df",fit2$df,"(CV)")), col=c("red", "blue"), lty=1, lwd=2, cex=.8)
+# last_season_start = "2015-12-01"
+# last_season_end = "2016-03-01"
 # 
-# ################################################################
-}
-
+# hvac_ref_date = "2015-3-23"
+# 
+# 
+# get.last.12weeks.ref <- function(last_season_start, last_season_end, hvac_ref_date,
+#                                  marg_defalut_table_15min,
+#                                  hcc_defalut_table_15min,
+#                                  ux_defalut_table_15min) {
+#                 
+#         marg_lastSeason_15min <- reviseSNUData(marg_defalut_table_15min, "marg", last_season_start, last_season_end, verbose = T)
+#         hcc_lastSeason_15min <- reviseSNUData( hcc_defalut_table_15min, "hcc",  last_season_start, last_season_end, verbose = T)
+#         ux_lastSeason_15min <- reviseSNUData(  ux_defalut_table_15min, "ux",   last_season_start, last_season_end, verbose = T)
+#         
+#         print(head(data))
+#         print(tail(data))
+#         
+#         weekDAY = subset(data, subset=data$weekday == T)
+#         weekEND = subset(data, subset=data$weekday == F)
+#         
+#         new_index_weekDAY = rep(1:96, nrow(weekDAY)/96)
+#         new_index_weekEND = rep(1:96, nrow(weekEND)/96)
+#         
+#         weekDAY = cbind(weekDAY, new_index_weekDAY)
+#         weekEND = cbind(weekEND, new_index_weekEND)
+#         
+#         weekDAY_aggregated = aggregate(. ~ new_index_weekDAY,  weekDAY[,c(2,3,4,5,6,9)], mean)
+#         weekDAY_aggregated = cumsum(weekDAY_aggregated)
+#         
+#         weekEND_aggregated = aggregate(. ~ new_index_weekEND,  weekEND[,c(2,3,4,5,6,9)], mean)
+#         weekEND_aggregated = cumsum(weekEND_aggregated)
+#         
+#         marg_ref_weekday <- get.spline.ref(marg_defalut_table_15min, hvac_ref_date, weekday_=T)
+#         marg_ref_weekend <- get.spline.ref(marg_defalut_table_15min, hvac_ref_date, weekday_=F)
+#         
+#         weekDAY_aggregated$hvac = marg_ref_weekday$hvac
+#         weekEND_aggregated$hvac = marg_ref_weekend$hvac
+#         
+#         weekDAY_aggregated$total = rowSums(weekDAY_aggregated[,2:5])
+#         weekEND_aggregated$total = rowSums(weekEND_aggregated[,2:5])
+#         
+#         weekDAY_aggregated
+#         weekEND_aggregated
+#         
+#         library(jsonlite)
+#         toJSON(weekDAY_aggregated)
+#         toJSON(weekEND_aggregated)
+# }
+# 
+# 

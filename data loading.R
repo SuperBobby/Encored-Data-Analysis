@@ -18,7 +18,7 @@ marg_defalut_table_hours <- getSNUData.feeder("marg", "hours", start, end, verbo
 ##################################################
 source("Encored-Data-Analysis/getSNUdata.R")
 update_start = "2014-09-01"
-update_end = "2016-02-18"
+update_end = "2016-03-20"
 
 marg_defalut_table_15min <- reviseSNUData(marg_defalut_table_15min, "marg", update_start, update_end, verbose = T)
  hcc_defalut_table_15min <- reviseSNUData( hcc_defalut_table_15min, "hcc",  update_start, update_end, verbose = T)
@@ -47,7 +47,6 @@ write.csv(marg_defalut_table_hours, file ="data/marg_hours.csv")
 write.csv( hcc_defalut_table_hours, file ="data/hcc_hours.csv")
 write.csv(  ux_defalut_table_hours, file ="data/ux_hours.csv")
 
-
 load("data/marg_15min.RData")
 load("data/hcc_15min.RData")
 load("data/ux_15min.RData")
@@ -72,15 +71,7 @@ load("data/ux_hours.RData")
 ## to-do...
 
 
-##################################################
-## Day table
-##################################################
-day_start = "2014-09-01"
-day_end   = "2016-01-09"
 
-marg_table_day = getSNUData.feeder.day("marg", day_start, day_end)
-hcc_table_day = getSNUData.feeder.day( "hcc", day_start, day_end)
-ux_table_day = getSNUData.feeder.day(  "ux", day_start, day_end)
 
 
 
