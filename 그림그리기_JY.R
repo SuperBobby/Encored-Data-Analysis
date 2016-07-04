@@ -47,7 +47,6 @@ marg_dt = data.table(marg_dt, aggDay)
 hcc_dt = data.table(hcc_dt, aggDay)
 ux_dt = data.table(ux_dt, aggDay)
 
-
 ### update : day, weekday depending on the aggDay
 marg_dt[, ':='(day = weekdays(aggDay, abbreviate = T), weekday = isWeekday(aggDay))]
 hcc_dt[, ':='(day = weekdays(aggDay, abbreviate = T), weekday = isWeekday(aggDay))]
@@ -121,6 +120,7 @@ hist(ux_dt[light>0.01]$light, 100)   # abnormal : over 0.5
 hcc_dt[light > 0.5, ':='(light = NA)]
 ux_dt[light > 0.5, ':='(light = NA)]
 
+light_min <- 0.1
 
 ### --------------------------- ###
 ### Build tables and functions for extraction & aggregation
@@ -136,6 +136,18 @@ get.four.stats <- function(usage, type){
         
         result=c(peak, base, avg, med)
         return(result[type])
+}
+
+filter.fault.partial.lightOn <- function(input){
+  light = na.locf(input)
+  
+  for(i in 2:(length(light)-1)){
+    
+    if(sum(light[(i-1):(i+1)]) == 1){
+      light[i] = 0
+    }
+  }
+  return(light)
 }
 
 
