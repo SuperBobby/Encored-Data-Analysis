@@ -131,14 +131,17 @@ hcc_Freq[freq > 300, ':='(freq = 300)]
 ux_Freq[freq > 300, ':='(freq = 300)]
 
 
-X.all <- data.table(unique(marg_dt$aggDay))
-marg_SumOfDuration = merge(X.all, marg_SumOfDuration, all.x=TRUE, by.x="x", by.y="date")
-hcc_SumOfDuration = merge(X.all, hcc_SumOfDuration, all.x=TRUE, by.x="x", by.y="date")
-ux_SumOfDuration = merge(X.all, ux_SumOfDuration, all.x=TRUE, by.x="x", by.y="date")
+X.all <- data.frame(unique(marg_dt$aggDay))
+colnames(X.all) <- c("date")
+marg_SumOfDuration = merge(X.all, marg_SumOfDuration, all.x=TRUE, by.x="date", by.y="date")
+hcc_SumOfDuration = merge(X.all, hcc_SumOfDuration, all.x=TRUE, by.x="date", by.y="date")
+ux_SumOfDuration = merge(X.all, ux_SumOfDuration, all.x=TRUE, by.x="date", by.y="date")
 
-marg_Freq = merge(X.all, marg_Freq, all.x=TRUE, by.x="x", by.y="date")
-hcc_Freq = merge(X.all, hcc_Freq, all.x=TRUE, by.x="x", by.y="date")
-ux_Freq = merge(X.all, ux_Freq, all.x=TRUE, by.x="x", by.y="date")
+marg_Freq = merge(X.all, marg_Freq, all.x=TRUE, by.x="date", by.y="date")
+hcc_Freq = merge(X.all, hcc_Freq, all.x=TRUE, by.x="date", by.y="date")
+ux_Freq = merge(X.all, ux_Freq, all.x=TRUE, by.x="date", by.y="date")
+
+# marg_Freq[is.na(marg_Freq)] <- 0
 
 ## Plotting 
 ## 1. sum of duration 
@@ -182,6 +185,7 @@ for(i in 1:3){
                 geom_vline(aes(xintercept = as.numeric(as.Date("2016-02-01"))),color="red") +
                 geom_vline(aes(xintercept = as.numeric(as.Date("2016-05-16"))),color="red") +
                 geom_vline(aes(xintercept = as.numeric(as.Date("2016-06-13"))),color="red") +    
+                ylim(0,300) + 
                 ggtitle(plot2_name)
 
         print(p1)
