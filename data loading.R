@@ -4,7 +4,7 @@ source("Encored-Data-Analysis/getSNUdata.R")
 ## Default data tables (15min & hours)
 ###########################################
 start = "2014-09-01"
-end = "2016-01-15"
+end = "2016-04-11"
 marg_defalut_table_15min <- getSNUData.feeder("marg", "quarters", start, end, verbose = T)
  hcc_defalut_table_15min <- getSNUData.feeder("hcc",  "quarters", start, end, verbose = T)
   ux_defalut_table_15min <- getSNUData.feeder("ux",   "quarters", start, end, verbose = T)
@@ -18,7 +18,7 @@ marg_defalut_table_hours <- getSNUData.feeder("marg", "hours", start, end, verbo
 ##################################################
 source("Encored-Data-Analysis/getSNUdata.R")
 update_start = "2014-09-01"
-update_end = "2016-03-20"
+update_end = "2016-07-01"
 
 marg_defalut_table_15min <- reviseSNUData(marg_defalut_table_15min, "marg", update_start, update_end, verbose = T)
  hcc_defalut_table_15min <- reviseSNUData( hcc_defalut_table_15min, "hcc",  update_start, update_end, verbose = T)

@@ -248,10 +248,12 @@ getSNUData.feeder.day <- function(lab = c("marg", "hcc", "ux"), start, cut, verb
                 query_timestamp = as.POSIXct(loop_timestamp, format="%Y-%m-%d", origin='1970-01-01', tz="ROK")
                 query = paste("http://localhost:3000/api/labs/", lab, "/energy/daily.json?day_from=", query_timestamp, sep="")
                 
-                #print(query)
+                # print(query)
                 
                 rd = readLines(query, warn="F")
                 dat <- fromJSON(rd)
+                
+                # print(dat)
                 
                 if(length(dat)==0){
                         com   = 0
@@ -272,7 +274,6 @@ getSNUData.feeder.day <- function(lab = c("marg", "hcc", "ux"), start, cut, verb
                                         etc = etc + dat[[1]]$feeders[[i]]$value
                                 } else {
                                         print("The feeder data is not classfied appropriatly")
-                                        return()
                                 }
                         }        
                         total  = dat[[1]]$sum
@@ -298,6 +299,9 @@ getSNUData.feeder.day <- function(lab = c("marg", "hcc", "ux"), start, cut, verb
                                     ":", total, "kW/h"))
                 }
                 
+                
+                # print(loop_timestamp)
+                
                 loop_timestamp = loop_timestamp + timestamp_gap 
                 
         }
@@ -320,7 +324,6 @@ getSNUData.feeder.day <- function(lab = c("marg", "hcc", "ux"), start, cut, verb
         row.names(return_table) = NULL
         return(return_table)
 }
-
 
 cutTail <- function(data, n){
         len = nrow(data)

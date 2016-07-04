@@ -7,7 +7,7 @@ library(data.table)
 library(ggplot2)
 
 day_start = "2014-09-01"
-day_end   = "2016-03-01"
+day_end   = "2016-06-04"
 
 marg_table_day = getSNUData.feeder.day("marg", day_start, day_end)
 hcc_table_day = getSNUData.feeder.day( "hcc", day_start, day_end)
@@ -80,8 +80,6 @@ plot.Monthly <- function(table_day, lab){
 plot.Monthly(marg_table_day, "marg")
 plot.Monthly(hcc_table_day, "hcc")
 plot.Monthly(ux_table_day, "ux")
-
-
 
 
 ux_tmp = getSNUData.feeder.day(  "ux", "2016-01-01", "2016-02-29")
