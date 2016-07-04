@@ -8,7 +8,7 @@ library(zoo)
 ## -------------------- ##
 ### data loading 
 source("Encored-Data-Analysis/getSNUdata.R")
-update_start = "2014-09-01"
+update_start = "2014-10-01"
 update_end = "2016-7-2"
 
 marg_defalut_table_15min = reviseSNUData(marg_defalut_table_15min, "marg", update_start, update_end, verbose = T)
@@ -139,17 +139,16 @@ get.four.stats <- function(usage, type){
 }
 
 filter.fault.partial.lightOn <- function(input){
-  light = na.locf(input)
-  
-  for(i in 2:(length(light)-1)){
-    
-    if(sum(light[(i-1):(i+1)]) == 1){
-      light[i] = 0
-    }
-  }
-  return(light)
+        light = na.locf(input)
+        
+        for(i in 2:(length(light)-1)){
+                
+                if(sum(light[(i-1):(i+1)]) == 1){
+                        light[i] = 0
+                }
+        }
+        return(light)
 }
-
 
 # 1. lab
 lab_names = c("MARG", "HCC", "UX")
@@ -163,7 +162,6 @@ day_selections = c("allDay", "weekDay", "weekEnd")
 
 # 4. feeders
 feeders = c("total", "computer", "light", "hvac")
-
 
 for(lab in 1:3){ 
         # lab_dt & name selection 
@@ -190,79 +188,46 @@ for(lab in 1:3){
                                 if(day_selection == "allDay"){
                                         
                                         return_dt = lab_dt[, .(peak = get.four.stats(get(feeder), 1),
-                                                                base = get.four.stats(get(feeder), 2),
-                                                                avg  = get.four.stats(get(feeder), 3),
-                                                                med  = get.four.stats(get(feeder), 4)), by=get(agg_Unit)]
-                                        
-                                        light_dt = lab_dt[, .(timestamp = timestamp,
-                                                               aggDay = aggDay,
-                                                               aggWeek = aggWeek,
-                                                               light = na.locf(light),
-                                                               lightON = ifelse(na.locf(light) > light_min, 1, 0),
-                                                               peak_50 = filter.fault.partial.lightOn(ifelse((na.locf(light) < light_peak * 0.5) & (na.locf(light) > light_min), 1, 0)),
-                                                               peak_60 = filter.fault.partial.lightOn(ifelse((na.locf(light) < light_peak * 0.6) & (na.locf(light) > light_min), 1, 0)),
-                                                               peak_70 = filter.fault.partial.lightOn(ifelse((na.locf(light) < light_peak * 0.7) & (na.locf(light) > light_min), 1, 0)),
-                                                               peak_80 = filter.fault.partial.lightOn(ifelse((na.locf(light) < light_peak * 0.8) & (na.locf(light) > light_min), 1, 0)))]
-                                        
-                                        partial_light = light_dt[, .(lightON = sum(lightON),
-                                                                     threshold50 = sum(peak_50)/sum(lightON),
-                                                                     threshold60 = sum(peak_60)/sum(lightON),
-                                                                     threshold70 = sum(peak_70)/sum(lightON),
-                                                                     threshold80 = sum(peak_80)/sum(lightON)), by=get(agg_Unit)]
-                                        
-                                        return_dt = merge(return_dt, partial_light, by="get")
+                                                               base = get.four.stats(get(feeder), 2),
+                                                               avg  = get.four.stats(get(feeder), 3),
+                                                               med  = get.four.stats(get(feeder), 4)), by=get(agg_Unit)]
                                         
                                 } else if(day_selection == "weekDay") {
                                         
                                         return_dt = lab_dt[weekday == T, .(peak = get.four.stats(get(feeder), 1),
-                                                                            base = get.four.stats(get(feeder), 2),
-                                                                            avg  = get.four.stats(get(feeder), 3),
-                                                                            med  = get.four.stats(get(feeder), 4)), by=get(agg_Unit)]
-                                        
-                                        light_dt = lab_dt[, .(timestamp = timestamp,
-                                                              aggDay = aggDay,
-                                                              aggWeek = aggWeek,
-                                                              light = na.locf(light),
-                                                              lightON = ifelse(na.locf(light) > light_min, 1, 0),
-                                                              peak_50 = filter.fault.partial.lightOn(ifelse((na.locf(light) < light_peak * 0.5) & (na.locf(light) > light_min), 1, 0)),
-                                                              peak_60 = filter.fault.partial.lightOn(ifelse((na.locf(light) < light_peak * 0.6) & (na.locf(light) > light_min), 1, 0)),
-                                                              peak_70 = filter.fault.partial.lightOn(ifelse((na.locf(light) < light_peak * 0.7) & (na.locf(light) > light_min), 1, 0)),
-                                                              peak_80 = filter.fault.partial.lightOn(ifelse((na.locf(light) < light_peak * 0.8) & (na.locf(light) > light_min), 1, 0)))]
-                                        
-                                        partial_light = light_dt[, .(lightON = sum(lightON),
-                                                                     threshold50 = sum(peak_50)/sum(lightON),
-                                                                     threshold60 = sum(peak_60)/sum(lightON),
-                                                                     threshold70 = sum(peak_70)/sum(lightON),
-                                                                     threshold80 = sum(peak_80)/sum(lightON)), by=get(agg_Unit)]
-
-                                        return_dt = merge(return_dt, partial_light, by="get")
-                                        
+                                                                           base = get.four.stats(get(feeder), 2),
+                                                                           avg  = get.four.stats(get(feeder), 3),
+                                                                           med  = get.four.stats(get(feeder), 4)), by=get(agg_Unit)]
                                         
                                 } else if(day_selection == "weekEnd") {
                                         
                                         return_dt = lab_dt[weekday == F, .(peak = get.four.stats(get(feeder), 1),
-                                                                            base = get.four.stats(get(feeder), 2),
-                                                                            avg  = get.four.stats(get(feeder), 3),
-                                                                            med  = get.four.stats(get(feeder), 4)), by=get(agg_Unit)]
-                                        
-                                        light_dt = lab_dt[, .(timestamp = timestamp,
-                                                              aggDay = aggDay,
-                                                              aggWeek = aggWeek,
-                                                              light = na.locf(light),
-                                                              lightON = ifelse(na.locf(light) > light_min, 1, 0),
-                                                              peak_50 = filter.fault.partial.lightOn(ifelse((na.locf(light) < light_peak * 0.5) & (na.locf(light) > light_min), 1, 0)),
-                                                              peak_60 = filter.fault.partial.lightOn(ifelse((na.locf(light) < light_peak * 0.6) & (na.locf(light) > light_min), 1, 0)),
-                                                              peak_70 = filter.fault.partial.lightOn(ifelse((na.locf(light) < light_peak * 0.7) & (na.locf(light) > light_min), 1, 0)),
-                                                              peak_80 = filter.fault.partial.lightOn(ifelse((na.locf(light) < light_peak * 0.8) & (na.locf(light) > light_min), 1, 0)))]
-                                        
-                                        partial_light = light_dt[, .(lightON = sum(lightON),
-                                                                     threshold50 = sum(peak_50)/sum(lightON),
-                                                                     threshold60 = sum(peak_60)/sum(lightON),
-                                                                     threshold70 = sum(peak_70)/sum(lightON),
-                                                                     threshold80 = sum(peak_80)/sum(lightON)), by=get(agg_Unit)]
-                                
-                                        return_dt = merge(return_dt, partial_light, by="get")
+                                                                           base = get.four.stats(get(feeder), 2),
+                                                                           avg  = get.four.stats(get(feeder), 3),
+                                                                           med  = get.four.stats(get(feeder), 4)), by=get(agg_Unit)]
                                 }
+                                
+                                light_min = 0.01
+                                light_peak = quantile(lab_dt$light, .95, na.rm = T)
+                                light_dt = lab_dt[, .(timestamp = timestamp,
+                                                      aggDay = aggDay,
+                                                      aggWeek = aggWeek,
+                                                      light = na.locf(light),
+                                                      lightON = ifelse(na.locf(light) > light_min, 1, 0),
+                                                      peak_50 = filter.fault.partial.lightOn(ifelse((na.locf(light) < light_peak * 0.5) & (na.locf(light) > light_min), 1, 0)),
+                                                      peak_60 = filter.fault.partial.lightOn(ifelse((na.locf(light) < light_peak * 0.6) & (na.locf(light) > light_min), 1, 0)),
+                                                      peak_70 = filter.fault.partial.lightOn(ifelse((na.locf(light) < light_peak * 0.7) & (na.locf(light) > light_min), 1, 0)),
+                                                      peak_80 = filter.fault.partial.lightOn(ifelse((na.locf(light) < light_peak * 0.8) & (na.locf(light) > light_min), 1, 0)),
+                                                      peak_90 = filter.fault.partial.lightOn(ifelse((na.locf(light) < light_peak * 0.9) & (na.locf(light) > light_min), 1, 0)))]
+                                
+                                partial_light = light_dt[, .(lightON = sum(lightON),
+                                                             threshold50 = sum(peak_50)/sum(lightON),
+                                                             threshold60 = sum(peak_60)/sum(lightON),
+                                                             threshold70 = sum(peak_70)/sum(lightON),
+                                                             threshold80 = sum(peak_80)/sum(lightON),
+                                                             threshold90 = sum(peak_90)/sum(lightON)), by=get(agg_Unit)]
+                                
+                                return_dt = merge(return_dt, partial_light, by="get")
                                 
                                 assign(dt_name, return_dt)
                                 return_dts = append(return_dts, setNames(list(return_dt),dt_name))
@@ -291,7 +256,7 @@ for(i in 2:(length(return_dts))){
         # plot_name = names(return_dts[i])
         # plot_name = paste0(names(return_dts[i]), "_partial_lightON")
         
-        for(s in seq(0.1, 1, 0.1)) {
+        for(s in seq(0.1, 0.5, 0.1)) {
                       
                 plot_name = paste(names(return_dts[i]), "- span", s)  
                 print(plot_name)
@@ -335,7 +300,10 @@ for(i in 2:(length(return_dts))){
                                 geom_smooth(aes(y=threshold70, color='threshold70'), span = s) +             
                                 
                                 geom_point(aes(y=threshold80, color='threshold80')) +
-                                geom_smooth(aes(y=threshold80, color='threshold80'), span = s) +        
+                                geom_smooth(aes(y=threshold80, color='threshold80'), span = s) +  
+                                
+                                geom_point(aes(y=threshold90, color='threshold90')) +
+                                geom_smooth(aes(y=threshold90, color='threshold90'), span = s) +  
                                 
                                 scale_x_date("Timestamp", labels = date_format("%y-%m"), breaks = date_breaks("month")) +
                                 
@@ -404,14 +372,16 @@ for(lab in 1:3){
                                       lunch_lightOFF_50 = get.lunch.lightOFF(.SD, 0.5),
                                       lunch_lightOFF_60 = get.lunch.lightOFF(.SD, 0.6),
                                       lunch_lightOFF_70 = get.lunch.lightOFF(.SD, 0.7),
-                                      lunch_lightOFF_80 = get.lunch.lightOFF(.SD, 0.8)), by=aggDay]
+                                      lunch_lightOFF_80 = get.lunch.lightOFF(.SD, 0.8),
+                                      lunch_lightOFF_90 = get.lunch.lightOFF(.SD, 0.9)), by=aggDay]
         
         lunch_dt_aggWeek <- lunch_dt_aggDay[, .(lunch_lightOFF_50 = sum(lunch_lightOFF_50),
-                                                 lunch_lightOFF_60 = sum(lunch_lightOFF_60),
-                                                 lunch_lightOFF_70 = sum(lunch_lightOFF_70),
-                                                 lunch_lightOFF_80 = sum(lunch_lightOFF_80)), by=aggWeek]
+                                                lunch_lightOFF_60 = sum(lunch_lightOFF_60),
+                                                lunch_lightOFF_70 = sum(lunch_lightOFF_70),
+                                                lunch_lightOFF_80 = sum(lunch_lightOFF_80),
+                                                lunch_lightOFF_90 = sum(lunch_lightOFF_90)), by=aggWeek]
         
-        for(s in seq(0.1, 1, 0.1)) {
+        for(s in seq(0.1, 0.5, 0.1)) {
                 
                 plot_name = paste(lab_name, "lunch light OFF count - span", s)  
                 print(plot_name)
@@ -419,16 +389,19 @@ for(lab in 1:3){
                 p1 <- ggplot(lunch_dt_aggDay, aes(x=aggDay)) +
                         
                         geom_point(aes(y=lunch_lightOFF_50, color='lunch_lightOFF_50')) +
-                        geom_smooth(aes(y=lunch_lightOFF_50, color='lunch_lightOFF_50')) +    
+                        geom_smooth(aes(y=lunch_lightOFF_50, color='lunch_lightOFF_50'), span = s) +    
                         
                         geom_point(aes(y=lunch_lightOFF_60, color='lunch_lightOFF_60')) +
-                        geom_smooth(aes(y=lunch_lightOFF_60, color='lunch_lightOFF_60')) +             
+                        geom_smooth(aes(y=lunch_lightOFF_60, color='lunch_lightOFF_60'), span = s) +             
                         
                         geom_point(aes(y=lunch_lightOFF_70, color='lunch_lightOFF_70')) +
-                        geom_smooth(aes(y=lunch_lightOFF_70, color='lunch_lightOFF_70')) +             
+                        geom_smooth(aes(y=lunch_lightOFF_70, color='lunch_lightOFF_70'), span = s) +             
                         
                         geom_point(aes(y=lunch_lightOFF_80, color='lunch_lightOFF_80')) +
-                        geom_smooth(aes(y=lunch_lightOFF_80, color='lunch_lightOFF_80')) +        
+                        geom_smooth(aes(y=lunch_lightOFF_80, color='lunch_lightOFF_80'), span = s) +   
+                        
+                        geom_point(aes(y=lunch_lightOFF_90, color='lunch_lightOFF_90')) +
+                        geom_smooth(aes(y=lunch_lightOFF_90, color='lunch_lightOFF_90'), span = s) +   
                         
                         scale_x_date("Timestamp", labels = date_format("%y-%m"), breaks = date_breaks("month")) +
                         
@@ -442,11 +415,64 @@ for(lab in 1:3){
                         
                         ggtitle(plot_name)
                 
-                ggsave(file = paste0("plots/",paste(lab_name, "lunch light OFF"), ".png"), width = 25, height = 10, dpi = 600, p1)
+                ggsave(file = paste0("plots/", plot_name, ".png"), width = 25, height = 10, dpi = 600, p1)
         }
 }
 
+###
+## 3. light peak * (0.5~0.8) / 96:15mins ==> strong_light counting 
 
-
+for(lab in 1:3){ 
+        # lab_dt & name selection 
+        lab_dt = dt_list[[lab]]
+        lab_name = lab_names[lab]
         
+        print(lab_name)
+        
+        light_peak = quantile(lab_dt$light, .95, na.rm = T)
+        print(light_peak)
+        
+        strong_light_dt = lab_dt[, .(strong_light_50 = sum(light > (light_peak * 0.5)),
+                                     strong_light_60 = sum(light > (light_peak * 0.6)),
+                                     strong_light_70 = sum(light > (light_peak * 0.7)),
+                                     strong_light_80 = sum(light > (light_peak * 0.8)),
+                                     strong_light_90 = sum(light > (light_peak * 0.9))), by=aggDay]
+        
+        for(s in seq(0.1, 0.5, 0.1)) {
+                
+                plot_name = paste(lab_name, "strong_light count - span", s)  
+                print(plot_name)
+                
+                p1 <- ggplot(strong_light_dt, aes(x=aggDay)) +
+                        
+                        geom_point(aes(y=strong_light_50, color='strong_light_50')) +
+                        geom_smooth(aes(y=strong_light_50, color='strong_light_50'), span = s) +    
+                        
+                        geom_point(aes(y=strong_light_60, color='strong_light_60')) +
+                        geom_smooth(aes(y=strong_light_60, color='strong_light_60'), span = s) +             
+                        
+                        geom_point(aes(y=strong_light_70, color='strong_light_70')) +
+                        geom_smooth(aes(y=strong_light_70, color='strong_light_70'), span = s) +             
+                        
+                        geom_point(aes(y=strong_light_80, color='strong_light_80')) +
+                        geom_smooth(aes(y=strong_light_80, color='strong_light_80'), span = s) +    
+                        
+                        geom_point(aes(y=strong_light_90, color='strong_light_90')) +
+                        geom_smooth(aes(y=strong_light_90, color='strong_light_90'), span = s) +    
+                        
+                        scale_x_date("Timestamp", labels = date_format("%y-%m"), breaks = date_breaks("month")) +
+                        
+                        geom_vline(aes(xintercept = as.numeric(as.Date("2015-10-08"))),color="green4") +
+                        geom_vline(aes(xintercept = as.numeric(as.Date("2015-12-01"))),color="green4") +
+                        geom_vline(aes(xintercept = as.numeric(as.Date("2016-01-11"))),color="green4") +
+                        geom_vline(aes(xintercept = as.numeric(as.Date("2016-02-01"))),color="green4") +
+                        geom_vline(aes(xintercept = as.numeric(as.Date("2016-05-16"))),color="green4") +
+                        geom_vline(aes(xintercept = as.numeric(as.Date("2016-06-13"))),color="green4") +         
+                        theme(legend.position = "bottom") +
+                        
+                        ggtitle(plot_name)
+                
+                ggsave(file = paste0("plots/", plot_name, ".png"), width = 25, height = 10, dpi = 600, p1)
+        }
+}
 
