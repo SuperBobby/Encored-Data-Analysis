@@ -7,6 +7,7 @@ library(gridExtra)
 library(data.table)
 library(timeDate)
 require(bit64)
+library(data.table)
 
 table.time2string <- function(RS_raw_data){
         RS_raw_data$joined = as.POSIXct(RS_raw_data$joined/1000, origin = "1970-01-01", tz="ROK")
@@ -27,12 +28,12 @@ make.quarter.label = function(input){
 
 ### ----------------------- ###
 # raw data loading
-RS_adsl_raw = fread("realsense/adsl.csv")
+# RS_adsl_raw = fread("realsense/adsl.csv")
 RS_marg_raw = fread("realsense/marg.csv")
 RS_hcc_raw = fread("realsense/hcc.csv")
 RS_ux_raw = fread("realsense/ux.csv")
 
-adsl_RS = table.time2string(RS_adsl_raw)
+# adsl_RS = table.time2string(RS_adsl_raw)
 marg_RS = table.time2string(RS_marg_raw)
 hcc_RS = table.time2string(RS_hcc_raw)
 ux_RS = table.time2string(RS_ux_raw)
@@ -42,6 +43,11 @@ date_adjust_parameter = 7 * 60 * 60 # 7 hours
 marg_RS[, ':='(date=as.Date(joined-date_adjust_parameter, tz="rok"), weekday = isWeekday(joined-date_adjust_parameter))]
 hcc_RS[, ':='(date=as.Date(joined-date_adjust_parameter, tz="rok"), weekday = isWeekday(joined-date_adjust_parameter))]
 ux_RS[, ':='(date=as.Date(joined-date_adjust_parameter, tz="rok"), weekday = isWeekday(joined-date_adjust_parameter))]
+
+### update : day, weekday depending on the aggDay
+marg_RS[, ':='(weekday = isWeekday(date))]
+hcc_RS[, ':='(weekday = isWeekday(date))]
+ux_RS[, ':='(weekday = isWeekday(date))]
 
 write.csv(marg_RS, file ="data/marg_RS.csv")
 write.csv(hcc_RS, file ="data/hcc_RS.csv")
@@ -83,7 +89,7 @@ ggplot(hcc_RS[duration < 1 & date > "2015-12-01" & date < "2016-01-05" ], aes(fa
 
 tmp <- hcc_RS[date < "2015-12-11" | date > "2015-12-30"]
 
-ggplot(tmp[duration < 1], aes(factor(date), as.numeric(duration))) + 
+ggplot(tmp[duration < 1 & date > "2015-12-01" & date < "2016-01-05" ], aes(factor(date), as.numeric(duration))) + 
         geom_boxplot(aes(fill = factor(weekday))) +
         theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
         ggtitle(paste("Distribution of individual sample's duration -", toupper("hcc")))
@@ -125,8 +131,22 @@ hcc_Freq[freq > 300, ':='(freq = 300)]
 ux_Freq[freq > 300, ':='(freq = 300)]
 
 
+X.all <- data.frame(unique(marg_dt$aggDay))
+colnames(X.all) <- c("date")
+marg_SumOfDuration = merge(X.all, marg_SumOfDuration, all.x=TRUE, by.x="date", by.y="date")
+hcc_SumOfDuration = merge(X.all, hcc_SumOfDuration, all.x=TRUE, by.x="date", by.y="date")
+ux_SumOfDuration = merge(X.all, ux_SumOfDuration, all.x=TRUE, by.x="date", by.y="date")
+
+marg_Freq = merge(X.all, marg_Freq, all.x=TRUE, by.x="date", by.y="date")
+hcc_Freq = merge(X.all, hcc_Freq, all.x=TRUE, by.x="date", by.y="date")
+ux_Freq = merge(X.all, ux_Freq, all.x=TRUE, by.x="date", by.y="date")
+
+# marg_Freq[is.na(marg_Freq)] <- 0
+
 ## Plotting 
 ## 1. sum of duration 
+lab_names = c("MARG", "HCC", "UX")
+
 RS_sum_of_duration_list = list(marg_SumOfDuration, hcc_SumOfDuration, ux_SumOfDuration)
 RS_freq_list = list(marg_Freq, hcc_Freq, ux_Freq)
 
@@ -165,6 +185,7 @@ for(i in 1:3){
                 geom_vline(aes(xintercept = as.numeric(as.Date("2016-02-01"))),color="red") +
                 geom_vline(aes(xintercept = as.numeric(as.Date("2016-05-16"))),color="red") +
                 geom_vline(aes(xintercept = as.numeric(as.Date("2016-06-13"))),color="red") +    
+                ylim(0,300) + 
                 ggtitle(plot2_name)
 
         print(p1)

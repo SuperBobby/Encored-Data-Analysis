@@ -133,7 +133,6 @@ hist(marg_dt[light>0.01]$light, 100) # no problem
 hist(hcc_dt[light>0.01]$light, 100)  # abnormal : over 0.5
 hist(ux_dt[light>0.01]$light, 100)   # abnormal : over 0.5
 
-
 ### --------------------------- ###
 ### Build tables and functions for extraction & aggregation
 
