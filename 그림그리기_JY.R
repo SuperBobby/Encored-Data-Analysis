@@ -47,6 +47,15 @@ marg_dt = data.table(marg_dt, aggDay)
 hcc_dt = data.table(hcc_dt, aggDay)
 ux_dt = data.table(ux_dt, aggDay)
 
+# cut the date depending on addDay & index update 
+marg_dt = marg_dt[aggDay >= "2014-10-01" & aggDay <= "2016-6-30"]
+hcc_dt = hcc_dt[aggDay >= "2014-10-01" & aggDay <= "2016-6-30"]
+ux_dt = ux_dt[aggDay >= "2014-10-01" & aggDay <= "2016-6-30"]
+
+marg_dt[, ':='(index=rep(1:96, nrow(marg_dt)/96))]
+hcc_dt[, ':='(index=rep(1:96, nrow(marg_dt)/96))]
+ux_dt[, ':='(index=rep(1:96, nrow(marg_dt)/96))]
+
 
 ### update : day, weekday depending on the aggDay
 marg_dt[, ':='(day = weekdays(aggDay, abbreviate = T), weekday = isWeekday(aggDay))]
@@ -91,7 +100,6 @@ marg_dt = na.missing.data(marg_dt, 0.1)
 hcc_dt = na.missing.data(hcc_dt, 0.05)
 ux_dt = na.missing.data(ux_dt, 0.02)
 
-
 ### Computer
 ## abnormal computer usage : 
 ## hcc : computer usage over 0.5 = NA
@@ -120,6 +128,10 @@ hist(ux_dt[light>0.01]$light, 100)   # abnormal : over 0.5
 
 hcc_dt[light > 0.5, ':='(light = NA)]
 ux_dt[light > 0.5, ':='(light = NA)]
+
+hist(marg_dt[light>0.01]$light, 100) # no problem
+hist(hcc_dt[light>0.01]$light, 100)  # abnormal : over 0.5
+hist(ux_dt[light>0.01]$light, 100)   # abnormal : over 0.5
 
 
 ### --------------------------- ###
@@ -248,7 +260,23 @@ for(lab in 1:3){
 ### ------------------------------------------- ###
 ### Plotting
 
-## 1. partial_lightON & lightON duration plots 
+add.event.vline <- function(plot_body){
+        result = plot_body + 
+                scale_x_date("Timestamp", labels = date_format("%y-%m"), breaks = date_breaks("month")) +
+                
+                geom_vline(aes(xintercept = as.numeric(as.Date("2015-10-08"))),color="green4") +
+                geom_vline(aes(xintercept = as.numeric(as.Date("2015-12-01"))),color="green4") +
+                geom_vline(aes(xintercept = as.numeric(as.Date("2016-01-11"))),color="green4") +
+                geom_vline(aes(xintercept = as.numeric(as.Date("2016-02-01"))),color="green4") +
+                geom_vline(aes(xintercept = as.numeric(as.Date("2016-05-16"))),color="green4") +
+                geom_vline(aes(xintercept = as.numeric(as.Date("2016-06-13"))),color="green4") +         
+                theme(legend.position = "bottom")
+        
+        return(result)
+}
+
+
+## 1. Four stats plots  +  partial_lightON & lightON duration plots 
 
 for(i in 2:(length(return_dts))){
         # (length(return_dts)) 
@@ -274,15 +302,6 @@ for(i in 2:(length(return_dts))){
                         geom_point(aes(y=med, color='med')) +
                         geom_smooth(aes(y=med, color='med'), span = s) +
                         
-                        scale_x_date("Timestamp", labels = date_format("%y-%m"), breaks = date_breaks("month")) +
-                        
-                        geom_vline(aes(xintercept = as.numeric(as.Date("2015-10-08"))),color="green4") +
-                        geom_vline(aes(xintercept = as.numeric(as.Date("2015-12-01"))),color="green4") +
-                        geom_vline(aes(xintercept = as.numeric(as.Date("2016-01-11"))),color="green4") +
-                        geom_vline(aes(xintercept = as.numeric(as.Date("2016-02-01"))),color="green4") +
-                        geom_vline(aes(xintercept = as.numeric(as.Date("2016-05-16"))),color="green4") +
-                        geom_vline(aes(xintercept = as.numeric(as.Date("2016-06-13"))),color="green4") +
-                        theme(legend.position = "bottom") + 
                         ggtitle(plot_name)
         
                 
@@ -305,15 +324,6 @@ for(i in 2:(length(return_dts))){
                                 geom_point(aes(y=threshold90, color='threshold90')) +
                                 geom_smooth(aes(y=threshold90, color='threshold90'), span = s) +  
                                 
-                                scale_x_date("Timestamp", labels = date_format("%y-%m"), breaks = date_breaks("month")) +
-                                
-                                geom_vline(aes(xintercept = as.numeric(as.Date("2015-10-08"))),color="green4") +
-                                geom_vline(aes(xintercept = as.numeric(as.Date("2015-12-01"))),color="green4") +
-                                geom_vline(aes(xintercept = as.numeric(as.Date("2016-01-11"))),color="green4") +
-                                geom_vline(aes(xintercept = as.numeric(as.Date("2016-02-01"))),color="green4") +
-                                geom_vline(aes(xintercept = as.numeric(as.Date("2016-05-16"))),color="green4") +
-                                geom_vline(aes(xintercept = as.numeric(as.Date("2016-06-13"))),color="green4") +         
-                                theme(legend.position = "bottom") +
                                 ggtitle("partial_lightON")
                         
                         lightON_duration <- ggplot(plot_dt, aes(x=get, y=lightON)) +
@@ -321,30 +331,28 @@ for(i in 2:(length(return_dts))){
                                 geom_point(aes(y=lightON, color='lightON')) +
                                 geom_smooth(aes(y=lightON, color='lightON'), span = s) +          
                                 
-                                scale_x_date("Timestamp", labels = date_format("%y-%m"), breaks = date_breaks("month")) +
-                                
-                                geom_vline(aes(xintercept = as.numeric(as.Date("2015-10-08"))),color="red") +
-                                geom_vline(aes(xintercept = as.numeric(as.Date("2015-12-01"))),color="red") +
-                                geom_vline(aes(xintercept = as.numeric(as.Date("2016-01-11"))),color="red") +
-                                geom_vline(aes(xintercept = as.numeric(as.Date("2016-02-01"))),color="red") +
-                                geom_vline(aes(xintercept = as.numeric(as.Date("2016-05-16"))),color="red") +
-                                geom_vline(aes(xintercept = as.numeric(as.Date("2016-06-13"))),color="red") +         
-                                theme(legend.position = "bottom") +
                                 ggtitle("lightON duration")
                         
+                        
+                        stats            = add.event.vline(stats)
+                        partial_lightON  = add.event.vline(partial_lightON)
+                        lightON_duration = add.event.vline(lightON_duration)
+                        
                         plots <- arrangeGrob(stats, partial_lightON, lightON_duration)
-                        ggsave(file = paste0("plots/",plot_name, ".png"), width = 25, height = 20, dpi = 300, plots)
+                        ggsave(file = paste0("plots/",plot_name, ".png"), width = 20, height = 30, dpi = 300, plots)
                         
                 } else {
+                        
+                        stats            = add.event.vline(stats)
                         plots <- stats
-                        ggsave(file = paste0("plots/",plot_name, ".png"), width = 25, height = 10, dpi = 300, plots)
+                        ggsave(file = paste0("plots/",plot_name, ".png"), width = 20, height = 10, dpi = 300, plots)
                 }
         }
 }
 
 
 ###
-## 2. lunch light OFF plots 
+## 2. lunch light OFF plots --> 상단 1번 과정 안에 통합되어야 함 
 
 get.lunch.lightOFF <- function(dt, threshold){
         # print(dt)
@@ -403,24 +411,37 @@ for(lab in 1:3){
                         geom_point(aes(y=lunch_lightOFF_90, color='lunch_lightOFF_90')) +
                         geom_smooth(aes(y=lunch_lightOFF_90, color='lunch_lightOFF_90'), span = s) +   
                         
-                        scale_x_date("Timestamp", labels = date_format("%y-%m"), breaks = date_breaks("month")) +
-                        
-                        geom_vline(aes(xintercept = as.numeric(as.Date("2015-10-08"))),color="green4") +
-                        geom_vline(aes(xintercept = as.numeric(as.Date("2015-12-01"))),color="green4") +
-                        geom_vline(aes(xintercept = as.numeric(as.Date("2016-01-11"))),color="green4") +
-                        geom_vline(aes(xintercept = as.numeric(as.Date("2016-02-01"))),color="green4") +
-                        geom_vline(aes(xintercept = as.numeric(as.Date("2016-05-16"))),color="green4") +
-                        geom_vline(aes(xintercept = as.numeric(as.Date("2016-06-13"))),color="green4") +         
-                        theme(legend.position = "bottom") +
-                        
-                        ggtitle(plot_name)
+                        ggtitle(paste(plot_name, "aggDay"))
                 
-                ggsave(file = paste0("plots/", plot_name, ".png"), width = 25, height = 10, dpi = 600, p1)
+                p2 <- ggplot(lunch_dt_aggWeek, aes(x=aggWeek)) +
+                        
+                        geom_point(aes(y=lunch_lightOFF_50, color='lunch_lightOFF_50')) +
+                        geom_smooth(aes(y=lunch_lightOFF_50, color='lunch_lightOFF_50'), span = s) +    
+                        
+                        geom_point(aes(y=lunch_lightOFF_60, color='lunch_lightOFF_60')) +
+                        geom_smooth(aes(y=lunch_lightOFF_60, color='lunch_lightOFF_60'), span = s) +             
+                        
+                        geom_point(aes(y=lunch_lightOFF_70, color='lunch_lightOFF_70')) +
+                        geom_smooth(aes(y=lunch_lightOFF_70, color='lunch_lightOFF_70'), span = s) +             
+                        
+                        geom_point(aes(y=lunch_lightOFF_80, color='lunch_lightOFF_80')) +
+                        geom_smooth(aes(y=lunch_lightOFF_80, color='lunch_lightOFF_80'), span = s) +   
+                        
+                        geom_point(aes(y=lunch_lightOFF_90, color='lunch_lightOFF_90')) +
+                        geom_smooth(aes(y=lunch_lightOFF_90, color='lunch_lightOFF_90'), span = s) +   
+                        
+                        ggtitle(paste(plot_name, "aggWeek"))
+
+                
+                plots <- arrangeGrob(p1, p2)
+                
+                ggsave(file = paste0("plots/", plot_name, ".png"), width = 20, height = 20, dpi = 600, plots)
         }
 }
 
-###
-## 3. light peak * (0.5~0.8) / 96:15mins ==> strong_light counting 
+### 
+## 3. strong_light counting light 
+## ==> # of over "peak * (0.5~0.8)" in 15mins 
 
 for(lab in 1:3){ 
         # lab_dt & name selection 
@@ -432,18 +453,24 @@ for(lab in 1:3){
         light_peak = quantile(lab_dt$light, .95, na.rm = T)
         print(light_peak)
         
-        strong_light_dt = lab_dt[, .(strong_light_50 = sum(light > (light_peak * 0.5)),
-                                     strong_light_60 = sum(light > (light_peak * 0.6)),
-                                     strong_light_70 = sum(light > (light_peak * 0.7)),
-                                     strong_light_80 = sum(light > (light_peak * 0.8)),
-                                     strong_light_90 = sum(light > (light_peak * 0.9))), by=aggDay]
+        strong_light_aggDay_dt = lab_dt[, .(strong_light_50 = sum(light > (light_peak * 0.5)),
+                                            strong_light_60 = sum(light > (light_peak * 0.6)),
+                                            strong_light_70 = sum(light > (light_peak * 0.7)),
+                                            strong_light_80 = sum(light > (light_peak * 0.8)),
+                                            strong_light_90 = sum(light > (light_peak * 0.9))), by=aggDay]
+        
+        strong_light_aggWeek_dt = lab_dt[, .(strong_light_50 = sum(light > (light_peak * 0.5)),
+                                             strong_light_60 = sum(light > (light_peak * 0.6)),
+                                             strong_light_70 = sum(light > (light_peak * 0.7)),
+                                             strong_light_80 = sum(light > (light_peak * 0.8)),
+                                             strong_light_90 = sum(light > (light_peak * 0.9))), by=aggWeek]
         
         for(s in seq(0.1, 0.5, 0.1)) {
                 
                 plot_name = paste(lab_name, "strong_light count - span", s)  
                 print(plot_name)
                 
-                p1 <- ggplot(strong_light_dt, aes(x=aggDay)) +
+                p1 <- ggplot(strong_light_aggDay_dt, aes(x=aggDay)) +
                         
                         geom_point(aes(y=strong_light_50, color='strong_light_50')) +
                         geom_smooth(aes(y=strong_light_50, color='strong_light_50'), span = s) +    
@@ -459,20 +486,94 @@ for(lab in 1:3){
                         
                         geom_point(aes(y=strong_light_90, color='strong_light_90')) +
                         geom_smooth(aes(y=strong_light_90, color='strong_light_90'), span = s) +    
-                        
-                        scale_x_date("Timestamp", labels = date_format("%y-%m"), breaks = date_breaks("month")) +
-                        
-                        geom_vline(aes(xintercept = as.numeric(as.Date("2015-10-08"))),color="green4") +
-                        geom_vline(aes(xintercept = as.numeric(as.Date("2015-12-01"))),color="green4") +
-                        geom_vline(aes(xintercept = as.numeric(as.Date("2016-01-11"))),color="green4") +
-                        geom_vline(aes(xintercept = as.numeric(as.Date("2016-02-01"))),color="green4") +
-                        geom_vline(aes(xintercept = as.numeric(as.Date("2016-05-16"))),color="green4") +
-                        geom_vline(aes(xintercept = as.numeric(as.Date("2016-06-13"))),color="green4") +         
-                        theme(legend.position = "bottom") +
-                        
-                        ggtitle(plot_name)
+
+                        ggtitle(paste(plot_name, "aggDay"))
                 
-                ggsave(file = paste0("plots/", plot_name, ".png"), width = 25, height = 10, dpi = 600, p1)
+                p2 <- ggplot(strong_light_aggWeek_dt, aes(x=aggWeek)) +
+                        
+                        geom_point(aes(y=strong_light_50, color='strong_light_50')) +
+                        geom_smooth(aes(y=strong_light_50, color='strong_light_50'), span = s) +    
+                        
+                        geom_point(aes(y=strong_light_60, color='strong_light_60')) +
+                        geom_smooth(aes(y=strong_light_60, color='strong_light_60'), span = s) +             
+                        
+                        geom_point(aes(y=strong_light_70, color='strong_light_70')) +
+                        geom_smooth(aes(y=strong_light_70, color='strong_light_70'), span = s) +             
+                        
+                        geom_point(aes(y=strong_light_80, color='strong_light_80')) +
+                        geom_smooth(aes(y=strong_light_80, color='strong_light_80'), span = s) +    
+                        
+                        geom_point(aes(y=strong_light_90, color='strong_light_90')) +
+                        geom_smooth(aes(y=strong_light_90, color='strong_light_90'), span = s) +    
+
+                        ggtitle(paste(plot_name, "aggWeek"))
+                
+                
+                p1 = add.event.vline(p1)
+                p2 = add.event.vline(p2)
+                
+                plots <- arrangeGrob(p1, p2)
+                
+                ggsave(file = paste0("plots/", plot_name, ".png"), width = 20, height = 20, dpi = 600, plots)
         }
 }
+
+
+### 
+## 4. full_lightON counting : 24hours 
+## ==> # of "over peak*(0.5~0.8)" == 96?
+
+for(lab in 1:3){ 
+        # lab_dt & name selection 
+        lab_dt = dt_list[[lab]]
+        lab_name = lab_names[lab]
+        
+        print(lab_name)
+        
+        light_peak = quantile(lab_dt$light, .95, na.rm = T)
+        print(light_peak)
+        
+        full_lightON_aggDay_dt = lab_dt[, .(full_lightON_50 = sum(light > (light_peak * 0.5), na.rm = T)==96,
+                                            full_lightON_40 = sum(light > (light_peak * 0.4), na.rm = T)==96,
+                                            full_lightON_30 = sum(light > (light_peak * 0.3), na.rm = T)==96,
+                                            full_lightON_20 = sum(light > (light_peak * 0.2), na.rm = T)==96,
+                                            full_lightON_10 = sum(light > (light_peak * 0.1), na.rm = T)==96), by=aggDay]
+        
+        full_lightON_aggWeek_dt = full_lightON_aggDay_dt[, .(full_lightON_50 = sum(full_lightON_50, na.rm = T),
+                                                             full_lightON_40 = sum(full_lightON_40, na.rm = T),
+                                                             full_lightON_30 = sum(full_lightON_30, na.rm = T),
+                                                             full_lightON_20 = sum(full_lightON_20, na.rm = T),
+                                                             full_lightON_10 = sum(full_lightON_10, na.rm = T)), by=.(aggWeek=as.Date(cut(aggDay, breaks = "week", start.on.monday = T)))]
+        
+        for(s in seq(0.1, 0.5, 0.1)) {
+                
+                plot_name = paste(lab_name, "full(24hrs)_lightON count - span", s)  
+                print(plot_name)
+                
+                p <- ggplot(full_lightON_aggWeek_dt, aes(x=aggWeek)) +
+                        
+                        #                         geom_point(aes(y=full_lightON_50, color='full_lightON_50')) +
+                        #                         geom_smooth(aes(y=full_lightON_50, color='full_lightON_50'), span = s) +    
+                        #                         
+                        #                         geom_point(aes(y=full_lightON_40, color='full_lightON_40')) +
+                        #                         geom_smooth(aes(y=full_lightON_40, color='full_lightON_40'), span = s) +             
+                        
+                        geom_point(aes(y=full_lightON_30, color='full_lightON_30')) +
+                        geom_smooth(aes(y=full_lightON_30, color='full_lightON_30'), span = s) +             
+                        
+                        geom_point(aes(y=full_lightON_20, color='full_lightON_20')) +
+                        geom_smooth(aes(y=full_lightON_20, color='full_lightON_20'), span = s) +    
+                        
+                        geom_point(aes(y=full_lightON_10, color='full_lightON_10')) +
+                        geom_smooth(aes(y=full_lightON_10, color='full_lightON_10'), span = s) +  
+                        
+                        ggtitle(paste(plot_name, "aggWeek"))
+                
+                p = add.event.vline(p)
+                
+                ggsave(file = paste0("plots/", plot_name, ".png"), width = 20, height = 10, dpi = 600, p)
+        }
+}
+
+
 
