@@ -135,9 +135,12 @@ hist(ux_dt[light>0.01]$light, 100)   # abnormal : over 0.5
 
 
 ### Build AllLabs data.table
-#
-#
-#
+##
+AllLabs_dt = marg_dt
+AllLabs_dt$computer = AllLabs_dt$computer + hcc_dt$computer + ux_dt$computer
+AllLabs_dt$light = AllLabs_dt$light + hcc_dt$light + ux_dt$light
+AllLabs_dt$etc = AllLabs_dt$etc + hcc_dt$etc + ux_dt$etc
+AllLabs_dt$total = AllLabs_dt$total + hcc_dt$total + ux_dt$total
 
 
 ### --------------------------- ###
@@ -169,8 +172,8 @@ filter.fault.partial.lightOn <- function(input){
 }
 
 # 1. lab
-lab_names = c("MARG", "HCC", "UX")
-dt_list = list(marg_dt, hcc_dt, ux_dt)
+lab_names = c("MARG", "HCC", "UX", "All Labs")
+dt_list = list(marg_dt, hcc_dt, ux_dt, AllLabs_dt)
 
 # 2. aggregation unit 
 agg_Units = c("aggWeek", "aggDay")
@@ -181,7 +184,7 @@ day_selections = c("allDay", "weekDay", "weekEnd")
 # 4. feeders
 feeders = c("total", "computer", "light", "hvac")
 
-for(lab in 1:3){ 
+for(lab in 1:4){ 
         # lab_dt & name selection 
         lab_dt = dt_list[[lab]]
         lab_name = lab_names[lab]
@@ -377,7 +380,7 @@ get.lunch.lightOFF <- function(dt, threshold){
         }
 }
 
-for(lab in 1:3){ 
+for(lab in 1:4){ 
         # lab_dt & name selection 
         lab_dt = dt_list[[lab]]
         lab_name = lab_names[lab]
@@ -449,7 +452,7 @@ for(lab in 1:3){
 ## 3. strong_light counting light 
 ## ==> # of over "peak * (0.5~0.8)" in 15mins 
 
-for(lab in 1:3){ 
+for(lab in 1:4){ 
         # lab_dt & name selection 
         lab_dt = dt_list[[lab]]
         lab_name = lab_names[lab]
@@ -529,7 +532,7 @@ for(lab in 1:3){
 ## 4. full_lightON counting : 24hours 
 ## ==> # of "over peak*(0.5~0.8)" == 96?
 
-for(lab in 1:3){ 
+for(lab in 1:4){ 
         # lab_dt & name selection 
         lab_dt = dt_list[[lab]]
         lab_name = lab_names[lab]
