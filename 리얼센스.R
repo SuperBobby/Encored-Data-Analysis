@@ -160,7 +160,8 @@ for(i in 1:3){
         plot2_name = paste0("RealSense Freq - ", lab_name)
         
         p1 <- ggplot(plot1_dt, aes(x=date, y=sum_of_duration))+
-                geom_bar(aes(fill=isWeekday(date)), stat = "identity") + 
+#                 geom_bar(aes(fill=isWeekday(date)), stat = "identity") + 
+                geom_line(stat = "identity") + 
                 geom_text(aes(label=round(sum_of_duration, 0)), position=position_dodge(width=0.9), vjust=-0.25) + 
                 theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
                 scale_x_date("Timestamp", labels = date_format("%y-%m-%d"), breaks = date_breaks("week")) +
@@ -174,7 +175,8 @@ for(i in 1:3){
                 ggtitle(plot1_name)
         
         p2 <- ggplot(plot2_dt, aes(x=date, y=freq))+
-                geom_bar(aes(fill=isWeekday(date)), stat = "identity") + 
+#                 geom_bar(aes(fill=isWeekday(date)), stat = "identity") + 
+                geom_bar(stat = "identity") + 
                 geom_text(aes(label=round(freq, 0)), position=position_dodge(width=0.9), vjust=-0.25) + 
                 theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
                 scale_x_date("Timestamp", labels = date_format("%y-%m-%d"), breaks = date_breaks("week")) +
@@ -192,7 +194,7 @@ for(i in 1:3){
         print(p2)
         
         plots <- arrangeGrob(p1, p2)
-        ggsave(file = paste0("plots/RealSense-",lab_name, ".png"), width = 25, height = 20, dpi = 300, plots)
+#         ggsave(file = paste0("plots/RealSense-",lab_name, ".png"), width = 25, height = 20, dpi = 300, plots)
 }
         
 # 
