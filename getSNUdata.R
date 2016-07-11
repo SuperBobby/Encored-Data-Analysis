@@ -133,7 +133,7 @@ getSNUData.feeder <- function(lab = c("marg", "hcc", "ux"),
                 usage_total   = c(usage_total, total)
                 
                 if(verbose) {
-                        print(paste(as.POSIXct(query_timestamp, format="%Y-%m-%d", origin='1970-01-01', tz="ROK"), 
+                        print(paste(lab, "-", as.POSIXct(query_timestamp, format="%Y-%m-%d", origin='1970-01-01', tz="ROK"), 
                                     ":", total, "kW/h"))
                 }
                 

@@ -22,7 +22,6 @@ getYearMonthLabel <- function(timestamp){
         return(as.POSIXct(result))
 }
 
-
 marg_table_day[, ':='(Month = getYearMonthLabel(timestamp))]
 hcc_table_day[, ':='(Month = getYearMonthLabel(timestamp))]
 ux_table_day[, ':='(Month = getYearMonthLabel(timestamp))]

@@ -6,12 +6,12 @@ library(scales)
 library(timeDate)
 library(stringr)
 
-        ## last Season
-last_season_start = "2016-3-21"
-last_season_end = "2016-6-13"
+## last Season
+last_season_start = "2016-4-18"
+last_season_end = "2016-7-11"
 
 # spline target date
-target_date = "2015-6-15"
+target_date = "2015-7-14"
                 
 ## realtime ref
 last_12weeks_marg_hours <- reviseSNUData(marg_defalut_table_hours, "marg", last_season_start, last_season_end, verbose = T)
@@ -43,9 +43,8 @@ marg_weekDAY_aggregated = cumsum(marg_weekDAY_aggregated)
 marg_weekEND_aggregated = aggregate(. ~ marg_new_index_weekEND,  marg_weekEND[,c(2,3,4,5,6,9)], mean)
 marg_weekEND_aggregated = cumsum(marg_weekEND_aggregated)
 
-
-marg_marg_ref_weekday <- get.spline.ref(marg_defalut_table_15min, target_date, weekday_=T)
-marg_marg_ref_weekend <- get.spline.ref(marg_defalut_table_15min, target_date, weekday_=F)
+marg_ref_weekday <- get.spline.ref(marg_defalut_table_15min, target_date, weekday_=T)
+marg_ref_weekend <- get.spline.ref(marg_defalut_table_15min, target_date, weekday_=F)
 
 marg_weekDAY_aggregated$hvac = marg_ref_weekday$hvac
 marg_weekEND_aggregated$hvac = marg_ref_weekend$hvac

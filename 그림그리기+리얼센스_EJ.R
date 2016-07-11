@@ -30,9 +30,9 @@ make.quarter.label = function(input){
 ### ----------------------- ###
 # raw data loading
 # RS_adsl_raw = fread("realsense/adsl.csv")
-RS_marg_raw = fread("../realsense/marg.csv")
-RS_hcc_raw = fread("../realsense/hcc.csv")
-RS_ux_raw = fread("../realsense/ux.csv")
+RS_marg_raw = fread("realsense/marg.csv")
+RS_hcc_raw = fread("realsense/hcc.csv")
+RS_ux_raw = fread("realsense/ux.csv")
 
 # adsl_RS = table.time2string(RS_adsl_raw)
 marg_RS = table.time2string(RS_marg_raw)
