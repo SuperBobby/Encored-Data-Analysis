@@ -1,9 +1,15 @@
 library(data.table)
 library(ggplot2)
 library(gridExtra)
-
 library(timeDate)
 library(zoo)
+library(lubridate)
+library(plyr)
+library(scales)
+library(reshape2)
+library(data.table)
+require(bit64)
+
 
 ## -------------------- ##
 ### data loading 
@@ -11,9 +17,9 @@ library(zoo)
 # load("Encored-Data-Analysis/hcc_15min.RData")
 # load("Encored-Data-Analysis/ux_15min.RData")
 
-source("getSNUdata.R")
+source("Encored-Data-Analysis/getSNUdata.R")
 update_start = "2014-10-01"
-update_end = "2016-7-2"
+update_end = "2016-7-11"
 
 marg_defalut_table_15min = reviseSNUData(marg_defalut_table_15min, "marg", update_start, update_end, verbose = T)
 hcc_defalut_table_15min = reviseSNUData( hcc_defalut_table_15min, "hcc",  update_start, update_end, verbose = T)
@@ -140,10 +146,133 @@ hist(ux_dt[light>0.01]$light, 100)   # abnormal : over 0.5
 
 ### --------------------------- ###
 #### RealSense
-source("그림그리기+리얼센스_EJ.R")
-# marg_dt <- merge(marg_dt, margRS_dt, by="aggDay", all=FALSE, all.x=T)
-# hcc_dt <- merge(hcc_dt, hccRS_dt, all.x=T, by="aggDay")
-# ux_dt <- merge(ux_dt, uxRS_dt, all.x=T, by="aggDay")
+# source("Encored-Data-Analysis/그림그리기+리얼센스_EJ.R")
+
+table.time2string <- function(RS_raw_data){
+        RS_raw_data$joined = as.POSIXct(RS_raw_data$joined/1000, origin = "1970-01-01", tz="ROK")
+        RS_raw_data$leaved = as.POSIXct(RS_raw_data$leaved/1000, origin = "1970-01-01", tz="ROK")
+        
+        duration = as.numeric(difftime(RS_raw_data$leaved, RS_raw_data$joined, units = "secs"))
+        
+        return(cbind(RS_raw_data, duration))
+}
+
+make.quarter.label = function(input){ 
+        # 15min data label maker 
+        h = floor(((input-1) * 15)/60)
+        m = (input-1)*15 - h*60
+        l = paste0(h,":",m)
+        return(l)
+}
+
+# raw data loading
+# RS_adsl_raw = fread("realsense/adsl.csv")
+RS_marg_raw = fread("realsense/marg.csv")
+RS_hcc_raw = fread("realsense/hcc.csv")
+RS_ux_raw = fread("realsense/ux.csv")
+
+# adsl_RS = table.time2string(RS_adsl_raw)
+marg_RS = table.time2string(RS_marg_raw)
+hcc_RS = table.time2string(RS_hcc_raw)
+ux_RS = table.time2string(RS_ux_raw)
+
+date_adjust_parameter = 7 * 60 * 60 # 7 hours 
+
+marg_RS[, ':='(aggDay=as.Date(joined-date_adjust_parameter, tz="rok"), weekday = isWeekday(joined-date_adjust_parameter))]
+hcc_RS[, ':='(aggDay=as.Date(joined-date_adjust_parameter, tz="rok"), weekday = isWeekday(joined-date_adjust_parameter))]
+ux_RS[, ':='(aggDay=as.Date(joined-date_adjust_parameter, tz="rok"), weekday = isWeekday(joined-date_adjust_parameter))]
+
+# write.csv(marg_RS, file ="data/marg_RS.csv")
+# write.csv(hcc_RS, file ="data/hcc_RS.csv")
+# write.csv(ux_RS, file ="data/ux_RS.csv")
+
+
+## vaild date 
+marg_RS = marg_RS[aggDay > "2015-10-14" & aggDay <= "2016-6-30"]
+hcc_RS = hcc_RS[aggDay > "2015-10-14" & aggDay <= "2016-6-30"]
+ux_RS = ux_RS[aggDay > "2015-10-14" & aggDay <= "2016-6-30"]
+
+
+## Validate the "duration"
+marg_RS[duration > 5*60] # 4 --> Over 1000 case should be removed (single case : duration 1494.048)
+marg_RS = marg_RS[duration < 1000]
+hcc_RS[duration > 5*60]  # 48 --> All are in the abnormal period (will be removed) 
+ux_RS[duration > 5*60]   # 3 --> All cases make sense 
+
+hcc_RS <- hcc_RS[aggDay < "2015-12-11" | aggDay > "2015-12-30"]
+
+
+# Sum of duration 
+marg_SumOfDuration_day = marg_RS[, .(sum_of_duration = sum(duration)), by=aggDay]
+hcc_SumOfDuration_day = hcc_RS[, .(sum_of_duration = sum(duration)), by=aggDay]
+ux_SumOfDuration_day = ux_RS[, .(sum_of_duration = sum(duration)), by=aggDay]
+
+marg_Freq_day = marg_RS[, .(freq = nrow(.SD)), by=aggDay]
+hcc_Freq_day = hcc_RS[, .(freq = nrow(.SD)), by=aggDay]
+ux_Freq_day = ux_RS[, .(freq = nrow(.SD)), by=aggDay]
+
+
+# set max sum_of_duration as 600
+max_sum_of_duration = 600
+marg_SumOfDuration_day[sum_of_duration > max_sum_of_duration]
+hcc_SumOfDuration_day[sum_of_duration > max_sum_of_duration]
+ux_SumOfDuration_day[sum_of_duration > max_sum_of_duration]
+
+marg_SumOfDuration_day[sum_of_duration > max_sum_of_duration, ':='(sum_of_duration = max_sum_of_duration)]
+hcc_SumOfDuration_day[sum_of_duration > max_sum_of_duration, ':='(sum_of_duration = max_sum_of_duration)]
+ux_SumOfDuration_day[sum_of_duration > max_sum_of_duration, ':='(sum_of_duration = max_sum_of_duration)]
+
+# hist(marg_Freq$freq, 100)
+# hist(hcc_Freq$freq, 100)
+# hist(ux_Freq$freq, 100)
+# 
+
+marg_Freq_day[freq > 100]
+hcc_Freq_day[freq > 100]
+ux_Freq_day[freq > 100]
+
+# set max freq as 300 
+marg_Freq_day[freq > 300, ':='(freq = 300)]
+hcc_Freq_day[freq > 300, ':='(freq = 300)]
+ux_Freq_day[freq > 300, ':='(freq = 300)]
+
+
+datetime.all <- data.table(marg_dt$aggDay)
+colnames(datetime.all) <- c("aggDay")
+datetime.all[, ':='(sum_of_duration = NA)][, ':='(freq = NA)]
+datetime.all[, sum_of_duration := as.numeric(sum_of_duration)]
+datetime.all[, freq := as.numeric(freq)]
+
+margRS_dt <- datetime.all
+margRS_dt[which(aggDay >= as.Date(marg_RS$joined[1],format="%y-%m-%d") & aggDay <= "2016-6-30"), ]$sum_of_duration = 0
+margRS_dt[which(aggDay >= as.Date(marg_RS$joined[1],format="%y-%m-%d") & aggDay <= "2016-6-30"), ]$freq = 0
+uniqueDate = unique(marg_SumOfDuration_day$aggDay)
+
+for(i in 1:length(uniqueDate)){
+        margRS_dt[min(which(margRS_dt$aggDay == uniqueDate[i]))]$sum_of_duration = marg_SumOfDuration_day[marg_SumOfDuration_day[,marg_SumOfDuration_day$aggDay==uniqueDate[i]],]$sum_of_duration
+        margRS_dt[min(which(margRS_dt$aggDay == uniqueDate[i]))]$freq = marg_Freq_day[marg_Freq_day[,marg_Freq_day$aggDay==uniqueDate[i]],]$freq
+}
+
+hccRS_dt <- datetime.all
+hccRS_dt[which(aggDay >= as.Date(hcc_RS$joined[1],format="%y-%m-%d") & aggDay <= "2016-6-30"), ]$sum_of_duration = 0
+hccRS_dt[which(aggDay >= as.Date(hcc_RS$joined[1],format="%y-%m-%d") & aggDay <= "2016-6-30"), ]$freq = 0
+uniqueDate = unique(hcc_SumOfDuration_day$aggDay)
+for(i in 1:length(uniqueDate)){
+        hccRS_dt[min(which(hccRS_dt$aggDay == uniqueDate[i]))]$sum_of_duration = hcc_SumOfDuration_day[hcc_SumOfDuration_day[,hcc_SumOfDuration_day$aggDay==uniqueDate[i]],]$sum_of_duration
+        hccRS_dt[min(which(hccRS_dt$aggDay == uniqueDate[i]))]$freq = hcc_Freq_day[hcc_Freq_day[,hcc_Freq_day$aggDay==uniqueDate[i]],]$freq
+}
+
+uxRS_dt <- datetime.all
+uxRS_dt[which(aggDay >= as.Date(ux_RS$joined[1],format="%y-%m-%d") & aggDay <= "2016-6-30"), ]$sum_of_duration = 0
+uxRS_dt[which(aggDay >= as.Date(ux_RS$joined[1],format="%y-%m-%d") & aggDay <= "2016-6-30"), ]$freq = 0
+uniqueDate = unique(ux_SumOfDuration_day$aggDay)
+for(i in 1:length(uniqueDate)){
+        uxRS_dt[min(which(uxRS_dt$aggDay == uniqueDate[i]))]$sum_of_duration = ux_SumOfDuration_day[ux_SumOfDuration_day[,ux_SumOfDuration_day$aggDay==uniqueDate[i]],]$sum_of_duration
+        uxRS_dt[min(which(uxRS_dt$aggDay == uniqueDate[i]))]$freq = ux_Freq_day[ux_Freq_day[,ux_Freq_day$aggDay==uniqueDate[i]],]$freq
+}
+
+
+
 
 marg_dt[,sum_of_duration := margRS_dt$sum_of_duration][,freq := margRS_dt$freq]
 hcc_dt[,sum_of_duration := hccRS_dt$sum_of_duration][,freq := hccRS_dt$freq]
@@ -307,7 +436,7 @@ add.event.vline <- function(plot_body){
 
 ## 1. Four stats plots  +  partial_lightON & lightON duration plots 
 
-for(i in 43:(length(return_dts))){
+for(i in 2:(length(return_dts))){
         # (length(return_dts)) 
         plot_dt   = return_dts[[i]]
         # plot_name = names(return_dts[i])
@@ -345,7 +474,7 @@ for(i in 43:(length(return_dts))){
                               geom_point(aes(y=sum_of_duration), colour="darkcyan") +
                               geom_smooth(method = "auto", color="darkcyan", span = s) +
                               geom_text(aes(label=round(sum_of_duration, 0)), position=position_dodge(width=0.9), vjust=-0.25, colour="grey50") + 
-                              scale_x_date("Timestamp", labels = date_format("%y-%m"), breaks = date_breaks("month")) +
+                              # scale_x_date("Timestamp", labels = date_format("%y-%m"), breaks = date_breaks("month")) +
                               scale_y_continuous(limits=c(0,ylim_RS_duration), oob=rescale_none) +
                               ggtitle("RealSense Sum of duration")
                       
@@ -353,7 +482,7 @@ for(i in 43:(length(return_dts))){
                           geom_point(aes(y=freq), colour="darkcyan") +
                           geom_smooth(method = "auto", colour="darkcyan", span = s) +
                           geom_text(aes(label=round(freq, 0)), position=position_dodge(width=0.9), vjust=-0.25, colour="grey50") + 
-                          scale_x_date("Timestamp", labels = date_format("%y-%m"), breaks = date_breaks("month")) +
+#                           scale_x_date("Timestamp", labels = date_format("%y-%m"), breaks = date_breaks("month")) +
                           scale_y_continuous(limits=c(0,ylim_RS_freq), oob=rescale_none) +
                           ggtitle("RealSense Freq")
                 
@@ -390,19 +519,19 @@ for(i in 43:(length(return_dts))){
                         partial_lightON  = add.event.vline(partial_lightON)
                         lightON_duration = add.event.vline(lightON_duration)
                         RS_duration      = add.event.vline(RS_duration)
-                        RS_freq      = add.event.vline(RS_freq)
+                        RS_freq          = add.event.vline(RS_freq)
                         
                         plots <- arrangeGrob(stats, partial_lightON, lightON_duration, RS_duration, RS_freq, ncol=1)
-                        ggsave(file = paste0("../plots/plus_RS/",plot_name, ".png"), width = 20, height = 50, dpi = 300, plots, limitsize=FALSE)
+                        ggsave(file = paste0("plots/",plot_name, ".png"), width = 20, height = 50, dpi = 300, plots, limitsize=FALSE)
                         
                 } else {
                         
                         stats            = add.event.vline(stats)
                         RS_duration      = add.event.vline(RS_duration)
-                        RS_freq      = add.event.vline(RS_freq)
+                        RS_freq          = add.event.vline(RS_freq)
                         
                         plots <- arrangeGrob(stats, RS_duration, RS_freq, ncol=1)
-                        ggsave(file = paste0("../plots/plus_RS/",plot_name, ".png"), width = 20, height = 30, dpi = 300, plots)
+                        ggsave(file = paste0("plots/",plot_name, ".png"), width = 20, height = 30, dpi = 300, plots)
                 }
         }
 }
@@ -492,7 +621,7 @@ for(lab in 1:4){
                 
                 plots <- arrangeGrob(p1, p2)
                 
-                ggsave(file = paste0("../plots/", plot_name, ".png"), width = 20, height = 20, dpi = 600, plots)
+                ggsave(file = paste0("plots/", plot_name, ".png"), width = 20, height = 20, dpi = 600, plots)
         }
 }
 
@@ -571,7 +700,7 @@ for(lab in 1:4){
                 
                 plots <- arrangeGrob(p1, p2)
                 
-                ggsave(file = paste0("../plots/", plot_name, ".png"), width = 20, height = 20, dpi = 600, plots)
+                ggsave(file = paste0("plots/", plot_name, ".png"), width = 20, height = 20, dpi = 600, plots)
         }
 }
 
@@ -628,9 +757,6 @@ for(lab in 1:4){
                 
                 p = add.event.vline(p)
                 
-                ggsave(file = paste0("../plots/", plot_name, ".png"), width = 20, height = 10, dpi = 600, p)
+                ggsave(file = paste0("plots/", plot_name, ".png"), width = 20, height = 10, dpi = 600, p)
         }
 }
-
-
-
