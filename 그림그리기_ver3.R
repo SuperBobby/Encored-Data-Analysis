@@ -439,7 +439,7 @@ windowingByExpDate <- function(data, yName, windowingWeek){
     end<-1
     
     ##Collecting UX RealSense data starts on "2015-11-02"
-    if((yName=='sum_of_duration' | yName=='freq') & (data[k,1] < as.Date("2015-11-02"))) {
+    if((yName=='sum_of_duration' | yName=='freq') & (data$get[k] < as.Date("2015-11-02"))) {
       windowing$mean[k] <- NA
       windowing$sd[k] <- NA 
       next
@@ -539,7 +539,7 @@ windowingByExpDate <- function(data, yName, windowingWeek){
       windowing$sd[k] <- ifelse(is.nan(sd(y[start:end],na.rm=T)),NA,sd(y[start:end],na.rm=T)) 
     }
   }
-  windowing$get <- data[[1]]
+  windowing$get <- data$get
   return (windowing)
 }
 
@@ -885,18 +885,29 @@ for(lab in 1:4){
                                             full_lightON_20 = sum(light > (light_peak * 0.2), na.rm = T)==96,
                                             full_lightON_10 = sum(light > (light_peak * 0.1), na.rm = T)==96), by=aggDay]
         
+        setnames(full_lightON_aggDay_dt,old="aggDay",new="get")
+        
         full_lightON_aggWeek_dt = full_lightON_aggDay_dt[, .(full_lightON_50 = sum(full_lightON_50, na.rm = T),
                                                              full_lightON_40 = sum(full_lightON_40, na.rm = T),
                                                              full_lightON_30 = sum(full_lightON_30, na.rm = T),
                                                              full_lightON_20 = sum(full_lightON_20, na.rm = T),
-                                                             full_lightON_10 = sum(full_lightON_10, na.rm = T)), by=.(aggWeek=as.Date(cut(aggDay, breaks = "week", start.on.monday = T)))]
+                                                             full_lightON_10 = sum(full_lightON_10, na.rm = T)), by=.(aggWeek=as.Date(cut(get, breaks = "week", start.on.monday = T)))]
         
-        for(s in seq(0.1, 0.5, 0.1)) {
+        setnames(full_lightON_aggWeek_dt,old="aggWeek",new="get")
+        
+        
+        rownum_expDate <- 1
+        
+        for (d in expDate) {
+          rownum_expDate <- append(rownum_expDate, (nrow(lunch_dt_aggWeek[d>lunch_dt_aggWeek$get,])+1))
+        }
+        
+        for(windowingWeek in c(4,8,12,16)) {
                 
-                plot_name = paste(lab_name, "full(24hrs)_lightON count - span", s)  
+                plot_name = paste(lab_name, "full(24hrs)_lightON count - windowing", windowingWeek,"weeks")  
                 print(plot_name)
                 
-                p <- ggplot(full_lightON_aggWeek_dt, aes(x=aggWeek)) +
+                p <- ggplot(full_lightON_aggWeek_dt, aes(x=get)) +
                         
                         #                         geom_point(aes(y=full_lightON_50, color='full_lightON_50')) +
                         #                         geom_smooth(aes(y=full_lightON_50, color='full_lightON_50'), span = s) +    
@@ -904,19 +915,17 @@ for(lab in 1:4){
                         #                         geom_point(aes(y=full_lightON_40, color='full_lightON_40')) +
                         #                         geom_smooth(aes(y=full_lightON_40, color='full_lightON_40'), span = s) +             
                         
-                        geom_point(aes(y=full_lightON_30, color='full_lightON_30')) +
-                        geom_smooth(aes(y=full_lightON_30, color='full_lightON_30'), span = s) +             
-                        
+                        geom_point(aes(y=full_lightON_30, color='full_lightON_30')) +        
                         geom_point(aes(y=full_lightON_20, color='full_lightON_20')) +
-                        geom_smooth(aes(y=full_lightON_20, color='full_lightON_20'), span = s) +    
-                        
                         geom_point(aes(y=full_lightON_10, color='full_lightON_10')) +
-                        geom_smooth(aes(y=full_lightON_10, color='full_lightON_10'), span = s) +  
-                        
                         ggtitle(paste(plot_name, "aggWeek"))
+                
+                p = add.window.line(p, full_lightON_aggWeek_dt, 'full_lightON_30', windowingWeek)
+                p = add.window.line(p, full_lightON_aggWeek_dt, 'full_lightON_20', windowingWeek)
+                p = add.window.line(p, full_lightON_aggWeek_dt, 'full_lightON_10', windowingWeek)
                 
                 p = add.event.vline(p)
                 
-                ggsave(file = paste0("plots/", plot_name, ".png"), width = 20, height = 10, dpi = 600, p)
+                ggsave(file = paste0("../plots/custom_window/", plot_name, ".png"), width = 20, height = 10, dpi = 600, p)
         }
 }
