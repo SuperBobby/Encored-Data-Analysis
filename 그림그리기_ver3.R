@@ -439,7 +439,7 @@ windowingByExpDate <- function(data, yName, windowingWeek){
     end<-1
     
     ##Collecting UX RealSense data starts on "2015-11-02"
-    if((yName=='sum_of_duration' | yName=='freq') & (data[k,1] < as.Date("2015-11-02"))) {
+    if((yName=='sum_of_duration' | yName=='freq') & (data$get[k] < as.Date("2015-11-02"))) {
       windowing$mean[k] <- NA
       windowing$sd[k] <- NA 
       next
@@ -539,7 +539,7 @@ windowingByExpDate <- function(data, yName, windowingWeek){
       windowing$sd[k] <- ifelse(is.nan(sd(y[start:end],na.rm=T)),NA,sd(y[start:end],na.rm=T)) 
     }
   }
-  windowing$get <- data[[1]]
+  windowing$get <- data$get
   return (windowing)
 }
 
@@ -577,7 +577,7 @@ expDate<-c(as.Date("2015-10-08"),
            as.Date("2016-06-13"))
 
 start.time <- Sys.time()
-for(i in 54:(length(return_dts))){ 
+for(i in 24:(length(return_dts))){ 
         plot_dt   = return_dts[[i]]
         
         rownum_expDate <- 1
@@ -586,8 +586,7 @@ for(i in 54:(length(return_dts))){
           rownum_expDate <- append(rownum_expDate, (nrow(plot_dt[d>plot_dt$get,])+1))
         }
         
-        ##windowingWeek must be even
-        for(windowingWeek in c(4,8,12,16)) {
+        for(windowingWeek in c(4,8,16)) {
                       
                 plot_name = paste(names(return_dts[i]), "- windowing ", windowingWeek,"weeks")  
                 print(plot_name)
@@ -674,6 +673,37 @@ end.time-start.time
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ###
 ## 2. lunch light OFF plots --> 상단 1번 과정 안에 통합되어야 함 
 
@@ -699,8 +729,6 @@ for(lab in 1:4){
         lab_dt = dt_list[[lab]]
         lab_name = lab_names[lab]
         
-        rownum_expDate <- 1
-
         lunch_dt_aggDay <- lab_dt[, .(aggWeek=as.Date(cut(aggDay, breaks = "week", start.on.monday = T)),
                                       lunch_lightOFF_50 = get.lunch.lightOFF(.SD, 0.5),
                                       lunch_lightOFF_60 = get.lunch.lightOFF(.SD, 0.6),
@@ -708,71 +736,59 @@ for(lab in 1:4){
                                       lunch_lightOFF_80 = get.lunch.lightOFF(.SD, 0.8),
                                       lunch_lightOFF_90 = get.lunch.lightOFF(.SD, 0.9)), by=aggDay]
         
-        setnames(lunch_dt_aggDay,old="aggDay",new="get")
-        
         lunch_dt_aggWeek <- lunch_dt_aggDay[, .(lunch_lightOFF_50 = sum(lunch_lightOFF_50),
                                                 lunch_lightOFF_60 = sum(lunch_lightOFF_60),
                                                 lunch_lightOFF_70 = sum(lunch_lightOFF_70),
                                                 lunch_lightOFF_80 = sum(lunch_lightOFF_80),
                                                 lunch_lightOFF_90 = sum(lunch_lightOFF_90)), by=aggWeek]
         
-        setnames(lunch_dt_aggWeek,old="aggWeek",new="get")
-        
-        aggDay_rownum_expDate <- 1
-        
-        for (d in expDate) {
-          aggDay_rownum_expDate <- append(aggDay_rownum_expDate, (nrow(lunch_dt_aggDay[d>lunch_dt_aggDay$get,])+1))
-        }
-        
-        aggWeek_rownum_expDate <- 1
-        
-        for (d in expDate) {
-          aggWeek_rownum_expDate <- append(aggWeek_rownum_expDate, (nrow(lunch_dt_aggWeek[d>lunch_dt_aggWeek$get,])+1))
-        }
-        
-        for(windowingWeek in c(4,8,12,16)) {
+        for(s in seq(0.1, 0.5, 0.1)) {
                 
-                plot_name = paste(lab_name, "lunch light OFF count - windowing", windowingWeek,"weeks")  
+                plot_name = paste(lab_name, "lunch light OFF count - span", s)  
                 print(plot_name)
                 
-                rownum_expDate <- aggDay_rownum_expDate
+                p1 <- ggplot(lunch_dt_aggDay, aes(x=aggDay)) +
+                        
+                        geom_point(aes(y=lunch_lightOFF_50, color='lunch_lightOFF_50')) +
+                        geom_smooth(aes(y=lunch_lightOFF_50, color='lunch_lightOFF_50'), span = s) +    
+                        
+                        geom_point(aes(y=lunch_lightOFF_60, color='lunch_lightOFF_60')) +
+                        geom_smooth(aes(y=lunch_lightOFF_60, color='lunch_lightOFF_60'), span = s) +             
+                        
+                        geom_point(aes(y=lunch_lightOFF_70, color='lunch_lightOFF_70')) +
+                        geom_smooth(aes(y=lunch_lightOFF_70, color='lunch_lightOFF_70'), span = s) +             
+                        
+                        geom_point(aes(y=lunch_lightOFF_80, color='lunch_lightOFF_80')) +
+                        geom_smooth(aes(y=lunch_lightOFF_80, color='lunch_lightOFF_80'), span = s) +   
+                        
+                        geom_point(aes(y=lunch_lightOFF_90, color='lunch_lightOFF_90')) +
+                        geom_smooth(aes(y=lunch_lightOFF_90, color='lunch_lightOFF_90'), span = s) +   
+                        
+                        ggtitle(paste(plot_name, "aggDay"))
                 
-                p1 <- ggplot(lunch_dt_aggDay, aes(x=get)) +
-                        geom_point(aes(y=lunch_lightOFF_50, color='lunch_lightOFF_50')) +   
-                        geom_point(aes(y=lunch_lightOFF_60, color='lunch_lightOFF_60')) +            
-                        geom_point(aes(y=lunch_lightOFF_70, color='lunch_lightOFF_70')) +          
-                        geom_point(aes(y=lunch_lightOFF_80, color='lunch_lightOFF_80')) + 
-                        geom_point(aes(y=lunch_lightOFF_90, color='lunch_lightOFF_90')) +  
-                        ggtitle(paste(plot_name, "get"))
-                
-                p1 = add.window.line(p1, lunch_dt_aggDay, 'lunch_lightOFF_50', windowingWeek)
-                p1 = add.window.line(p1, lunch_dt_aggDay, 'lunch_lightOFF_60', windowingWeek)
-                p1 = add.window.line(p1, lunch_dt_aggDay, 'lunch_lightOFF_70', windowingWeek)
-                p1 = add.window.line(p1, lunch_dt_aggDay, 'lunch_lightOFF_80', windowingWeek)
-                p1 = add.window.line(p1, lunch_dt_aggDay, 'lunch_lightOFF_90', windowingWeek)
-                
-                rownum_expDate <- aggWeek_rownum_expDate
-                
-                p2 <- ggplot(lunch_dt_aggWeek, aes(x=get)) +
-                        geom_point(aes(y=lunch_lightOFF_50, color='lunch_lightOFF_50')) + 
-                        geom_point(aes(y=lunch_lightOFF_60, color='lunch_lightOFF_60')) +            
-                        geom_point(aes(y=lunch_lightOFF_70, color='lunch_lightOFF_70')) +            
-                        geom_point(aes(y=lunch_lightOFF_80, color='lunch_lightOFF_80')) + 
-                        geom_point(aes(y=lunch_lightOFF_90, color='lunch_lightOFF_90')) +  
-                        ggtitle(paste(plot_name, "get"))
-                
-                p2 = add.window.line(p2, lunch_dt_aggWeek, 'lunch_lightOFF_50', windowingWeek)
-                p2 = add.window.line(p2, lunch_dt_aggWeek, 'lunch_lightOFF_60', windowingWeek)
-                p2 = add.window.line(p2, lunch_dt_aggWeek, 'lunch_lightOFF_70', windowingWeek)
-                p2 = add.window.line(p2, lunch_dt_aggWeek, 'lunch_lightOFF_80', windowingWeek)
-                p2 = add.window.line(p2, lunch_dt_aggWeek, 'lunch_lightOFF_90', windowingWeek)
-                
-                p1 = add.event.vline(p1)
-                p2 = add.event.vline(p2)
+                p2 <- ggplot(lunch_dt_aggWeek, aes(x=aggWeek)) +
+                        
+                        geom_point(aes(y=lunch_lightOFF_50, color='lunch_lightOFF_50')) +
+                        geom_smooth(aes(y=lunch_lightOFF_50, color='lunch_lightOFF_50'), span = s) +    
+                        
+                        geom_point(aes(y=lunch_lightOFF_60, color='lunch_lightOFF_60')) +
+                        geom_smooth(aes(y=lunch_lightOFF_60, color='lunch_lightOFF_60'), span = s) +             
+                        
+                        geom_point(aes(y=lunch_lightOFF_70, color='lunch_lightOFF_70')) +
+                        geom_smooth(aes(y=lunch_lightOFF_70, color='lunch_lightOFF_70'), span = s) +             
+                        
+                        geom_point(aes(y=lunch_lightOFF_80, color='lunch_lightOFF_80')) +
+                        geom_smooth(aes(y=lunch_lightOFF_80, color='lunch_lightOFF_80'), span = s) +   
+                        
+                        geom_point(aes(y=lunch_lightOFF_90, color='lunch_lightOFF_90')) +
+                        geom_smooth(aes(y=lunch_lightOFF_90, color='lunch_lightOFF_90'), span = s) +   
+                        
+                        ggtitle(paste(plot_name, "aggWeek"))
+
                 
                 plots <- arrangeGrob(p1, p2)
                 
-                ggsave(file = paste0("../plots/custom_window/", plot_name, ".png"), width = 20, height = 20, dpi = 600, plots)
+                ggsave(file = paste0("plots/", plot_name, ".png"), width = 20, height = 20, dpi = 600, plots)
         }
 }
 
@@ -796,71 +812,62 @@ for(lab in 1:4){
                                             strong_light_80 = sum(light > (light_peak * 0.8)),
                                             strong_light_90 = sum(light > (light_peak * 0.9))), by=aggDay]
         
-        setnames(strong_light_aggDay_dt,old="aggDay",new="get")
-        
         strong_light_aggWeek_dt = lab_dt[, .(strong_light_50 = sum(light > (light_peak * 0.5)),
                                              strong_light_60 = sum(light > (light_peak * 0.6)),
                                              strong_light_70 = sum(light > (light_peak * 0.7)),
                                              strong_light_80 = sum(light > (light_peak * 0.8)),
                                              strong_light_90 = sum(light > (light_peak * 0.9))), by=aggWeek]
         
-        setnames(strong_light_aggWeek_dt,old="aggWeek",new="get")
-        
-        aggDay_rownum_expDate <- 1
-        
-        for (d in expDate) {
-          aggDay_rownum_expDate <- append(aggDay_rownum_expDate, (nrow(lunch_dt_aggDay[d>lunch_dt_aggDay$get,])+1))
-        }
-        
-        aggWeek_rownum_expDate <- 1
-        
-        for (d in expDate) {
-          aggWeek_rownum_expDate <- append(aggWeek_rownum_expDate, (nrow(lunch_dt_aggWeek[d>lunch_dt_aggWeek$get,])+1))
-        }
-        
-        for(windowingWeek in c(4,8,12,16)) {
+        for(s in seq(0.1, 0.5, 0.1)) {
                 
-                plot_name = paste(lab_name, "strong_light count - windowing", windowingWeek,"weeks")  
+                plot_name = paste(lab_name, "strong_light count - span", s)  
                 print(plot_name)
                 
-                rownum_expDate <- aggDay_rownum_expDate
-                
-                p1 <- ggplot(strong_light_aggDay_dt, aes(x=get)) +
-                        geom_point(aes(y=strong_light_50, color='strong_light_50')) +  
-                        geom_point(aes(y=strong_light_60, color='strong_light_60')) +          
-                        geom_point(aes(y=strong_light_70, color='strong_light_70')) +            
+                p1 <- ggplot(strong_light_aggDay_dt, aes(x=aggDay)) +
+                        
+                        geom_point(aes(y=strong_light_50, color='strong_light_50')) +
+                        geom_smooth(aes(y=strong_light_50, color='strong_light_50'), span = s) +    
+                        
+                        geom_point(aes(y=strong_light_60, color='strong_light_60')) +
+                        geom_smooth(aes(y=strong_light_60, color='strong_light_60'), span = s) +             
+                        
+                        geom_point(aes(y=strong_light_70, color='strong_light_70')) +
+                        geom_smooth(aes(y=strong_light_70, color='strong_light_70'), span = s) +             
+                        
                         geom_point(aes(y=strong_light_80, color='strong_light_80')) +
+                        geom_smooth(aes(y=strong_light_80, color='strong_light_80'), span = s) +    
+                        
                         geom_point(aes(y=strong_light_90, color='strong_light_90')) +
+                        geom_smooth(aes(y=strong_light_90, color='strong_light_90'), span = s) +    
+
                         ggtitle(paste(plot_name, "aggDay"))
                 
-                p1 = add.window.line(p1, strong_light_aggDay_dt, 'strong_light_50', windowingWeek)
-                p1 = add.window.line(p1, strong_light_aggDay_dt, 'strong_light_60', windowingWeek)
-                p1 = add.window.line(p1, strong_light_aggDay_dt, 'strong_light_70', windowingWeek)
-                p1 = add.window.line(p1, strong_light_aggDay_dt, 'strong_light_80', windowingWeek)
-                p1 = add.window.line(p1, strong_light_aggDay_dt, 'strong_light_90', windowingWeek)
-                
-                rownum_expDate <- aggWeek_rownum_expDate
-                
-                p2 <- ggplot(strong_light_aggWeek_dt, aes(x=get)) +
+                p2 <- ggplot(strong_light_aggWeek_dt, aes(x=aggWeek)) +
+                        
                         geom_point(aes(y=strong_light_50, color='strong_light_50')) +
+                        geom_smooth(aes(y=strong_light_50, color='strong_light_50'), span = s) +    
+                        
                         geom_point(aes(y=strong_light_60, color='strong_light_60')) +
+                        geom_smooth(aes(y=strong_light_60, color='strong_light_60'), span = s) +             
+                        
                         geom_point(aes(y=strong_light_70, color='strong_light_70')) +
+                        geom_smooth(aes(y=strong_light_70, color='strong_light_70'), span = s) +             
+                        
                         geom_point(aes(y=strong_light_80, color='strong_light_80')) +
+                        geom_smooth(aes(y=strong_light_80, color='strong_light_80'), span = s) +    
+                        
                         geom_point(aes(y=strong_light_90, color='strong_light_90')) +
+                        geom_smooth(aes(y=strong_light_90, color='strong_light_90'), span = s) +    
+
                         ggtitle(paste(plot_name, "aggWeek"))
                 
-                p2 = add.window.line(p2, strong_light_aggWeek_dt, 'strong_light_50', windowingWeek)
-                p2 = add.window.line(p2, strong_light_aggWeek_dt, 'strong_light_60', windowingWeek)
-                p2 = add.window.line(p2, strong_light_aggWeek_dt, 'strong_light_70', windowingWeek)
-                p2 = add.window.line(p2, strong_light_aggWeek_dt, 'strong_light_80', windowingWeek)
-                p2 = add.window.line(p2, strong_light_aggWeek_dt, 'strong_light_90', windowingWeek)
-
+                
                 p1 = add.event.vline(p1)
                 p2 = add.event.vline(p2)
                 
                 plots <- arrangeGrob(p1, p2)
                 
-                ggsave(file = paste0("../plots/custom_window/", plot_name, ".png"), width = 20, height = 20, dpi = 600, plots)
+                ggsave(file = paste0("plots/", plot_name, ".png"), width = 20, height = 20, dpi = 600, plots)
         }
 }
 
