@@ -17,12 +17,11 @@ require(bit64)
 # load("Encored-Data-Analysis/hcc_15min.RData")
 # load("Encored-Data-Analysis/ux_15min.RData")
 
-load("../Encored-Data-Analysis/marg_15min.RData")
-load("../Encored-Data-Analysis/hcc_15min.RData")
-load("../Encored-Data-Analysis/ux_15min.RData")
+# load("../Encored-Data-Analysis/marg_15min.RData")
+# load("../Encored-Data-Analysis/hcc_15min.RData")
+# load("../Encored-Data-Analysis/ux_15min.RData")
 
-
-source("../Encored-Data-Analysis/getSNUdata.R")
+source("Encored-Data-Analysis/getSNUdata.R")
 update_start = "2014-10-01"
 update_end = "2016-7-11"
 
@@ -117,11 +116,20 @@ ux_dt = na.missing.data(ux_dt, 0.02)
 
 ### Computer
 ## abnormal computer usage : 
+## all labs : computer usage under 0.001 = NA
 ## hcc : computer usage over 0.5 = NA
 ##  ux : computer usage over 0.35 = NA
 
+marg_dt[computer < 0.001, ':='(computer = NA,light = NA,
+                               hvac = NA, etc = NA, total = NA)]
+hcc_dt[computer < 0.001, ':='(computer = NA,light = NA,
+                              hvac = NA, etc = NA, total = NA)]
+ux_dt[computer < 0.001, ':='(computer = NA,light = NA,
+                             hvac = NA, etc = NA, total = NA)]
+
 hcc_dt[computer > 0.5, ':='(computer = NA)]
 ux_dt[computer > 0.35, ':='(computer = NA)]
+
 
 # check the distributions
 par(mfrow=c(2,3))
@@ -673,7 +681,7 @@ for(i in 2:length(return_dts)){
                         RS_freq          = add.event.vline(RS_freq)
                         
                         plots <- arrangeGrob(stats, partial_lightON, lightON_duration, RS_duration, RS_freq, ncol=1)
-                        ggsave(file = paste0("../plots/custom_window/",plot_name, ".png"), width = 20, height = 50, dpi = 300, plots, limitsize=FALSE)
+                        ggsave(file = paste0("../plots/",plot_name, ".png"), width = 20, height = 50, dpi = 300, plots, limitsize=FALSE)
                         
                 } else {
                         
@@ -682,11 +690,14 @@ for(i in 2:length(return_dts)){
                         RS_freq          = add.event.vline(RS_freq)
                         
                         plots <- arrangeGrob(stats, RS_duration, RS_freq, ncol=1)
-                        ggsave(file = paste0("../plots/custom_window/peak4_",plot_name, ".png"), width = 20, height = 30, dpi = 300, plots)
+
+                        ggsave(file = paste0("../plots/peak4_",plot_name, ".png"), width = 20, height = 30, dpi = 300, plots)
                 }
         }
 }
 end.time <- Sys.time()
+
+
 end.time-start.time
 
 
