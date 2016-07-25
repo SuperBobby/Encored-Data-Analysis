@@ -1,4 +1,4 @@
-source("Encored-Data-Analysis/getSNUdata.R")
+source("../Encored-Data-Analysis/getSNUdata.R")
 library(data.table)
 library(ggplot2)
 
@@ -19,8 +19,8 @@ str(elec_dt)
 ########################
 ## Weather table
 ########################
-weather_dt = fread("data/Suwon_weather.csv")
-weather_dt$date_string = as.Date(weather_dt$date_string)
+weather_dt = fread("../rawData/Suwon_weather.csv")
+weather_dt$date_index = as.Date(weather_dt$date_index)
 str(weather_dt)
 
 

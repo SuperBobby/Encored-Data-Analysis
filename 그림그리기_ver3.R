@@ -232,6 +232,15 @@ marg_Freq_day = marg_RS[, .(freq = nrow(.SD)), by=aggDay]
 hcc_Freq_day = hcc_RS[, .(freq = nrow(.SD)), by=aggDay]
 ux_Freq_day = ux_RS[, .(freq = nrow(.SD)), by=aggDay]
 
+# #frequency cut
+marg_SumOfDuration_day = marg_RS[duration>1, .(sum_of_duration = sum(duration)), by=aggDay]
+hcc_SumOfDuration_day = hcc_RS[duration>1, .(sum_of_duration = sum(duration)), by=aggDay]
+ux_SumOfDuration_day = ux_RS[duration>1, .(sum_of_duration = sum(duration)), by=aggDay]
+
+marg_Freq_day = marg_RS[duration>1, .(freq = nrow(.SD)), by=aggDay]
+hcc_Freq_day = hcc_RS[duration>1, .(freq = nrow(.SD)), by=aggDay]
+ux_Freq_day = ux_RS[duration>1, .(freq = nrow(.SD)), by=aggDay]
+
 
 # set max sum_of_duration as 600
 max_sum_of_duration = 600
@@ -315,10 +324,13 @@ AllLabs_dt$freq = AllLabs_dt$freq + hcc_dt$freq + ux_dt$freq
 
 ## four stat : peak, base, avg, mid --> c(1,2,3,4)
 get.four.stats <- function(usage, type){
-        peak = quantile(usage, .95, na.rm = T)
-        base = quantile(usage, .05, na.rm = T)
-        avg  = mean(usage, na.rm = T)
-        med  = median(usage, na.rm = T)
+        peak = quantile(usage, .90, na.rm = T)
+#         peak = quantile(usage, .10, na.rm = T)
+        base = quantile(usage, .80, na.rm = T)
+#         avg  = mean(usage, na.rm = T)
+#         med  = median(usage, na.rm = T)
+        avg  = quantile(usage, .70, na.rm = T)
+        med  = quantile(usage, .60, na.rm = T)
         
         result=c(peak, base, avg, med)
         return(result[type])
@@ -347,12 +359,14 @@ agg_Units = c("aggWeek", "aggDay")
 day_selections = c("allDay", "weekDay", "weekEnd")
 
 # 4. feeders
-feeders = c("total", "computer", "light", "hvac")
+# feeders = c("total", "computer", "light", "hvac")
+feeders = c("hvac")
 
 
 return_dts = list(0)
 
-for(lab in 1:4){ 
+# for(lab in 1:4){ 
+for(lab in 1){
         # lab_dt & name selection 
         lab_dt = dt_list[[lab]]
         lab_name = lab_names[lab]
@@ -469,7 +483,7 @@ windowingByExpDate <- function(data, yName, windowingWeek){
         start <- 1
       }
       if(k+n >= rownum_expDate[2]) {
-        end <- rownum_expDate[2]
+        end <- rownum_expDate[2] - 1
       }
       
       windowing$mean[k] <- ifelse(is.nan(mean(y[start:end],na.rm=T)),NA,mean(y[start:end],na.rm=T))
@@ -483,7 +497,7 @@ windowingByExpDate <- function(data, yName, windowingWeek){
         start <- rownum_expDate[2]
       }
       if(k+n >= rownum_expDate[3]) {
-        end <- rownum_expDate[3]
+        end <- rownum_expDate[3] - 1
       }
       
       windowing$mean[k] <- ifelse(is.nan(mean(y[start:end],na.rm=T)),NA,mean(y[start:end],na.rm=T))
@@ -496,7 +510,7 @@ windowingByExpDate <- function(data, yName, windowingWeek){
         start <- rownum_expDate[3]
       }
       if(k+n >= rownum_expDate[4]) {
-        end <- rownum_expDate[4]
+        end <- rownum_expDate[4] - 1
       }
       
       windowing$mean[k] <- ifelse(is.nan(mean(y[start:end],na.rm=T)),NA,mean(y[start:end],na.rm=T))
@@ -509,7 +523,7 @@ windowingByExpDate <- function(data, yName, windowingWeek){
         start <- rownum_expDate[4]
       }
       if(k+n >= rownum_expDate[5]) {
-        end <- rownum_expDate[5]
+        end <- rownum_expDate[5] - 1
       }
       
       windowing$mean[k] <- ifelse(is.nan(mean(y[start:end],na.rm=T)),NA,mean(y[start:end],na.rm=T))
@@ -522,7 +536,7 @@ windowingByExpDate <- function(data, yName, windowingWeek){
         start <- rownum_expDate[5]
       }
       if(k+n >= rownum_expDate[6]) {
-        end <- rownum_expDate[6]
+        end <- rownum_expDate[6] - 1
       }
       
       windowing$mean[k] <- ifelse(is.nan(mean(y[start:end],na.rm=T)),NA,mean(y[start:end],na.rm=T))
@@ -535,7 +549,7 @@ windowingByExpDate <- function(data, yName, windowingWeek){
         start <- rownum_expDate[6]
       }
       if(k+n >= rownum_expDate[7]) {
-        end <- rownum_expDate[7]
+        end <- rownum_expDate[7] - 1
       }
       
       windowing$mean[k] <- ifelse(is.nan(mean(y[start:end],na.rm=T)),NA,mean(y[start:end],na.rm=T))
@@ -592,8 +606,11 @@ expDate<-c(as.Date("2015-10-08"),
            as.Date("2016-05-16"),
            as.Date("2016-06-13"))
 
+# return_dts[[40]][get >= "2015-12-11" & get <= "2015-12-30"]$sum_of_duration <- NA
+# return_dts[[40]][get >= "2015-12-11" & get <= "2015-12-30"]$freq <- NA
+
 start.time <- Sys.time()
-for(i in 54:(length(return_dts))){ 
+for(i in 2:length(return_dts)){ 
         plot_dt   = return_dts[[i]]
         
         rownum_expDate <- 1
@@ -618,7 +635,9 @@ for(i in 54:(length(return_dts))){
                 stats = add.window.line(stats, plot_dt, "base", windowingWeek)
                 stats = add.window.line(stats, plot_dt, "avg", windowingWeek)
                 stats = add.window.line(stats, plot_dt, "med", windowingWeek)
-                
+                stats = stats + 
+                        scale_color_discrete(breaks=c("peak", "base", "avg", "med"), labels=c("peak 90%", "peak 80%", "peak 70%", "peak 60%"))
+
                 if(strsplit(plot_name,"_")[[1]][2] == "aggWeek"){
                   ylim_RS_duration <- 2000
                   ylim_RS_freq <- 1000
@@ -679,7 +698,12 @@ for(i in 54:(length(return_dts))){
                         RS_freq          = add.event.vline(RS_freq)
                         
                         plots <- arrangeGrob(stats, RS_duration, RS_freq, ncol=1)
+<<<<<<< HEAD
                         ggsave(file = paste0("plots/",plot_name, ".png"), width = 20, height = 30, dpi = 200, plots)
+=======
+
+                        ggsave(file = paste0("../plots/peak4_",plot_name, ".png"), width = 20, height = 30, dpi = 300, plots)
+>>>>>>> origin/master
                 }
         }
 }
@@ -947,3 +971,5 @@ for(lab in 1:4){
                 ggsave(file = paste0("plots/", plot_name, ".png"), width = 20, height = 10, dpi = 200, p)
         }
 }
+
+
