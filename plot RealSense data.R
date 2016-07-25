@@ -37,20 +37,20 @@ RS_marg_raw = fread("realsense/marg.csv")
 RS_hcc_raw = fread("realsense/hcc.csv")
 RS_ux_raw = fread("realsense/ux.csv")
 
-adsl_RS = table.time2string(RS_adsl_raw)
-marg_RS = table.time2string(RS_marg_raw)
-hcc_RS = table.time2string(RS_hcc_raw)
-ux_RS = table.time2string(RS_ux_raw)
+RS_adsl = table.time2string(RS_adsl_raw)
+RS_marg = table.time2string(RS_marg_raw)
+RS_hcc = table.time2string(RS_hcc_raw)
+RS_ux = table.time2string(RS_ux_raw)
 
 date_adjust_parameter = 7 * 60 * 60 # 7 hours 
 
-marg_RS[, ':='(date=as.Date(joined-date_adjust_parameter, tz="rok"), weekday = isWeekday(joined))]
-hcc_RS[, ':='(date=as.Date(joined-date_adjust_parameter, tz="rok"), weekday = isWeekday(joined))]
-ux_RS[, ':='(date=as.Date(joined-date_adjust_parameter, tz="rok"), weekday = isWeekday(joined))]
+RS_marg[, ':='(date=as.Date(joined-date_adjust_parameter, tz="rok"), weekday = isWeekday(joined))]
+RS_hcc[, ':='(date=as.Date(joined-date_adjust_parameter, tz="rok"), weekday = isWeekday(joined))]
+RS_ux[, ':='(date=as.Date(joined-date_adjust_parameter, tz="rok"), weekday = isWeekday(joined))]
 
-write.csv(marg_RS, file ="data/marg_RS.csv")
-write.csv(hcc_RS, file ="data/hcc_RS.csv")
-write.csv(ux_RS, file ="data/ux_RS.csv")
+write.csv(RS_marg, file ="data/marg_RS.csv")
+write.csv(RS_hcc, file ="data/hcc_RS.csv")
+write.csv(RS_ux, file ="data/ux_RS.csv")
 
 # raw data histogram
 
@@ -96,6 +96,9 @@ hist.by.day <- function(lab, dt, duration_cut, type = c("gt, le"), date_cut, j=F
         return(dt)
 }        
 
+
+
+
 # hist(log(as.numeric(RS_marg$duration)))
 
 sum(RS_marg$duration <= 10) / length(RS_marg$duration)
@@ -104,24 +107,23 @@ sum(RS_ux$duration <= 10) / length(RS_ux$duration)
 # 약 97%의 sample이 30초 이하 
 # 20초 미만 : 94~95%
 # 10초 미만 : 90%
-
-cut_date = "2015-10-8"
-
-hist.by.day("marg", RS_marg, 300, "le", cut_date, j=F)
-hist.by.day("marg", RS_marg, 300, "gt", cut_date, j=T)
-
-hist.by.day("hcc", RS_hcc, 300, "le", cut_date, j=F)
-hist.by.day("hcc", RS_hcc, 300, "gt", cut_date, j=T)
-
-hist.by.day("ux", RS_ux, 300, "le", cut_date, j=F)
-hist.by.day("ux", RS_ux, 300, "gt", cut_date, j=T)
-
-hist.by.day("hcc", RS_hcc, 300, "le", cut_date, j=F)
+# 
+# cut_date = "2015-10-8"
+# 
+# hist.by.day("marg", RS_marg, 300, "le", cut_date, j=F)
+# hist.by.day("marg", RS_marg, 300, "gt", cut_date, j=T)
+# 
+# hist.by.day("hcc", RS_hcc, 300, "le", cut_date, j=F)
+# hist.by.day("hcc", RS_hcc, 300, "gt", cut_date, j=T)
+# 
+# hist.by.day("ux", RS_ux, 300, "le", cut_date, j=F)
+# hist.by.day("ux", RS_ux, 300, "gt", cut_date, j=T)
+# 
+# hist.by.day("hcc", RS_hcc, 300, "le", cut_date, j=F)
 
 #
 
-
-
+# 
 
 
 

@@ -23,7 +23,7 @@ require(bit64)
 
 source("Encored-Data-Analysis/getSNUdata.R")
 update_start = "2014-10-01"
-update_end = "2016-7-11"
+update_end = "2016-7-18"
 
 marg_defalut_table_15min = reviseSNUData(marg_defalut_table_15min, "marg", update_start, update_end, verbose = T)
 hcc_defalut_table_15min = reviseSNUData( hcc_defalut_table_15min, "hcc",  update_start, update_end, verbose = T)
@@ -215,6 +215,14 @@ ux_RS[duration > 5*60]   # 3 --> All cases make sense
 hcc_RS <- hcc_RS[aggDay < "2015-12-11" | aggDay > "2015-12-30"]
 
 
+
+i = 1
+sum(marg_RS$duration < i) / nrow(marg_RS)
+sum(hcc_RS$duration < i) / nrow(hcc_RS)
+sum(ux_RS$duration < i) / nrow(ux_RS)
+
+
+
 # Sum of duration 
 marg_SumOfDuration_day = marg_RS[, .(sum_of_duration = sum(duration)), by=aggDay]
 hcc_SumOfDuration_day = hcc_RS[, .(sum_of_duration = sum(duration)), by=aggDay]
@@ -238,7 +246,7 @@ ux_SumOfDuration_day[sum_of_duration > max_sum_of_duration, ':='(sum_of_duration
 # hist(marg_Freq$freq, 100)
 # hist(hcc_Freq$freq, 100)
 # hist(ux_Freq$freq, 100)
-# 
+
 
 marg_Freq_day[freq > 100]
 hcc_Freq_day[freq > 100]
@@ -662,7 +670,7 @@ for(i in 54:(length(return_dts))){
                         RS_freq          = add.event.vline(RS_freq)
                         
                         plots <- arrangeGrob(stats, partial_lightON, lightON_duration, RS_duration, RS_freq, ncol=1)
-                        ggsave(file = paste0("../plots/",plot_name, ".png"), width = 20, height = 50, dpi = 300, plots, limitsize=FALSE)
+                        ggsave(file = paste0("plots/",plot_name, ".png"), width = 20, height = 50, dpi = 200, plots, limitsize=FALSE)
                         
                 } else {
                         
@@ -671,7 +679,7 @@ for(i in 54:(length(return_dts))){
                         RS_freq          = add.event.vline(RS_freq)
                         
                         plots <- arrangeGrob(stats, RS_duration, RS_freq, ncol=1)
-                        ggsave(file = paste0("../plots/",plot_name, ".png"), width = 20, height = 30, dpi = 300, plots)
+                        ggsave(file = paste0("plots/",plot_name, ".png"), width = 20, height = 30, dpi = 200, plots)
                 }
         }
 }
@@ -782,7 +790,7 @@ for(lab in 1:4){
                 
                 plots <- arrangeGrob(p1, p2)
                 
-                ggsave(file = paste0("../plots/custom_window/", plot_name, ".png"), width = 20, height = 20, dpi = 600, plots)
+                ggsave(file = paste0("plots/", plot_name, ".png"), width = 20, height = 20, dpi = 200, plots)
         }
 }
 
@@ -870,7 +878,7 @@ for(lab in 1:4){
                 
                 plots <- arrangeGrob(p1, p2)
                 
-                ggsave(file = paste0("../plots/custom_window/", plot_name, ".png"), width = 20, height = 20, dpi = 600, plots)
+                ggsave(file = paste0("plots/", plot_name, ".png"), width = 20, height = 20, dpi = 200, plots)
         }
 }
 
@@ -936,6 +944,6 @@ for(lab in 1:4){
                 
                 p = add.event.vline(p)
                 
-                ggsave(file = paste0("../plots/custom_window/", plot_name, ".png"), width = 20, height = 10, dpi = 600, p)
+                ggsave(file = paste0("plots/", plot_name, ".png"), width = 20, height = 10, dpi = 200, p)
         }
 }
