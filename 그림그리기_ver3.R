@@ -17,13 +17,13 @@ require(bit64)
 # load("Encored-Data-Analysis/hcc_15min.RData")
 # load("Encored-Data-Analysis/ux_15min.RData")
 
-# load("../Encored-Data-Analysis/marg_15min.RData")
-# load("../Encored-Data-Analysis/hcc_15min.RData")
-# load("../Encored-Data-Analysis/ux_15min.RData")
+load("../rawData/marg_15min.RData")
+load("../rawData/hcc_15min.RData")
+load("../rawData/ux_15min.RData")
 
-source("Encored-Data-Analysis/getSNUdata.R")
+source("getSNUdata.R")
 update_start = "2014-10-01"
-update_end = "2016-7-18"
+update_end = "2016-7-26"
 
 marg_defalut_table_15min = reviseSNUData(marg_defalut_table_15min, "marg", update_start, update_end, verbose = T)
 hcc_defalut_table_15min = reviseSNUData( hcc_defalut_table_15min, "hcc",  update_start, update_end, verbose = T)
@@ -180,9 +180,9 @@ make.quarter.label = function(input){
 
 # raw data loading
 # RS_adsl_raw = fread("realsense/adsl.csv")
-RS_marg_raw = fread("realsense/marg.csv")
-RS_hcc_raw = fread("realsense/hcc.csv")
-RS_ux_raw = fread("realsense/ux.csv")
+RS_marg_raw = fread("../realsense/marg.csv")
+RS_hcc_raw = fread("../realsense/hcc.csv")
+RS_ux_raw = fread("../realsense/ux.csv")
 
 # adsl_RS = table.time2string(RS_adsl_raw)
 marg_RS = table.time2string(RS_marg_raw)
@@ -366,7 +366,7 @@ feeders = c("hvac")
 return_dts = list(0)
 
 # for(lab in 1:4){ 
-for(lab in 1){
+for(lab in 1:4){
         # lab_dt & name selection 
         lab_dt = dt_list[[lab]]
         lab_name = lab_names[lab]
@@ -698,12 +698,7 @@ for(i in 2:length(return_dts)){
                         RS_freq          = add.event.vline(RS_freq)
                         
                         plots <- arrangeGrob(stats, RS_duration, RS_freq, ncol=1)
-<<<<<<< HEAD
-                        ggsave(file = paste0("plots/",plot_name, ".png"), width = 20, height = 30, dpi = 200, plots)
-=======
-
                         ggsave(file = paste0("../plots/peak4_",plot_name, ".png"), width = 20, height = 30, dpi = 300, plots)
->>>>>>> origin/master
                 }
         }
 }
@@ -711,7 +706,6 @@ end.time <- Sys.time()
 
 
 end.time-start.time
-
 
 
 
