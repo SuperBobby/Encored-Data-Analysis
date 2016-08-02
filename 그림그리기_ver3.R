@@ -9,7 +9,8 @@ library(scales)
 library(reshape2)
 library(data.table)
 require(bit64)
-
+library(gtable)
+library(gridExtra)
 
 ## -------------------- ##
 ### data loading 
@@ -17,11 +18,11 @@ require(bit64)
 # load("Encored-Data-Analysis/hcc_15min.RData")
 # load("Encored-Data-Analysis/ux_15min.RData")
 
-# load("../Encored-Data-Analysis/marg_15min.RData")
-# load("../Encored-Data-Analysis/hcc_15min.RData")
-# load("../Encored-Data-Analysis/ux_15min.RData")
+load("../rawData/marg_15min.RData")
+load("../rawData/hcc_15min.RData")
+load("../rawData/ux_15min.RData")
 
-source("Encored-Data-Analysis/getSNUdata.R")
+source("../Encored-Data-Analysis/getSNUdata.R")
 update_start = "2014-10-01"
 update_end = "2016-7-18"
 
@@ -33,6 +34,9 @@ ux_defalut_table_15min = reviseSNUData(  ux_defalut_table_15min, "ux",   update_
 # hcc_defalut_table_hours = reviseSNUData( hcc_defalut_table_hours, "hcc",  update_start, update_end, verbose = T)
 # ux_defalut_table_hours = reviseSNUData(  ux_defalut_table_hours, "ux",   update_start, update_end, verbose = T)
 
+save(marg_defalut_table_15min, file ="../rawData/marg_15min.RData")
+save( hcc_defalut_table_15min, file ="../rawData/hcc_15min.RData")
+save(  ux_defalut_table_15min, file ="../rawData/ux_15min.RData")
 
 ## -------------------- ##
 #### 기본 data.table 빌드 
@@ -62,9 +66,9 @@ hcc_dt = data.table(hcc_dt, aggDay)
 ux_dt = data.table(ux_dt, aggDay)
 
 # cut the date depending on addDay & index update 
-marg_dt = marg_dt[aggDay >= "2014-10-01" & aggDay <= "2016-6-30"]
-hcc_dt = hcc_dt[aggDay >= "2014-10-01" & aggDay <= "2016-6-30"]
-ux_dt = ux_dt[aggDay >= "2014-10-01" & aggDay <= "2016-6-30"]
+marg_dt = marg_dt[aggDay >= "2014-10-01" & aggDay <= update_end]
+hcc_dt = hcc_dt[aggDay >= "2014-10-01" & aggDay <= update_end]
+ux_dt = ux_dt[aggDay >= "2014-10-01" & aggDay <= update_end]
 
 marg_dt[, ':='(index=rep(1:96, nrow(marg_dt)/96))]
 hcc_dt[, ':='(index=rep(1:96, nrow(marg_dt)/96))]
@@ -132,29 +136,29 @@ ux_dt[computer > 0.35, ':='(computer = NA)]
 
 
 # check the distributions
-par(mfrow=c(2,3))
-hist(marg_dt$computer, 100)
-hist(hcc_dt$computer, 100)
-hist(ux_dt$computer, 100)
-
-hist(marg_dt$total, 100)
-hist(hcc_dt$total, 100)
-hist(ux_dt$total, 100)
-par(mfrow=c(1,1))
+# par(mfrow=c(2,3))
+# hist(marg_dt$computer, 100)
+# hist(hcc_dt$computer, 100)
+# hist(ux_dt$computer, 100)
+# 
+# hist(marg_dt$total, 100)
+# hist(hcc_dt$total, 100)
+# hist(ux_dt$total, 100)
+# par(mfrow=c(1,1))
 
 
 ### Light 
 ## 
-hist(marg_dt[light>0.01]$light, 100) # no problem
-hist(hcc_dt[light>0.01]$light, 100)  # abnormal : over 0.5
-hist(ux_dt[light>0.01]$light, 100)   # abnormal : over 0.5
+# hist(marg_dt[light>0.01]$light, 100) # no problem
+# hist(hcc_dt[light>0.01]$light, 100)  # abnormal : over 0.5
+# hist(ux_dt[light>0.01]$light, 100)   # abnormal : over 0.5
 
 hcc_dt[light > 0.5, ':='(light = NA)]
 ux_dt[light > 0.5, ':='(light = NA)]
 
-hist(marg_dt[light>0.01]$light, 100) # no problem
-hist(hcc_dt[light>0.01]$light, 100)  # abnormal : over 0.5
-hist(ux_dt[light>0.01]$light, 100)   # abnormal : over 0.5
+# hist(marg_dt[light>0.01]$light, 100) # no problem
+# hist(hcc_dt[light>0.01]$light, 100)  # abnormal : over 0.5
+# hist(ux_dt[light>0.01]$light, 100)   # abnormal : over 0.5
 
 
 ### --------------------------- ###
@@ -201,9 +205,9 @@ ux_RS[, ':='(aggDay=as.Date(joined-date_adjust_parameter, tz="rok"), weekday = i
 
 
 ## vaild date 
-marg_RS = marg_RS[aggDay > "2015-10-14" & aggDay <= "2016-6-30"]
-hcc_RS = hcc_RS[aggDay > "2015-10-14" & aggDay <= "2016-6-30"]
-ux_RS = ux_RS[aggDay > "2015-10-14" & aggDay <= "2016-6-30"]
+marg_RS = marg_RS[aggDay > "2015-10-14" & aggDay <= update_end]
+hcc_RS = hcc_RS[aggDay > "2015-10-14" & aggDay <= update_end]
+ux_RS = ux_RS[aggDay > "2015-10-14" & aggDay <= update_end]
 
 
 ## Validate the "duration"
@@ -232,14 +236,14 @@ marg_Freq_day = marg_RS[, .(freq = nrow(.SD)), by=aggDay]
 hcc_Freq_day = hcc_RS[, .(freq = nrow(.SD)), by=aggDay]
 ux_Freq_day = ux_RS[, .(freq = nrow(.SD)), by=aggDay]
 
-# #frequency cut
-marg_SumOfDuration_day = marg_RS[duration>1, .(sum_of_duration = sum(duration)), by=aggDay]
-hcc_SumOfDuration_day = hcc_RS[duration>1, .(sum_of_duration = sum(duration)), by=aggDay]
-ux_SumOfDuration_day = ux_RS[duration>1, .(sum_of_duration = sum(duration)), by=aggDay]
-
-marg_Freq_day = marg_RS[duration>1, .(freq = nrow(.SD)), by=aggDay]
-hcc_Freq_day = hcc_RS[duration>1, .(freq = nrow(.SD)), by=aggDay]
-ux_Freq_day = ux_RS[duration>1, .(freq = nrow(.SD)), by=aggDay]
+# # #frequency cut
+# marg_SumOfDuration_day = marg_RS[duration>1, .(sum_of_duration = sum(duration)), by=aggDay]
+# hcc_SumOfDuration_day = hcc_RS[duration>1, .(sum_of_duration = sum(duration)), by=aggDay]
+# ux_SumOfDuration_day = ux_RS[duration>1, .(sum_of_duration = sum(duration)), by=aggDay]
+# 
+# marg_Freq_day = marg_RS[duration>1, .(freq = nrow(.SD)), by=aggDay]
+# hcc_Freq_day = hcc_RS[duration>1, .(freq = nrow(.SD)), by=aggDay]
+# ux_Freq_day = ux_RS[duration>1, .(freq = nrow(.SD)), by=aggDay]
 
 
 # set max sum_of_duration as 600
@@ -698,17 +702,12 @@ for(i in 2:length(return_dts)){
                         RS_freq          = add.event.vline(RS_freq)
                         
                         plots <- arrangeGrob(stats, RS_duration, RS_freq, ncol=1)
-<<<<<<< HEAD
-                        ggsave(file = paste0("plots/",plot_name, ".png"), width = 20, height = 30, dpi = 200, plots)
-=======
 
                         ggsave(file = paste0("../plots/peak4_",plot_name, ".png"), width = 20, height = 30, dpi = 300, plots)
->>>>>>> origin/master
                 }
         }
 }
 end.time <- Sys.time()
-
 
 end.time-start.time
 
@@ -972,4 +971,114 @@ for(lab in 1:4){
         }
 }
 
+########################
+## Weather table
+########################
+weather_dt = fread("../rawData/Suwon_weather.csv")
+weather_dt$date_index = as.Date(weather_dt$date_index)
+str(weather_dt)
+
+
+ggplot(data=elec_with_weather, aes(x=timestamp))+
+  geom_line(aes(y=hvac, color="1. HVAC")) +
+  geom_line(aes(y=avg_temp, color="2. avg_temp")) +
+  geom_line(aes(y=max_temp, color="3. max_temp")) +
+  geom_line(aes(y=min_temp, color="4. min_temp")) +
+  # geom_line(aes(y=avg_cloud, color="avg_cloud")) +
+  # geom_line(aes(y=precipitation, color="precipitation")) +
+  scale_x_date("Timestamp", labels = date_format("%y/%m/%d"), breaks = date_breaks("week")) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ggtitle("HVAC & Temperature")
+
+
+start.time <- Sys.time()
+for(i in 2:length(return_dts)){ 
+  plot_dt   = return_dts[[i]]
+  
+  plot_name = names(return_dts[i])
+  
+  if((strsplit(plot_name,"_")[[1]][4] != "hvac") & (strsplit(plot_name,"_")[[1]][1] != "MARG")){
+    next
+  }
+  
+  rownum_expDate <- 1
+  
+  for (d in expDate) {
+    rownum_expDate <- append(rownum_expDate, (nrow(plot_dt[d>plot_dt$get,])+1))
+  }
+  
+  ##windowingWeek must be even
+  for(windowingWeek in c(4,8)) {
+    
+    
+    grid.newpage()
+    
+    plot_name = paste(plot_name, "+ Temperature - windowing ", windowingWeek,"weeks")  
+    print(plot_name)
+    
+    p2<-ggplot(weather_dt, aes(x=date_index)) +
+      geom_line(aes(y=avg_temp, color='avg_temp')) +
+      geom_line(aes(y=max_temp, color='max_temp')) +
+      geom_line(aes(y=min_temp, color='min_temp')) + 
+      ylab("temperature(°C)")+
+      theme_bw()+
+      theme(panel.background = element_rect(fill = NA),
+            panel.grid.major.x=element_blank(),
+            panel.grid.minor.x=element_blank(),
+            panel.grid.major.y=element_blank(),
+            panel.grid.minor.y=element_blank(),
+            legend.position="bottom")+
+      scale_color_manual(values=c("dodgerblue2", "skyblue", "darkblue"), 
+                        breaks=c("max_temp", "avg_temp", "min_temp"))
+      
+    
+    stats <- ggplot(plot_dt, aes(x=get)) +
+      geom_point(aes(y=peak, color='peak')) +
+#       theme_bw()+
+      ggtitle(plot_name)
+    stats = add.window.line(stats, plot_dt, "peak", windowingWeek)
+
+    stats = stats + 
+      scale_color_discrete(breaks=c("peak"), labels=c("peak 90%"))
+    stats            = add.event.vline(stats)
+
+
+    theme(panel.background = element_rect(fill = NA))
+    
+    g1<-ggplot_gtable(ggplot_build(stats))
+    g2<-ggplot_gtable(ggplot_build(p2))
+    
+    pp<-c(subset(g1$layout, name == "panel", se = t:r))
+    g <- gtable_add_grob(g1, g2$grobs[[which(g2$layout$name == "panel")]], pp$t, pp$l, pp$b, pp$l)
+
+    ia<-which(g2$layout$name=="axis-l")
+    ga <- g2$grobs[[ia]]
+    ax <- ga$children[[2]]
+    ax$widths <- rev(ax$widths)
+    ax$grobs <- rev(ax$grobs)
+    ax$grobs[[1]]$x <- ax$grobs[[1]]$x - unit(1, "npc") + unit(0.15, "cm")
+    g <- gtable_add_cols(g, g2$widths[g2$layout[ia, ]$l], length(g$widths) - 1)
+    g <- gtable_add_grob(g, ax, pp$t, length(g$widths) - 1, pp$b)
+    g <- gtable_add_grob(g, g2$grobs[[7]], pp$t, length(g$widths), pp$b)
+
+    leg1 <- g1$grobs[[which(g1$layout$name == "guide-box")]]
+    leg2 <- g2$grobs[[which(g2$layout$name == "guide-box")]]
+    g$grobs[[which(g$layout$name == "guide-box")]] <- gtable:::cbind_gtable(leg1, leg2, "first")
+
+#     il <- which(g2$layout$name == "ylab")
+#     gl <- g2$grobs[[il]]
+#     gl$x <- gl$x - unit(1, "npc") + unit(0.15, "cm")
+#     g <- gtable_add_cols(g, g2$widths[g2$layout[il, ]$l], length(g$widths) - 1)
+#     g <- gtable_add_grob(g, gl, pp$t, length(g$widths) - 1, pp$b)
+#     
+#     grid.arrange(g, ncol=1, heights=c(10, 1),widths =c(1) ,as.table =TRUE)
+    
+    png(file = paste0("../plots/weather_",plot_name, ".png"), width = 2000, height = 1000)
+    grid.draw(g)
+    dev.off()
+    
+  }
+}
+end.time <- Sys.time()
+end.time-start.time
 

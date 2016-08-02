@@ -18,7 +18,7 @@ marg_defalut_table_hours <- getSNUData.feeder("marg", "hours", start, end, verbo
 ##################################################
 source("Encored-Data-Analysis/getSNUdata.R")
 update_start = "2014-09-01"
-update_end = "2016-07-18"
+update_end = "2016-07-27"
 
 marg_defalut_table_15min <- reviseSNUData(marg_defalut_table_15min, "marg", update_start, update_end, verbose = T)
  hcc_defalut_table_15min <- reviseSNUData( hcc_defalut_table_15min, "hcc",  update_start, update_end, verbose = T)
