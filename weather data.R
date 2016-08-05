@@ -5,12 +5,16 @@ library(ggplot2)
 ##################################################
 ## Day table
 ##################################################
-day_start = "2014-09-01"
-day_end   = "2016-01-09"
+day_start = "2014-10-01"
+day_end   = "2016-07-16"
 
 marg_table_day = getSNUData.feeder.day("marg", day_start, day_end)
 hcc_table_day = getSNUData.feeder.day( "hcc", day_start, day_end)
 ux_table_day = getSNUData.feeder.day(  "ux", day_start, day_end)
+
+save(marg_table_day, file ="../rawData/marg_day.RData")
+save( hcc_table_day, file ="../rawData/hcc_day.RData")
+save(  ux_table_day, file ="../rawData/ux_day.RData")
 
 elec_dt = data.table(marg_table_day)
 elec_dt$timestamp = as.Date(elec_dt$timestamp)
@@ -25,7 +29,7 @@ str(weather_dt)
 
 
 setkey(elec_dt, timestamp)
-setkey(weather_dt, date_string)
+setkey(weather_dt, date_index)
 elec_with_weather <- elec_dt[weather_dt, nomatch=0]
 
 ggplot(data=elec_with_weather, aes(x=timestamp))+

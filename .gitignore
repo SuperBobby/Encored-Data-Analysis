@@ -32,3 +32,12 @@ Network Trash Folder
 Temporary Items
 .apdisk
 .Rproj.user
+.Rproj
+
+
+# Session Data files
+.RData
+
+# History files
+.Rhistory
+.Rapp.history
