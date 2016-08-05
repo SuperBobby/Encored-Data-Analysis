@@ -359,8 +359,8 @@ agg_Units = c("aggWeek", "aggDay")
 day_selections = c("allDay", "weekDay", "weekEnd")
 
 # 4. feeders
-# feeders = c("total", "computer", "light", "hvac")
-feeders = c("hvac")
+feeders = c("total", "computer", "light", "hvac")
+# feeders = c("hvac")
 
 
 return_dts = list(0)
@@ -414,7 +414,7 @@ for(lab in 1:4){
                                 }
                                 
                                 light_min = 0.01
-                                light_peak = quantile(lab_dt$light, .95, na.rm = T)
+                                light_peak = quantile(lab_dt$light, .90, na.rm = T)
                                 light_dt = lab_dt[, .(timestamp = timestamp,
                                                       aggDay = aggDay,
                                                       aggWeek = aggWeek,
@@ -823,7 +823,7 @@ for(lab in 1:4){
         
         print(lab_name)
         
-        light_peak = quantile(lab_dt$light, .95, na.rm = T)
+        light_peak = quantile(lab_dt$light, .90, na.rm = T)
         print(light_peak)
         
         strong_light_aggDay_dt = lab_dt[, .(strong_light_50 = sum(light > (light_peak * 0.5)),
@@ -912,7 +912,7 @@ for(lab in 1:4){
         
         print(lab_name)
         
-        light_peak = quantile(lab_dt$light, .95, na.rm = T)
+        light_peak = quantile(lab_dt$light, .90, na.rm = T)
         print(light_peak)
         
         full_lightON_aggDay_dt = lab_dt[, .(full_lightON_50 = sum(light > (light_peak * 0.5), na.rm = T)==96,
@@ -965,5 +965,4 @@ for(lab in 1:4){
                 ggsave(file = paste0("plots/", plot_name, ".png"), width = 20, height = 10, dpi = 200, p)
         }
 }
-
 
