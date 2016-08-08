@@ -30,7 +30,7 @@ getSNUData.total <- function(lab = c("marg", "hcc", "ux"),
         
         while(query_timestamp < end_timestamp){
                 
-                query = paste("http://localhost:3000/api/labs/", lab, "/energy/", resolution, 
+                query = paste("http://adsl.snu.ac.kr:3300/api/labs/", lab, "/energy/", resolution, 
                               ".json?base_time=", query_timestamp, "000&limit=1", sep="")
                 #                 print(query)
                 
@@ -95,7 +95,7 @@ getSNUData.feeder <- function(lab = c("marg", "hcc", "ux"),
                 etc   = 0
                 total   = 0
                 
-                query = paste("http://localhost:3000/api/labs/", lab, "/energy/", resolution, 
+                query = paste("http://adsl.snu.ac.kr:3300/api/labs/", lab, "/energy/", resolution, 
                               ".json?base_time=", query_timestamp, "000&limit=1", sep="")
                 
                 rd = readLines(query, warn="F")
@@ -246,7 +246,7 @@ getSNUData.feeder.day <- function(lab = c("marg", "hcc", "ux"), start, cut, verb
                 total   = 0
                 
                 query_timestamp = as.POSIXct(loop_timestamp, format="%Y-%m-%d", origin='1970-01-01', tz="ROK")
-                query = paste("http://localhost:3000/api/labs/", lab, "/energy/daily.json?day_from=", query_timestamp, sep="")
+                query = paste("http://adsl.snu.ac.kr:3300/api/labs/", lab, "/energy/daily.json?day_from=", query_timestamp, sep="")
                 
                 # print(query)
                 

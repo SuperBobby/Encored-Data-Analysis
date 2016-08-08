@@ -23,8 +23,8 @@ load("../rawData/hcc_15min.RData")
 load("../rawData/ux_15min.RData")
 
 source("getSNUdata.R")
-update_start = "2014-10-01"
-update_end = "2016-7-26"
+update_start = "2014-11-01"
+update_end = "2014-12-31"
 
 marg_defalut_table_15min = reviseSNUData(marg_defalut_table_15min, "marg", update_start, update_end, verbose = T)
 hcc_defalut_table_15min = reviseSNUData( hcc_defalut_table_15min, "hcc",  update_start, update_end, verbose = T)
@@ -370,7 +370,7 @@ feeders = c("total", "computer", "light", "hvac")
 return_dts = list(0)
 
 # for(lab in 1:4){ 
-for(lab in 1:4){
+for(lab in 1){
   # lab_dt & name selection 
   lab_dt = dt_list[[lab]]
   lab_name = lab_names[lab]
@@ -392,7 +392,6 @@ for(lab in 1:4){
         dt_name = paste(lab_name, agg_Unit, day_selection, feeder, sep="_")
         print(dt_name)
         
-<<<<<<< HEAD
         for(agg_Unit in agg_Units){
                 # aggregation unit selection
                 # agg_Units = c("aggWeek", "aggDay")
@@ -461,31 +460,7 @@ for(lab in 1:4){
                                 return_dts = append(return_dts, setNames(list(return_dt),dt_name))
                         }
                 }
-=======
-        if(day_selection == "allDay"){
-          
-          return_dt = lab_dt[, .(peak = get.four.stats(get(feeder), 1),
-                                 base = get.four.stats(get(feeder), 2),
-                                 avg  = get.four.stats(get(feeder), 3),
-                                 med  = get.four.stats(get(feeder), 4),
-                                 sum_of_duration = sum(sum_of_duration), freq = sum(freq)), by=get(agg_Unit)]
-          
-        } else if(day_selection == "weekDay") {
-          
-          return_dt = lab_dt[weekday == T, .(peak = get.four.stats(get(feeder), 1),
-                                             base = get.four.stats(get(feeder), 2),
-                                             avg  = get.four.stats(get(feeder), 3),
-                                             med  = get.four.stats(get(feeder), 4),
-                                             sum_of_duration = sum(sum_of_duration), freq = sum(freq)), by=get(agg_Unit)]
-          
-        } else if(day_selection == "weekEnd") {
-          
-          return_dt = lab_dt[weekday == F, .(peak = get.four.stats(get(feeder), 1),
-                                             base = get.four.stats(get(feeder), 2),
-                                             avg  = get.four.stats(get(feeder), 3),
-                                             med  = get.four.stats(get(feeder), 4),
-                                             sum_of_duration = sum(sum_of_duration), freq = sum(freq)), by=get(agg_Unit)]
->>>>>>> origin/master
+
         }
         
         light_min = 0.01
