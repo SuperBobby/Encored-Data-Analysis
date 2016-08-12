@@ -381,9 +381,10 @@ feeders = c("total", "computer", "light", "hvac")
 return_dts = list(0)
 
 # for(lab in 1:4){ 
-for(lab in 1:4){
+for(lab in 1){
   # lab_dt & name selection 
-  lab_dt = dt_list[[lab]]
+#   lab_dt = dt_list[[lab]]
+  lab_dt = marg_dt
   lab_name = lab_names[lab]
   
   for(agg_Unit in agg_Units){
@@ -573,6 +574,7 @@ windowingByExpDate <- function(data, yName, windowingWeek){
       windowing$sd[k] <- ifelse(is.nan(sd(y[start:end],na.rm=T)),NA,sd(y[start:end],na.rm=T)) 
     }
   }
+  windowing$sd <- ifelse(is.na(windowing$sd),0,windowing$sd)
   windowing$get <- data$get
   return (windowing)
 }
@@ -582,6 +584,21 @@ add.window.line <- function(plot_body, data, valueName, windowingWeek) {
   result = plot_body +
     geom_line(data=window_df, aes_string(y = "mean", linetype = shQuote(valueName)), size=1) +
     geom_ribbon(data=window_df,aes(ymin = mean - sd, ymax = mean + sd), alpha = 0.2)
+  
+  return (result)
+}
+
+add.colorful.window.line <- function(plot_body, data, valueName, windowingWeek, colorName, ribbon=TRUE) {
+  window_df = windowingByExpDate(data,valueName,windowingWeek)
+
+  if(ribbon==TRUE) {
+    result = plot_body +
+      geom_line(data=window_df, aes_string(y = "mean", linetype = shQuote(valueName)), color=colorName, size=1) +
+      geom_ribbon(data=window_df,aes(ymin = mean - sd, ymax = mean + sd), fill=colorName, alpha = 0.2)
+  }else {
+    result = plot_body +
+      geom_line(data=window_df, aes_string(y = "mean", color = shQuote(valueName)), size=1)
+  }
   
   return (result)
 }
@@ -605,7 +622,7 @@ set.default.theme <- function(plot_body) {
     theme_bw()+
     theme(axis.line = element_line(colour = "black"),
           legend.text = element_text(size=23, hjust = 1),
-          plot.title = element_text(size=10),
+          plot.title = element_text(size=23),
           legend.position = "bottom",
           legend.title = element_blank(),
           legend.key = element_rect(colour="white"),
@@ -626,9 +643,43 @@ set.default.theme <- function(plot_body) {
   return(result)
 }
 
+##theme for light pattern plot; without legend box
+set.colorful.theme <- function(plot_body, colorName) {
+  result = plot_body + 
+    theme_bw()+
+    theme(axis.line = element_line(colour = "black"),
+          legend.text = element_text(size=23, hjust = 1),
+          plot.title = element_text(size=23),
+          legend.position = "none",
+          legend.title = element_blank(),
+          legend.key = element_rect(colour="white"),
+          legend.key.size = unit(10,"cm"),
+          legend.margin = unit(0, "cm"),
+          axis.text = element_text(size=20),
+          axis.text.x = element_text(size=15, angle = 45, hjust = 1),
+          axis.title.x = element_blank(),
+          axis.title.y = element_text(size=23, vjust = 1),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          panel.border = element_blank(),
+          panel.background = element_blank())+
+    guides(fill = guide_legend(keywidth = 1, keyheight = 1),
+           linetype = guide_legend(keywidth = 4, keyheight = 1),
+           colour = guide_legend(keywidth = 3, keyheight = 1))+
+    scale_color_manual(values=colorName)+
+    scale_fill_manual(values=colorName)
+  
+  return(result)
+}
+
 save.plot <- function(file, plot) {
   ggsave(file, width = 8, height = 6, dpi = 300, plot, limitsize=FALSE)
 }
+
+partial_lightON_color = "orange2"
+lightON_duration_color = "darkolivegreen"
+full_lightON_color = "violetred4"
+strong_light_color = "darkblue"
 
 ## 1. Four stats plots  +  partial_lightON & lightON duration plots 
 expDate<-c(as.Date("2015-10-08"),
@@ -651,9 +702,23 @@ for(i in 2:length(return_dts)){
     rownum_expDate <- append(rownum_expDate, (nrow(plot_dt[d>plot_dt$get,])+1))
   }
   
+  plot_dt$threshold80 <- plot_dt$threshold80*100 ## partial lightON rate -> percentage
+  plot_dt$lightON <- plot_dt$lightON*15.0/60.0 ## lightOn duration 15min block -> hour
+#   plotTitle <- "daily"
+  
   ##windowingWeek must be even
   for(windowingWeek in c(4,8)) {
     
+#     if(strsplit(plot_name,"_")[[1]][2] == "aggWeek"){
+#       #       ylim_RS_duration <- 2000
+#       #       ylim_RS_freq <- 1000
+#       plotTitle <- "weekly"
+#     } else{
+#       #       ylim_RS_duration <- 600
+#       #       ylim_RS_freq <- 300
+#       plotTitle <- "daily"
+#     }  
+#     
     plot_name = paste(names(return_dts[i]), "- windowing ", windowingWeek,"weeks")  
     print(plot_name)
     
@@ -665,34 +730,26 @@ for(i in 2:length(return_dts)){
     stats = add.window.line(stats, plot_dt, "base", windowingWeek)
     stats = add.window.line(stats, plot_dt, "avg", windowingWeek)
     
-    if(strsplit(plot_name,"_")[[1]][2] == "aggWeek"){
-      ylim_RS_duration <- 2000
-      ylim_RS_freq <- 1000
-    } else{
-      ylim_RS_duration <- 600
-      ylim_RS_freq <- 300
-    }    
+  
     
     if(grepl("light", plot_name) | grepl("total", plot_name)){
-      plot_dt$threshold80 <- plot_dt$threshold80*100
       partial_lightON <- ggplot(plot_dt, aes(x=get)) +
-        ggtitle("partial_lightON")+
+        ggtitle(plot_name)+
         ylab("Partial light-ON (%)")
-      partial_lightON = add.window.line(partial_lightON, plot_dt, 'threshold80', windowingWeek)
+      partial_lightON = add.colorful.window.line(partial_lightON, plot_dt, 'threshold80', windowingWeek, partial_lightON_color)
       
       lightON_duration <- ggplot(plot_dt, aes(x=get)) +
-        ggtitle("lightON duration")+
-        ylab("number of blocks")+
+        ggtitle(plot_name)+
+        ylab("Light-ON duration (hours)")+
         scale_color_discrete(breaks = c("lightON"), labels = c("number of lightON blocks(15min)"))
-      lightON_duration = add.window.line(lightON_duration, plot_dt, 'lightON',windowingWeek)
-      
+      lightON_duration = add.colorful.window.line(lightON_duration, plot_dt, 'lightON',windowingWeek, lightON_duration_color)
       
       stats            = add.event.vline(stats)
       partial_lightON  = add.event.vline(partial_lightON)
       lightON_duration = add.event.vline(lightON_duration)
       stats            = set.default.theme(stats)
-      partial_lightON  = set.default.theme(partial_lightON)
-      lightON_duration = set.default.theme(lightON_duration)
+      partial_lightON  = set.colorful.theme(partial_lightON, partial_lightON_color)
+      lightON_duration = set.colorful.theme(lightON_duration, lightON_duration_color)
       
 #       plots <- arrangeGrob(stats, partial_lightON, lightON_duration, ncol=1)
       save.plot(paste0("../plots/",plot_name, "_1.png"), stats)
@@ -715,6 +772,85 @@ end.time <- Sys.time()
 end.time-start.time
 
 
+###
+## 1-1. MARG computer 
+expDate<-c(as.Date("2014-11-10"),
+           as.Date("2014-11-16"),
+           as.Date("2016-11-16"),
+           as.Date("2016-11-16"),
+           as.Date("2016-11-16"),
+           as.Date("2016-11-16"))
+
+# expDate<-c(as.Date("2014-11-10"),
+#            as.Date("2014-11-16"),
+#            as.Date("2015-01-15"),
+#            as.Date("2015-01-21"),
+#            as.Date("2016-11-16"),
+#            as.Date("2016-11-16"))
+
+# return_dts[[40]][get >= "2015-12-11" & get <= "2015-12-30"]$sum_of_duration <- NA
+# return_dts[[40]][get >= "2015-12-11" & get <= "2015-12-30"]$freq <- NA
+
+start.time <- Sys.time()
+for(i in 2:length(MARG_return_dts)){ 
+  plot_dt   = MARG_return_dts[[i]]
+  
+  rownum_expDate <- 1
+  
+  for (d in expDate) {
+    rownum_expDate <- append(rownum_expDate, (nrow(plot_dt[d>plot_dt$get,])+1))
+  }
+  
+#   plot_dt$threshold80 <- plot_dt$threshold80*100 ## partial lightON rate -> percentage
+#   plot_dt$lightON <- plot_dt$lightON*15.0/60.0 ## lightOn duration 15min block -> hour
+#   
+  ##windowingWeek must be even
+  for(windowingWeek in c(4,8)) {
+      
+    plot_name = names(MARG_return_dts[i])
+    
+    if((strsplit(plot_name,"_")[[1]][4] != "computer") & (strsplit(plot_name,"_")[[1]][4] != "light")){
+      next
+    }
+    
+    plot_name = paste(names(MARG_return_dts[i]), "- windowing ", windowingWeek,"weeks")  
+    
+    #Exp1
+    plot_dt = plot_dt[get >= "2014-09-11" & get <= "2014-12-16"]
+#     #Exp2
+#     plot_dt = plot_dt[get >= "2014-09-11" & get < "2015-03-01"]
+    print(plot_name)
+    
+    stats <- ggplot(plot_dt, aes(x=get)) +
+      ggtitle(plot_name) +
+      ylab("Energy use (kWh/day)")+
+      scale_linetype_discrete(breaks=c("peak", "avg", "base"))
+    stats = add.window.line(stats, plot_dt, "peak", windowingWeek)
+    stats = add.window.line(stats, plot_dt, "base", windowingWeek)
+    stats = add.window.line(stats, plot_dt, "avg", windowingWeek)
+    
+    #Exp1
+    stats = stats + 
+      scale_x_date("Timestamp", labels = date_format("%Y-%m"), breaks = date_breaks("month")) +
+      theme_bw()+
+      geom_vline(aes(xintercept = as.numeric(as.Date("2014-11-10"))),color="gray40", linetype = "longdash") +
+      geom_vline(aes(xintercept = as.numeric(as.Date("2014-11-16"))),color="gray40", linetype = "longdash")
+#     #Exp2
+#     stats = stats + 
+#       scale_x_date("Timestamp", labels = date_format("%Y-%m"), breaks = date_breaks("month")) +
+#       theme_bw()+
+#       geom_vline(aes(xintercept = as.numeric(as.Date("2014-11-10"))),color="gray40", linetype = "longdash") +
+#       geom_vline(aes(xintercept = as.numeric(as.Date("2014-11-16"))),color="gray40", linetype = "longdash") +
+#       geom_vline(aes(xintercept = as.numeric(as.Date("2015-01-15"))),color="gray40", linetype = "longdash") +
+#       geom_vline(aes(xintercept = as.numeric(as.Date("2015-01-21"))),color="gray40", linetype = "longdash")
+    stats            = set.default.theme(stats)
+    
+    save.plot(paste0("../plots/Exp1_",plot_name, ".png"), stats)
+#     save.plot(paste0("../plots/Exp2_",plot_name, ".png"), stats)
+  }
+}
+end.time <- Sys.time()
+end.time-start.time
 
 
 ###
@@ -816,10 +952,10 @@ for(lab in 1:4){
   light_peak = quantile(lab_dt$light, .90, na.rm = T)
   print(light_peak)
   
-  strong_light_aggDay_dt = lab_dt[, .(strong_light_80 = sum(light > (light_peak * 0.8))), by=aggDay]
+  strong_light_aggDay_dt = lab_dt[, .(strong_light_80 = sum(light > (light_peak * 0.8), na.rm = T)*15.0/60.0), by=aggDay]
   setnames(strong_light_aggDay_dt,old="aggDay",new="get")
   
-  strong_light_aggWeek_dt = lab_dt[, .(strong_light_80 = sum(light > (light_peak * 0.8))), by=aggWeek]
+  strong_light_aggWeek_dt = lab_dt[, .(strong_light_80 = sum(light > (light_peak * 0.8), na.rm = T)*15.0/60.0), by=aggWeek]
   setnames(strong_light_aggWeek_dt,old="aggWeek",new="get")
   
   aggDay_rownum_expDate <- 1
@@ -843,22 +979,22 @@ for(lab in 1:4){
     
     p1 <- ggplot(strong_light_aggDay_dt, aes(x=get)) +         
       ggtitle(paste(plot_name, "aggDay"))+
-      ylab("number of blocks(15min)")
+      ylab("strong light-ON duration (hrs/day)")
     
-    p1 = add.window.line(p1, strong_light_aggDay_dt, 'strong_light_80', windowingWeek)
+    p1 = add.colorful.window.line(p1, strong_light_aggDay_dt, 'strong_light_80', windowingWeek, strong_light_color)
     
     rownum_expDate <- aggWeek_rownum_expDate
     
     p2 <- ggplot(strong_light_aggWeek_dt, aes(x=get)) +
       ggtitle(paste(plot_name, "aggWeek"))+
-      ylab("number of blocks(15min)")
+      ylab("strong light-ON duration (hrs/week)")
 
-    p2 = add.window.line(p2, strong_light_aggWeek_dt, 'strong_light_80', windowingWeek)
+    p2 = add.colorful.window.line(p2, strong_light_aggWeek_dt, 'strong_light_80', windowingWeek, strong_light_color)
     
     p1 = add.event.vline(p1)
     p2 = add.event.vline(p2)
-    p1 = set.default.theme(p1)
-    p2 = set.default.theme(p2)
+    p1 = set.colorful.theme(p1, strong_light_color)
+    p2 = set.colorful.theme(p2, strong_light_color)
     
 #     plots <- arrangeGrob(p1, p2)
     
@@ -913,8 +1049,8 @@ for(lab in 1:4){
 #       geom_point(aes(y=full_lightON_30, color='full_lightON_30')) +        
 #       geom_point(aes(y=full_lightON_20, color='full_lightON_20')) +
       geom_point(aes(y=full_lightON_10), colour='gray70') +
-      ggtitle(paste(plot_name, "aggWeek"))+
-      ylab("number of full_lightON days")
+      ggtitle(plot_name)+
+      ylab("24hrs light-ON day (count/week)")
 # +
 #       theme(legend.text = element_text(size=20),
 #             plot.title = element_text(size=20),
@@ -927,9 +1063,9 @@ for(lab in 1:4){
     
 #     p = add.window.line(p, full_lightON_aggWeek_dt, 'full_lightON_30', windowingWeek)
 #     p = add.window.line(p, full_lightON_aggWeek_dt, 'full_lightON_20', windowingWeek)
-    p = add.window.line(p, full_lightON_aggWeek_dt, 'full_lightON_10', windowingWeek)
+    p = add.colorful.window.line(p, full_lightON_aggWeek_dt, 'full_lightON_10', windowingWeek, full_lightON_color)
     p = add.event.vline(p)
-    p = set.default.theme(p)
+    p = set.colorful.theme(p, full_lightON_color)
     
     save.plot(paste0("../plots/",plot_name, ".png"), p)
 #     ggsave(file = paste0("../plots/", plot_name, ".png"), width = 20, height = 10, dpi = 200, p)
@@ -943,24 +1079,26 @@ for(lab in 1:4){
 ########################
 weather_dt = fread("../rawData/Suwon_weather.csv")
 weather_dt$date_index = as.Date(weather_dt$date_index)
+setnames(weather_dt,old="date_index",new="get")
 str(weather_dt)
 
-# 
-# ggplot(data=elec_with_weather, aes(x=timestamp))+
-#   geom_line(aes(y=hvac, color="1. HVAC")) +
-#   geom_line(aes(y=avg_temp, color="2. avg_temp")) +
-#   geom_line(aes(y=max_temp, color="3. max_temp")) +
-#   geom_line(aes(y=min_temp, color="4. min_temp")) +
-#   # geom_line(aes(y=avg_cloud, color="avg_cloud")) +
-#   # geom_line(aes(y=precipitation, color="precipitation")) +
-#   scale_x_date("Timestamp", labels = date_format("%y/%m/%d"), breaks = date_breaks("week")) +
-#   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-#   ggtitle("HVAC & Temperature")
-
+weather_dt <- weather_dt[, ':='(aggDay = get,
+                                aggWeek = as.Date(cut(get, breaks = "week", start.on.monday = T)))]
+aggWeek_weather_dt <- weather_dt[, .(get = aggWeek,
+                               avg_temp = mean(avg_temp),
+                               max_temp = mean(max_temp),
+                               min_temp = mean(min_temp)), by=aggWeek] 
+aggWeek_weather_dt <- aggWeek_weather_dt[, aggWeek:=NULL]
 
 ### 
 ## 5. MARG HVAC + weahter(max, avg, min temperature info) 
 ## 
+expDate<-c(as.Date("2015-10-08"),
+           as.Date("2015-12-01"),
+           as.Date("2016-01-11"),
+           as.Date("2016-02-01"),
+           as.Date("2016-05-16"),
+           as.Date("2016-06-13"))
 
 start.time <- Sys.time()
 for(i in 2:length(return_dts)){ 
@@ -972,37 +1110,74 @@ for(i in 2:length(return_dts)){
     next
   }
   
-  rownum_expDate <- 1
-  
-  for (d in expDate) {
-    rownum_expDate <- append(rownum_expDate, (nrow(plot_dt[d>plot_dt$get,])+1))
+  if(strsplit(plot_name,"_")[[1]][2] == "aggWeek") {
+    temp_weather_dt = aggWeek_weather_dt[get >= plot_dt$get[1] & get <= plot_dt$get[nrow(plot_dt)]]
+  }else {
+    temp_weather_dt = weather_dt[get >= plot_dt$get[1] & get <= plot_dt$get[nrow(plot_dt)]]  
   }
   
   ##windowingWeek must be even
   for(windowingWeek in c(4,8)) {
+    
+    rownum_expDate <- 1
+    for (d in expDate) {
+      rownum_expDate <- append(rownum_expDate, (nrow(temp_weather_dt[d>temp_weather_dt$get,])+1))
+    }
     
     grid.newpage()
     plot_name = names(return_dts[i])
     plot_name = paste(plot_name, "+ Temperature - windowing ", windowingWeek,"weeks")  
     print(plot_name)
     
-    p2 <- ggplot(weather_dt, aes(x=date_index)) +
-      geom_line(aes(y=avg_temp, color='avg_temp')) +
-      geom_line(aes(y=max_temp, color='max_temp')) +
-      geom_line(aes(y=min_temp, color='min_temp')) + 
+    print(strsplit(plot_name,"_")[[1]][2])
+    print(rownum_expDate)
+    print(head(temp_weather_dt))
+    print(head(w_max_tmp))
+    print(nrow(w_max_tmp))
+    
+    p2 <- ggplot(temp_weather_dt, aes(x=get)) +
       ylab("temperature(°C)")+
+      ylim(-20,40)+
       scale_color_manual(values=c("dodgerblue2", "skyblue", "midnightblue"), 
                          breaks=c("max_temp", "avg_temp", "min_temp"))
-    p2 = set.default.theme(p2)
-    p2 <- p2 + theme(panel.background = element_rect(fill = NA),
-            panel.grid.major.x=element_blank(),
-            panel.grid.minor.x=element_blank(),
-            panel.grid.major.y=element_blank(),
-            panel.grid.minor.y=element_blank(),
-            legend.key.height = unit(2,"cm"),
-            legend.key.width = unit(2,"cm"))+
-      guides(colour=guide_legend(override.aes = list(size=2)))
+    p2 = add.colorful.window.line(p2, temp_weather_dt, 'max_temp', windowingWeek, "dodgerblue2", ribbon=FALSE)
+    p2 = add.colorful.window.line(p2, temp_weather_dt, 'avg_temp', windowingWeek, "skyblue", ribbon=FALSE)
+    p2 = add.colorful.window.line(p2, temp_weather_dt, 'min_temp', windowingWeek, "midnightblue", ribbon=FALSE)
     
+    p2 = p2 + 
+      theme_bw()+
+      theme(axis.line = element_line(colour = "black"),
+            legend.text = element_text(size=23, hjust = 1),
+            plot.title = element_text(size=23),
+            legend.position = "bottom",
+            legend.title = element_blank(),
+            legend.key = element_rect(colour="white"),
+            legend.key.size = unit(10,"cm"),
+            legend.margin = unit(0, "cm"),
+            legend.key.height = unit(2,"cm"),
+            legend.key.width = unit(2,"cm"),
+            axis.text = element_text(size=20),
+            axis.text.x = element_text(size=15, angle = 45, hjust = 1),
+            axis.title.x = element_blank(),
+            axis.title.y = element_text(size=23, vjust = 1),
+            panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank(),
+            panel.border = element_rect(colour = "black"),
+            panel.background = element_rect(fill = NA))+
+      guides(fill = guide_legend(keywidth = 1, keyheight = 1),
+             colour = guide_legend(keywidth = 3, keyheight = 1))
+    p2 <- p2 +
+      guides(colour=guide_legend(override.aes = list(size=2)))
+#     p2            = add.event.vline(p2)
+  
+    rownum_expDate <- 1
+    for (d in expDate) {
+      rownum_expDate <- append(rownum_expDate, (nrow(plot_dt[d>plot_dt$get,])+1))
+    }
+    
+    print("plot_dt")
+    print(rownum_expDate)
+
     stats <- ggplot(plot_dt, aes(x=get)) +
 #       geom_point(aes(y=peak, color='peak')) +
       ylab("electricity usage(kWh)")+
@@ -1037,6 +1212,8 @@ for(i in 2:length(return_dts)){
     ax$grobs[[1]]$x <- ax$grobs[[1]]$x - unit(0, "npc") + unit(0, "cm")
     g <- gtable_add_cols(g, g2$widths[g2$layout[ia, ]$l], length(g$widths) - 1)
     g <- gtable_add_grob(g, ax, pp$t, length(g$widths) - 1, pp$b)
+#     g <- gtable_add_cols(g, g2$widths[g2$layout[ia, ]$l], length(g$widths))
+#     g <- gtable_add_grob(g, ax, pp$t, length(g$widths), pp$b)
     g <- gtable_add_grob(g, g2$grobs[[7]], pp$t, length(g$widths), pp$b)
     
     leg1 <- g1$grobs[[which(g1$layout$name == "guide-box")]]
@@ -1155,16 +1332,17 @@ for(i in 2:length(return_rs_dts)){
 #       geom_point(aes(y=sum_of_duration, color='sum_of_duration')) +
 #       geom_text(aes(y=sum_of_duration, label=round(sum_of_duration, 0)), position=position_dodge(width=0.9), vjust=-0.25, colour="grey50") + 
       scale_y_continuous(limits=c(0,ylim_RS_duration), oob=rescale_none) +
-      ggtitle(paste("RealSense Sum of duration", plot_name))+
+      ggtitle(paste("RS", plot_name))+
       theme_bw()+
-      ylab("second")
+      ylab("total duration(seconds)")
     
     RS_freq <- ggplot(plot_dt, aes(x=get, ymax=ylim_RS_freq))+
 #       geom_point(aes(y=freq, color='freq')) +
 #       geom_text(aes(y=freq, label=round(freq, 0)), position=position_dodge(width=0.9), vjust=-0.25, colour="grey50") + 
       scale_y_continuous(limits=c(0,ylim_RS_freq), oob=rescale_none) +
-      ggtitle(paste("RealSense Freq", plot_name))+
-      theme_bw()
+      ggtitle(paste("RS", plot_name))+
+      theme_bw()+
+      ylab("total frequency(times)")
     
     RS_duration      = add.window.line(RS_duration, plot_dt, "sum_of_duration", windowingWeek)
     RS_freq          = add.window.line(RS_freq, plot_dt, "freq", windowingWeek)
@@ -1172,8 +1350,8 @@ for(i in 2:length(return_rs_dts)){
     RS_duration      = add.event.vline(RS_duration)
     RS_freq          = add.event.vline(RS_freq)
 
-    RS_duration      = set.default.theme(RS_duration)
-    RS_freq          = set.default.theme(RS_freq)
+    RS_duration      = set.colorful.theme(RS_duration, "black")
+    RS_freq          = set.colorful.theme(RS_freq, "black")
         
     save.plot(paste0("../plots/RealSense_",plot_name, "_1.png"),RS_duration)
     save.plot(paste0("../plots/RealSense_",plot_name, "_2.png"),RS_freq)
