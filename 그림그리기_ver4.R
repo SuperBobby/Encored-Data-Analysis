@@ -25,7 +25,7 @@ load("../rawData/ux_15min.RData")
 
 source("getSNUdata.R")
 update_start = "2014-09-01"
-update_end = "2016-08-02"
+update_end = "2016-08-09"
 
 marg_defalut_table_15min <- reviseSNUData(marg_defalut_table_15min, "marg", update_start, update_end, verbose = T)
 hcc_defalut_table_15min <- reviseSNUData( hcc_defalut_table_15min, "hcc",  update_start, update_end, verbose = T)
@@ -34,14 +34,6 @@ ux_defalut_table_15min <- reviseSNUData(  ux_defalut_table_15min, "ux",   update
 save(marg_defalut_table_15min, file ="../rawData/marg_15min.RData")
 save( hcc_defalut_table_15min, file ="../rawData/hcc_15min.RData")
 save(  ux_defalut_table_15min, file ="../rawData/ux_15min.RData")
-
-# source("../Encored-Data-Analysis/getSNUdata.R")
-update_start = "2014-10-01"
-update_end = "2016-07-27"
-
-marg_defalut_table_15min = reviseSNUData(marg_defalut_table_15min, "marg", update_start, update_end, verbose = T)
-hcc_defalut_table_15min = reviseSNUData( hcc_defalut_table_15min, "hcc",  update_start, update_end, verbose = T)
-ux_defalut_table_15min = reviseSNUData(  ux_defalut_table_15min, "ux",   update_start, update_end, verbose = T)
 
 # marg_defalut_table_hours = reviseSNUData(marg_defalut_table_hours, "marg", update_start, update_end, verbose = T)
 # hcc_defalut_table_hours = reviseSNUData( hcc_defalut_table_hours, "hcc",  update_start, update_end, verbose = T)
