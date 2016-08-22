@@ -13,6 +13,7 @@ library(gtable)
 library(gridExtra)
 library(scales)
 
+
 ## 아래처럼 15분 데이터 전처리 
 ## NA --> na.locf()로 채우고  
 ## total 갱신
@@ -135,8 +136,6 @@ hcc_dt[, ':='(aggWeek=as.Date(cut(aggDay, breaks = "week", start.on.monday = T))
 ux_dt[, ':='(aggWeek=as.Date(cut(aggDay, breaks = "week", start.on.monday = T)))]
 
 
-
-
 fill.na <- function(dt){
   dt$computer = na.locf(dt$computer)
   dt$light = na.locf(dt$light)
@@ -154,6 +153,12 @@ ux_dt = fill.na(ux_dt)
 summary(marg_dt)
 summary(hcc_dt)
 summary(ux_dt)
+
+
+
+
+
+## build day table (7am - 7am)
 
 marg_day = marg_dt[, .(computer = sum(computer),
                        light = sum(light),
