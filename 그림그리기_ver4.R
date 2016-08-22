@@ -76,7 +76,6 @@ marg_dt[, ':='(index=rep(1:96, nrow(marg_dt)/96))]
 hcc_dt[, ':='(index=rep(1:96, nrow(marg_dt)/96))]
 ux_dt[, ':='(index=rep(1:96, nrow(marg_dt)/96))]
 
-
 ### update : day, weekday depending on the aggDay
 marg_dt[, ':='(day = weekdays(aggDay, abbreviate = T), weekday = isWeekday(aggDay))]
 hcc_dt[, ':='(day = weekdays(aggDay, abbreviate = T), weekday = isWeekday(aggDay))]
@@ -120,47 +119,55 @@ marg_dt = na.missing.data(marg_dt, 0.1)
 hcc_dt = na.missing.data(hcc_dt, 0.05)
 ux_dt = na.missing.data(ux_dt, 0.02)
 
+
 ### Computer
-## abnormal computer usage : 
-## all labs : computer usage under 0.001 = NA
-## hcc : computer usage over 0.5 = NA
-##  ux : computer usage over 0.35 = NA
+## abnormal computer usage (HVAC usage at computer feeder)
+## hcc : computer usage over 0.6 = NA
+##  ux : computer usage over 0.4 = NA
 
-marg_dt[computer < 0.001, ':='(computer = NA,light = NA,
-                               hvac = NA, etc = NA, total = NA)]
-hcc_dt[computer < 0.001, ':='(computer = NA,light = NA,
-                              hvac = NA, etc = NA, total = NA)]
-ux_dt[computer < 0.001, ':='(computer = NA,light = NA,
-                             hvac = NA, etc = NA, total = NA)]
-
-hcc_dt[computer > 0.5, ':='(computer = NA)]
-ux_dt[computer > 0.35, ':='(computer = NA)]
+hcc_dt[computer > 0.6, ':='(computer = NA)]
+ux_dt[computer > 0.4, ':='(computer = NA)]
 
 
 # check the distributions
-# par(mfrow=c(2,3))
-# hist(marg_dt$computer, 100)
-# hist(hcc_dt$computer, 100)
-# hist(ux_dt$computer, 100)
-# 
-# hist(marg_dt$total, 100)
-# hist(hcc_dt$total, 100)
-# hist(ux_dt$total, 100)
-# par(mfrow=c(1,1))
+par(mfrow=c(3,3))
+hist(marg_dt$computer, 100)
+hist(hcc_dt$computer, 100)
+hist(ux_dt$computer, 100)
+
+hist(marg_dt$light, 100)
+hist(hcc_dt$light, 100)
+hist(ux_dt$light, 100)
+
+hist(marg_dt$total, 100)
+hist(hcc_dt$total, 100)
+hist(ux_dt$total, 100)
+par(mfrow=c(1,1))
 
 
 ### Light 
 ## 
-# hist(marg_dt[light>0.01]$light, 100) # no problem
-# hist(hcc_dt[light>0.01]$light, 100)  # abnormal : over 0.5
-# hist(ux_dt[light>0.01]$light, 100)   # abnormal : over 0.5
+hist(marg_dt[light>0.01]$light, 100) # no problem
+hist(hcc_dt[light>0.01]$light, 100)  # abnormal : over 0.5
+hist(ux_dt[light>0.01]$light, 100)   # abnormal : over 0.5
 
+marg_dt[light > 0.5, ':='(light = NA)]
 hcc_dt[light > 0.5, ':='(light = NA)]
 ux_dt[light > 0.5, ':='(light = NA)]
 
 # hist(marg_dt[light>0.01]$light, 100) # no problem
 # hist(hcc_dt[light>0.01]$light, 100)  # abnormal : over 0.5
 # hist(ux_dt[light>0.01]$light, 100)   # abnormal : over 0.5
+
+## Replacement 
+marg_dt[timestamp >= "2015-01-18 11:00" & timestamp <= "2015-01-19 10:45"]$computer <- marg_dt[timestamp >= "2015-02-01 11:00" & timestamp <= "2015-02-02 10:45"]$computer
+marg_dt[timestamp >= "2015-01-18 11:00" & timestamp <= "2015-01-19 10:45"]$light <- marg_dt[timestamp >= "2015-02-01 11:00" & timestamp <= "2015-02-02 10:45"]$light
+marg_dt[timestamp >= "2015-01-18 11:00" & timestamp <= "2015-01-19 10:45"]$hvac <- marg_dt[timestamp >= "2015-02-01 11:00" & timestamp <= "2015-02-02 10:45"]$hvac
+marg_dt[timestamp >= "2015-01-18 11:00" & timestamp <= "2015-01-19 10:45"]$etc <- marg_dt[timestamp >= "2015-02-01 11:00" & timestamp <= "2015-02-02 10:45"]$etc
+marg_dt[timestamp >= "2015-01-18 11:00" & timestamp <= "2015-01-19 10:45"]$total <- marg_dt[timestamp >= "2015-02-01 11:00" & timestamp <= "2015-02-02 10:45"]$total
+
+marg_dt[timestamp >= "2015-01-18 11:00" & timestamp <= "2015-01-19 10:45"]
+marg_dt[timestamp >= "2015-02-01 11:00" & timestamp <= "2015-02-02 10:45"]
 
 
 ### --------------------------- ###
@@ -221,31 +228,29 @@ marg_RS = marg_RS[duration < 1000]
 hcc_RS <- hcc_RS[aggDay < "2015-12-11" | aggDay > "2015-12-30"]
 
 
-
-i = 1
-sum(marg_RS$duration < i) / nrow(marg_RS)
-sum(hcc_RS$duration < i) / nrow(hcc_RS)
-sum(ux_RS$duration < i) / nrow(ux_RS)
-
+# i = 1
+# sum(marg_RS$duration < i) / nrow(marg_RS)
+# sum(hcc_RS$duration < i) / nrow(hcc_RS)
+# sum(ux_RS$duration < i) / nrow(ux_RS)
 
 
-# Sum of duration 
-marg_SumOfDuration_day = marg_RS[, .(sum_of_duration = sum(duration)), by=aggDay]
-hcc_SumOfDuration_day = hcc_RS[, .(sum_of_duration = sum(duration)), by=aggDay]
-ux_SumOfDuration_day = ux_RS[, .(sum_of_duration = sum(duration)), by=aggDay]
-
-marg_Freq_day = marg_RS[, .(freq = nrow(.SD)), by=aggDay]
-hcc_Freq_day = hcc_RS[, .(freq = nrow(.SD)), by=aggDay]
-ux_Freq_day = ux_RS[, .(freq = nrow(.SD)), by=aggDay]
-
-# # #frequency cut
-# marg_SumOfDuration_day = marg_RS[duration>1, .(sum_of_duration = sum(duration)), by=aggDay]
-# hcc_SumOfDuration_day = hcc_RS[duration>1, .(sum_of_duration = sum(duration)), by=aggDay]
-# ux_SumOfDuration_day = ux_RS[duration>1, .(sum_of_duration = sum(duration)), by=aggDay]
+# # Sum of duration 
+# marg_SumOfDuration_day = marg_RS[, .(sum_of_duration = sum(duration)), by=aggDay]
+# hcc_SumOfDuration_day = hcc_RS[, .(sum_of_duration = sum(duration)), by=aggDay]
+# ux_SumOfDuration_day = ux_RS[, .(sum_of_duration = sum(duration)), by=aggDay]
 # 
-# marg_Freq_day = marg_RS[duration>1, .(freq = nrow(.SD)), by=aggDay]
-# hcc_Freq_day = hcc_RS[duration>1, .(freq = nrow(.SD)), by=aggDay]
-# ux_Freq_day = ux_RS[duration>1, .(freq = nrow(.SD)), by=aggDay]
+# marg_Freq_day = marg_RS[, .(freq = nrow(.SD)), by=aggDay]
+# hcc_Freq_day = hcc_RS[, .(freq = nrow(.SD)), by=aggDay]
+# ux_Freq_day = ux_RS[, .(freq = nrow(.SD)), by=aggDay]
+
+# #frequency cut
+marg_SumOfDuration_day = marg_RS[duration>1, .(sum_of_duration = sum(duration)), by=aggDay]
+hcc_SumOfDuration_day = hcc_RS[duration>1, .(sum_of_duration = sum(duration)), by=aggDay]
+ux_SumOfDuration_day = ux_RS[duration>1, .(sum_of_duration = sum(duration)), by=aggDay]
+
+marg_Freq_day = marg_RS[duration>1, .(freq = nrow(.SD)), by=aggDay]
+hcc_Freq_day = hcc_RS[duration>1, .(freq = nrow(.SD)), by=aggDay]
+ux_Freq_day = ux_RS[duration>1, .(freq = nrow(.SD)), by=aggDay]
 
 
 # set max sum_of_duration as 600
@@ -280,8 +285,8 @@ datetime.all[, sum_of_duration := as.numeric(sum_of_duration)]
 datetime.all[, freq := as.numeric(freq)]
 
 margRS_dt <- datetime.all
-margRS_dt[which(aggDay >= as.Date(marg_RS$joined[1],format="%y-%m-%d") & aggDay <= "2016-6-30"), ]$sum_of_duration = 0
-margRS_dt[which(aggDay >= as.Date(marg_RS$joined[1],format="%y-%m-%d") & aggDay <= "2016-6-30"), ]$freq = 0
+# margRS_dt[which(aggDay >= as.Date(marg_RS$joined[1],format="%y-%m-%d") & aggDay <= "2016-6-30"), ]$sum_of_duration = 0
+# margRS_dt[which(aggDay >= as.Date(marg_RS$joined[1],format="%y-%m-%d") & aggDay <= "2016-6-30"), ]$freq = 0
 uniqueDate = unique(marg_SumOfDuration_day$aggDay)
 
 for(i in 1:length(uniqueDate)){
@@ -290,8 +295,8 @@ for(i in 1:length(uniqueDate)){
 }
 
 hccRS_dt <- datetime.all
-hccRS_dt[which(aggDay >= as.Date(hcc_RS$joined[1],format="%y-%m-%d") & aggDay <= "2016-6-30"), ]$sum_of_duration = 0
-hccRS_dt[which(aggDay >= as.Date(hcc_RS$joined[1],format="%y-%m-%d") & aggDay <= "2016-6-30"), ]$freq = 0
+# hccRS_dt[which(aggDay >= as.Date(hcc_RS$joined[1],format="%y-%m-%d") & aggDay <= "2016-6-30"), ]$sum_of_duration = 0
+# hccRS_dt[which(aggDay >= as.Date(hcc_RS$joined[1],format="%y-%m-%d") & aggDay <= "2016-6-30"), ]$freq = 0
 uniqueDate = unique(hcc_SumOfDuration_day$aggDay)
 for(i in 1:length(uniqueDate)){
   hccRS_dt[min(which(hccRS_dt$aggDay == uniqueDate[i]))]$sum_of_duration = hcc_SumOfDuration_day[hcc_SumOfDuration_day[,hcc_SumOfDuration_day$aggDay==uniqueDate[i]],]$sum_of_duration
@@ -299,8 +304,8 @@ for(i in 1:length(uniqueDate)){
 }
 
 uxRS_dt <- datetime.all
-uxRS_dt[which(aggDay >= as.Date(ux_RS$joined[1],format="%y-%m-%d") & aggDay <= "2016-6-30"), ]$sum_of_duration = 0
-uxRS_dt[which(aggDay >= as.Date(ux_RS$joined[1],format="%y-%m-%d") & aggDay <= "2016-6-30"), ]$freq = 0
+# uxRS_dt[which(aggDay >= as.Date(ux_RS$joined[1],format="%y-%m-%d") & aggDay <= "2016-6-30"), ]$sum_of_duration = 0
+# uxRS_dt[which(aggDay >= as.Date(ux_RS$joined[1],format="%y-%m-%d") & aggDay <= "2016-6-30"), ]$freq = 0
 uniqueDate = unique(ux_SumOfDuration_day$aggDay)
 for(i in 1:length(uniqueDate)){
   uxRS_dt[min(which(uxRS_dt$aggDay == uniqueDate[i]))]$sum_of_duration = ux_SumOfDuration_day[ux_SumOfDuration_day[,ux_SumOfDuration_day$aggDay==uniqueDate[i]],]$sum_of_duration
@@ -372,11 +377,11 @@ feeders = c("total", "computer", "light", "hvac")
 
 return_dts = list(0)
 
-# for(lab in 1:4){ 
-for(lab in 1){
-  # lab_dt & name selection 
-#   lab_dt = dt_list[[lab]]
-  lab_dt = marg_dt
+for(lab in 1:4){ 
+# for(lab in 1){
+#   lab_dt & name selection 
+  lab_dt = dt_list[[lab]]
+#   lab_dt = marg_dt
   lab_name = lab_names[lab]
   
   for(agg_Unit in agg_Units){
@@ -440,6 +445,99 @@ for(lab in 1){
 }
 
 
+## making MARG_return_dts for exp1,2
+MARG_return_dts = list(0)
+
+for(lab in 1){ 
+  #   lab_dt & name selection 
+  lab_dt = dt_list[[lab]]
+  #   lab_dt = marg_dt
+  lab_name = lab_names[lab]
+  
+  for(agg_Unit in agg_Units){
+    # aggregation unit selection
+    # agg_Units = c("aggWeek", "aggDay")
+    # get(agg_Unit)
+    
+    for(day_selection in day_selections){
+      
+      # day selection
+      # print(day_selection)
+      
+      for(feeder in feeders){
+        # feeder selection
+        # get(feeder)
+        
+        dt_name = paste(lab_name, agg_Unit, day_selection, feeder, sep="_")
+        print(dt_name)
+        
+        if(day_selection == "allDay"){
+          
+          return_dt = lab_dt[, .(peak = get.four.stats(get(feeder), 1),
+                                 base = get.four.stats(get(feeder), 2),
+                                 avg  = get.four.stats(get(feeder), 3)),
+                             by=get(agg_Unit)]
+          
+        } else if(day_selection == "weekDay") {
+          
+          return_dt = lab_dt[weekday == T, .(peak = get.four.stats(get(feeder), 1),
+                                             base = get.four.stats(get(feeder), 2),
+                                             avg  = get.four.stats(get(feeder), 3)), 
+                             by=get(agg_Unit)]
+          
+        } else if(day_selection == "weekEnd") {
+          
+          return_dt = lab_dt[weekday == F, .(peak = get.four.stats(get(feeder), 1),
+                                             base = get.four.stats(get(feeder), 2),
+                                             avg  = get.four.stats(get(feeder), 3)),
+                             by=get(agg_Unit)]
+        }
+        
+        light_min = 0.01
+        light_peak = quantile(lab_dt$light, .90, na.rm = T)
+        light_dt = lab_dt[, .(timestamp = timestamp,
+                              aggDay = aggDay,
+                              aggWeek = aggWeek,
+                              light = na.locf(light),
+                              lightON = ifelse(na.locf(light) > light_min, 1, 0),
+                              peak_80 = filter.fault.partial.lightOn(ifelse((na.locf(light) < light_peak * 0.8) & (na.locf(light) > light_min), 1, 0)))]
+        
+        partial_light = light_dt[, .(lightON = sum(lightON),
+                                     threshold80 = ifelse(sum(lightON)==0,1,sum(peak_80)/sum(lightON))), by=get(agg_Unit)]
+        
+        return_dt = merge(return_dt, partial_light, by="get")
+        
+        assign(dt_name, return_dt)
+        MARG_return_dts = append(MARG_return_dts, setNames(list(return_dt),dt_name))
+      }
+    }
+  }
+}
+
+MARG_return_dts[[2]]$peak <- MARG_return_dts[[2]]$peak - MARG_return_dts[[5]]$peak
+MARG_return_dts[[2]]$avg <- MARG_return_dts[[2]]$avg - MARG_return_dts[[5]]$avg
+MARG_return_dts[[2]]$base <- MARG_return_dts[[2]]$base - MARG_return_dts[[5]]$base
+
+MARG_return_dts[[6]]$peak <- MARG_return_dts[[6]]$peak - MARG_return_dts[[9]]$peak
+MARG_return_dts[[6]]$avg <- MARG_return_dts[[6]]$avg - MARG_return_dts[[9]]$avg
+MARG_return_dts[[6]]$base <- MARG_return_dts[[6]]$base - MARG_return_dts[[9]]$base
+
+MARG_return_dts[[10]]$peak <- MARG_return_dts[[10]]$peak - MARG_return_dts[[13]]$peak
+MARG_return_dts[[10]]$avg <- MARG_return_dts[[10]]$avg - MARG_return_dts[[13]]$avg
+MARG_return_dts[[10]]$base <- MARG_return_dts[[10]]$base - MARG_return_dts[[13]]$base
+
+MARG_return_dts[[14]]$peak <- MARG_return_dts[[14]]$peak - MARG_return_dts[[17]]$peak
+MARG_return_dts[[14]]$avg <- MARG_return_dts[[14]]$avg - MARG_return_dts[[17]]$avg
+MARG_return_dts[[14]]$base <- MARG_return_dts[[14]]$base - MARG_return_dts[[17]]$base
+
+MARG_return_dts[[18]]$peak <- MARG_return_dts[[18]]$peak - MARG_return_dts[[21]]$peak
+MARG_return_dts[[18]]$avg <- MARG_return_dts[[18]]$avg - MARG_return_dts[[21]]$avg
+MARG_return_dts[[18]]$base <- MARG_return_dts[[18]]$base - MARG_return_dts[[21]]$base
+
+MARG_return_dts[[22]]$peak <- MARG_return_dts[[22]]$peak - MARG_return_dts[[25]]$peak
+MARG_return_dts[[22]]$avg <- MARG_return_dts[[22]]$avg - MARG_return_dts[[25]]$avg
+MARG_return_dts[[22]]$base <- MARG_return_dts[[22]]$base - MARG_return_dts[[25]]$base
+
 ## check the returns 
 # return_dts[15]
 # marg_dt[, .(peak = get.four.stats(computer, 1),
@@ -451,7 +549,7 @@ for(lab in 1){
 ### ------------------------------------------- ###
 ### Plotting
 windowingByExpDate <- function(data, yName, windowingWeek){
-  if(nrow(data) <= 150) {
+  if((plot_dt$get[2]-plot_dt$get[1]) > 3) {
     n <- windowingWeek/2
   }else {
     n <- windowingWeek/2*7
@@ -465,7 +563,7 @@ windowingByExpDate <- function(data, yName, windowingWeek){
     start<-1
     end<-1
     
-    ##Collecting UX RealSense data starts on "2015-11-02"
+    #Collecting UX RealSense data starts on "2015-11-02"
     if((yName=='sum_of_duration' | yName=='freq') & (data$get[k] < as.Date("2015-11-02"))) {
       windowing$mean[k] <- NA
       windowing$sd[k] <- NA 
@@ -565,9 +663,11 @@ windowingByExpDate <- function(data, yName, windowingWeek){
       windowing$mean[k] <- ifelse(is.nan(mean(y[start:end],na.rm=T)),NA,mean(y[start:end],na.rm=T))
       windowing$sd[k] <- ifelse(is.nan(sd(y[start:end],na.rm=T)),NA,sd(y[start:end],na.rm=T)) 
     }
+    print(paste(data$get[k],":",start,end, windowing$mean[k]))
   }
   windowing$sd <- ifelse(is.na(windowing$sd),0,windowing$sd)
   windowing$get <- data$get
+  
   return (windowing)
 }
 
@@ -593,6 +693,16 @@ add.colorful.window.line <- function(plot_body, data, valueName, windowingWeek, 
   }
   
   return (result)
+}
+
+set.expDate.rownum <- function(plot_dt, expDate) {
+  rownum_expDate <- 1
+  
+  for (d in expDate) {
+    rownum_expDate <- append(rownum_expDate, ifelse((nrow(plot_dt[d>plot_dt$get,])+1)>nrow(plot_dt),nrow(plot_dt),(nrow(plot_dt[d>plot_dt$get,])+1)))
+  }
+  
+  return(rownum_expDate)
 }
 
 add.event.vline <- function(plot_body){
@@ -664,8 +774,22 @@ set.colorful.theme <- function(plot_body, colorName) {
   return(result)
 }
 
+get.expDate.3 <- function() {
+  expDate<-c(as.Date("2015-10-08"),
+             as.Date("2015-12-01"),
+             as.Date("2016-01-11"),
+             as.Date("2016-02-01"),
+             as.Date("2016-05-16"),
+             as.Date("2016-06-13"))
+  return(expDate)
+}
+
 save.plot <- function(file, plot) {
   ggsave(file, width = 8, height = 6, dpi = 300, plot, limitsize=FALSE)
+}
+
+save.wide.plot <- function(file, plot) {
+  ggsave(file, width = 10, height = 6, dpi = 300, plot, limitsize=FALSE)
 }
 
 partial_lightON_color = "orange2"
@@ -674,12 +798,13 @@ full_lightON_color = "violetred4"
 strong_light_color = "darkblue"
 
 ## 1. Four stats plots  +  partial_lightON & lightON duration plots 
-expDate<-c(as.Date("2015-10-08"),
-           as.Date("2015-12-01"),
-           as.Date("2016-01-11"),
-           as.Date("2016-02-01"),
-           as.Date("2016-05-16"),
-           as.Date("2016-06-13"))
+# expDate<-c(as.Date("2015-10-08"),
+#            as.Date("2015-12-01"),
+#            as.Date("2016-01-11"),
+#            as.Date("2016-02-01"),
+#            as.Date("2016-05-16"),
+#            as.Date("2016-06-13"))
+expDate <- get.expDate.3()
 
 # return_dts[[40]][get >= "2015-12-11" & get <= "2015-12-30"]$sum_of_duration <- NA
 # return_dts[[40]][get >= "2015-12-11" & get <= "2015-12-30"]$freq <- NA
@@ -688,18 +813,17 @@ start.time <- Sys.time()
 for(i in 2:length(return_dts)){ 
   plot_dt   = return_dts[[i]]
   
-  rownum_expDate <- 1
+  rownum_expDate <- set.expDate.rownum(plot_dt, expDate)
   
-  for (d in expDate) {
-    rownum_expDate <- append(rownum_expDate, (nrow(plot_dt[d>plot_dt$get,])+1))
+  if(max(plot_dt$threshold80) <= 1.0) {
+    plot_dt$threshold80 <- plot_dt$threshold80*100 ## partial lightON rate -> percentage  
+    plot_dt$lightON <- plot_dt$lightON*15.0/60.0 ## lightOn duration 15min block -> hour
   }
   
-  plot_dt$threshold80 <- plot_dt$threshold80*100 ## partial lightON rate -> percentage
-  plot_dt$lightON <- plot_dt$lightON*15.0/60.0 ## lightOn duration 15min block -> hour
 #   plotTitle <- "daily"
   
   ##windowingWeek must be even
-  for(windowingWeek in c(4,8)) {
+  for(windowingWeek in c(4)) {
     
 #     if(strsplit(plot_name,"_")[[1]][2] == "aggWeek"){
 #       #       ylim_RS_duration <- 2000
@@ -732,6 +856,7 @@ for(i in 2:length(return_dts)){
       
       lightON_duration <- ggplot(plot_dt, aes(x=get)) +
         ggtitle(plot_name)+
+        ylim(0,24)+
         ylab("Light-ON duration (hours)")+
         scale_color_discrete(breaks = c("lightON"), labels = c("number of lightON blocks(15min)"))
       lightON_duration = add.colorful.window.line(lightON_duration, plot_dt, 'lightON',windowingWeek, lightON_duration_color)
@@ -766,19 +891,19 @@ end.time-start.time
 
 ###
 ## 1-1. MARG computer 
-expDate<-c(as.Date("2014-11-10"),
-           as.Date("2014-11-16"),
-           as.Date("2016-11-16"),
-           as.Date("2016-11-16"),
-           as.Date("2016-11-16"),
-           as.Date("2016-11-16"))
-
 # expDate<-c(as.Date("2014-11-10"),
 #            as.Date("2014-11-16"),
-#            as.Date("2015-01-15"),
-#            as.Date("2015-01-21"),
+#            as.Date("2016-11-16"),
+#            as.Date("2016-11-16"),
 #            as.Date("2016-11-16"),
 #            as.Date("2016-11-16"))
+# 
+expDate<-c(as.Date("2014-11-10"),
+           as.Date("2014-11-16"),
+           as.Date("2015-01-15"),
+           as.Date("2015-01-21"),
+           as.Date("2016-11-16"),
+           as.Date("2016-11-16"))
 
 # return_dts[[40]][get >= "2015-12-11" & get <= "2015-12-30"]$sum_of_duration <- NA
 # return_dts[[40]][get >= "2015-12-11" & get <= "2015-12-30"]$freq <- NA
@@ -787,11 +912,12 @@ start.time <- Sys.time()
 for(i in 2:length(MARG_return_dts)){ 
   plot_dt   = MARG_return_dts[[i]]
   
-  rownum_expDate <- 1
+  #     #Exp1
+  #     plot_dt = plot_dt[get >= "2014-09-11" & get <= "2014-12-16"]
+      #Exp2
+      plot_dt = plot_dt[get >= "2014-09-11" & get < "2015-06-01"]
   
-  for (d in expDate) {
-    rownum_expDate <- append(rownum_expDate, (nrow(plot_dt[d>plot_dt$get,])+1))
-  }
+  rownum_expDate <- set.expDate.rownum(plot_dt, expDate)
   
 #   plot_dt$threshold80 <- plot_dt$threshold80*100 ## partial lightON rate -> percentage
 #   plot_dt$lightON <- plot_dt$lightON*15.0/60.0 ## lightOn duration 15min block -> hour
@@ -801,16 +927,12 @@ for(i in 2:length(MARG_return_dts)){
       
     plot_name = names(MARG_return_dts[i])
     
-    if((strsplit(plot_name,"_")[[1]][4] != "computer") & (strsplit(plot_name,"_")[[1]][4] != "light")){
+    if((strsplit(plot_name,"_")[[1]][4] != "computer") & (strsplit(plot_name,"_")[[1]][4] != "light") & (strsplit(plot_name,"_")[[1]][4] != "total")){
       next
     }
     
     plot_name = paste(names(MARG_return_dts[i]), "- windowing ", windowingWeek,"weeks")  
     
-    #Exp1
-    plot_dt = plot_dt[get >= "2014-09-11" & get <= "2014-12-16"]
-#     #Exp2
-#     plot_dt = plot_dt[get >= "2014-09-11" & get < "2015-03-01"]
     print(plot_name)
     
     stats <- ggplot(plot_dt, aes(x=get)) +
@@ -821,24 +943,29 @@ for(i in 2:length(MARG_return_dts)){
     stats = add.window.line(stats, plot_dt, "base", windowingWeek)
     stats = add.window.line(stats, plot_dt, "avg", windowingWeek)
     
-    #Exp1
-    stats = stats + 
-      scale_x_date("Timestamp", labels = date_format("%Y-%m"), breaks = date_breaks("month")) +
-      theme_bw()+
-      geom_vline(aes(xintercept = as.numeric(as.Date("2014-11-10"))),color="gray40", linetype = "longdash") +
-      geom_vline(aes(xintercept = as.numeric(as.Date("2014-11-16"))),color="gray40", linetype = "longdash")
-#     #Exp2
+#     #Exp1
 #     stats = stats + 
 #       scale_x_date("Timestamp", labels = date_format("%Y-%m"), breaks = date_breaks("month")) +
 #       theme_bw()+
 #       geom_vline(aes(xintercept = as.numeric(as.Date("2014-11-10"))),color="gray40", linetype = "longdash") +
-#       geom_vline(aes(xintercept = as.numeric(as.Date("2014-11-16"))),color="gray40", linetype = "longdash") +
-#       geom_vline(aes(xintercept = as.numeric(as.Date("2015-01-15"))),color="gray40", linetype = "longdash") +
-#       geom_vline(aes(xintercept = as.numeric(as.Date("2015-01-21"))),color="gray40", linetype = "longdash")
+#       geom_vline(aes(xintercept = as.numeric(as.Date("2014-11-16"))),color="gray40", linetype = "longdash")
+    #Exp2
+    stats = stats + 
+      scale_x_date("Timestamp", labels = date_format("%Y-%m"), breaks = date_breaks("month")) +
+      theme_bw()+
+      geom_vline(aes(xintercept = as.numeric(as.Date("2014-11-10"))),color="gray40", linetype = "longdash") +
+      geom_vline(aes(xintercept = as.numeric(as.Date("2014-11-16"))),color="gray40", linetype = "longdash") +
+      geom_vline(aes(xintercept = as.numeric(as.Date("2015-01-15"))),color="gray40", linetype = "longdash") +
+      geom_vline(aes(xintercept = as.numeric(as.Date("2015-01-21"))),color="gray40", linetype = "longdash")
     stats            = set.default.theme(stats)
     
-    save.plot(paste0("../plots/Exp1_",plot_name, ".png"), stats)
-#     save.plot(paste0("../plots/Exp2_",plot_name, ".png"), stats)
+    if((strsplit(plot_name,"_")[[1]][4] == "total")){
+#       save.wide.plot(paste0("../plots/Exp1_",plot_name, ".png"), stats)
+      save.wide.plot(paste0("../plots/Exp2_",plot_name, ".png"), stats)
+    }else{
+#       save.plot(paste0("../plots/Exp1_",plot_name, ".png"), stats)
+      save.plot(paste0("../plots/Exp2_",plot_name, ".png"), stats)
+    }
   }
 }
 end.time <- Sys.time()
@@ -883,17 +1010,9 @@ for(lab in 1:4){
   
   setnames(lunch_dt_aggWeek,old="aggWeek",new="get")
   
-  aggDay_rownum_expDate <- 1
+  aggDay_rownum_expDate <- set.expDate.rownum(lunch_dt_aggDay, expDate)
   
-  for (d in expDate) {
-    aggDay_rownum_expDate <- append(aggDay_rownum_expDate, (nrow(lunch_dt_aggDay[d>lunch_dt_aggDay$get,])+1))
-  }
-  
-  aggWeek_rownum_expDate <- 1
-  
-  for (d in expDate) {
-    aggWeek_rownum_expDate <- append(aggWeek_rownum_expDate, (nrow(lunch_dt_aggWeek[d>lunch_dt_aggWeek$get,])+1))
-  }
+  aggWeek_rownum_expDate <- set.expDate.rownum(lunch_dt_aggWeek, expDate)
   
   for(windowingWeek in c(4,8)) {
     
@@ -950,6 +1069,8 @@ for(lab in 1:4){
   strong_light_aggWeek_dt = lab_dt[, .(strong_light_80 = sum(light > (light_peak * 0.8), na.rm = T)*15.0/60.0), by=aggWeek]
   setnames(strong_light_aggWeek_dt,old="aggWeek",new="get")
   
+  strong_light_aggWeek_dt$strong_light_80 <- strong_light_aggWeek_dt$strong_light_80/7.0
+
   aggDay_rownum_expDate <- 1
   
   for (d in expDate) {
@@ -979,7 +1100,7 @@ for(lab in 1:4){
     
     p2 <- ggplot(strong_light_aggWeek_dt, aes(x=get)) +
       ggtitle(paste(plot_name, "aggWeek"))+
-      ylab("strong light-ON duration (hrs/week)")
+      ylab("strong light-ON average duration (hrs/day)")
 
     p2 = add.colorful.window.line(p2, strong_light_aggWeek_dt, 'strong_light_80', windowingWeek, strong_light_color)
     
@@ -1257,20 +1378,20 @@ for(lab in 1:4){
       
       if(day_selection == "allDay"){
         
-        return_rs_dt = lab_dt[, .(sum_of_duration = sum(sum_of_duration),
-                               freq = sum(freq))
+        return_rs_dt = lab_dt[, .(sum_of_duration = sum(sum_of_duration, na.rm=T),
+                               freq = sum(freq, na.rm=T))
                            , by=get(agg_Unit)]
         
       } else if(day_selection == "weekDay") {
         
-        return_rs_dt = lab_dt[weekday == T, .(sum_of_duration = sum(sum_of_duration), 
-                                           freq = sum(freq))
+        return_rs_dt = lab_dt[weekday == T, .(sum_of_duration = sum(sum_of_duration, na.rm=T), 
+                                           freq = sum(freq, na.rm=T))
                            , by=get(agg_Unit)]
         
       } else if(day_selection == "weekEnd") {
         
-        return_rs_dt = lab_dt[weekday == F, .(sum_of_duration = sum(sum_of_duration), 
-                                           freq = sum(freq))
+        return_rs_dt = lab_dt[weekday == F, .(sum_of_duration = sum(sum_of_duration, na.rm=T), 
+                                           freq = sum(freq, na.rm=T))
                            , by=get(agg_Unit)]
       }
       
@@ -1292,18 +1413,17 @@ for(lab in 1:4){
 #                 guides(fill = guide_legend(keywidth = 1, keyheight = 1),
 #                        linetype=guide_legend(keywidth = 3, keyheight = 1),
 #                        colour=guide_legend(keywidth = 3, keyheight = 1))
-#   return(plot)
+#   dreturn(plot)
 # }
 
 start.time <- Sys.time()
+expDate <- get.expDate.3()
 for(i in 2:length(return_rs_dts)){ 
   plot_dt   = return_rs_dts[[i]]
   
-  rownum_expDate <- 1
+  plot_dt = plot_dt[get >= "2015-10-08" & get <= "2016-07-18"]
   
-  for (d in expDate) {
-    rownum_expDate <- append(rownum_expDate, (nrow(plot_dt[d>plot_dt$get,])+1))
-  }
+  rownum_expDate <- set.expDate.rownum(plot_dt, expDate)
   
   ##windowingWeek must be even, 
   ###add.window.line function will window from the point before (windowingWeek/2) weeks and the point after (windowingWeek/2) weeks
@@ -1334,7 +1454,7 @@ for(i in 2:length(return_rs_dts)){
       scale_y_continuous(limits=c(0,ylim_RS_freq), oob=rescale_none) +
       ggtitle(paste("RS", plot_name))+
       theme_bw()+
-      ylab("total frequency(times)")
+      ylab("(counts / day)")
     
     RS_duration      = add.window.line(RS_duration, plot_dt, "sum_of_duration", windowingWeek)
     RS_freq          = add.window.line(RS_freq, plot_dt, "freq", windowingWeek)
@@ -1343,7 +1463,7 @@ for(i in 2:length(return_rs_dts)){
     RS_freq          = add.event.vline(RS_freq)
 
     RS_duration      = set.colorful.theme(RS_duration, "black")
-    RS_freq          = set.colorful.theme(RS_freq, "black")
+    RS_freq          = set.colorful.theme(RS_freq, "black")    
         
     save.plot(paste0("../plots/RealSense_",plot_name, "_1.png"),RS_duration)
     save.plot(paste0("../plots/RealSense_",plot_name, "_2.png"),RS_freq)
