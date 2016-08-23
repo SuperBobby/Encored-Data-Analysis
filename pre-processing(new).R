@@ -142,7 +142,7 @@ fill.na <- function(dt){
   dt$hvac = na.locf(dt$hvac)
   dt$etc = na.locf(dt$etc)
   dt$total = na.locf(dt$total)
-
+  
   return(dt)  
 }
 
@@ -175,9 +175,5 @@ marg_day[year(aggDay)==2014 & month(aggDay)==10,
          lapply(.SD, mean, na.rm=TRUE), by=weekday, .SDcols=c("computer", "light", "total_noHVAC") ] 
 
 marg_day[year(aggDay)==2015 & month(aggDay)==1 & (day(aggDay)>14) & (day(aggDay)<22)]
-
-
-
-
 
 

@@ -214,9 +214,9 @@ ux_RS[, ':='(aggDay=as.Date(joined-date_adjust_parameter, tz="rok"), weekday = i
 
 
 ## vaild date 
-marg_RS = marg_RS[aggDay > "2015-10-14" & aggDay <= update_end]
-hcc_RS = hcc_RS[aggDay > "2015-10-14" & aggDay <= update_end]
-ux_RS = ux_RS[aggDay > "2015-10-14" & aggDay <= update_end]
+marg_RS = marg_RS[aggDay > "2015-10-14" & aggDay <= "2016-07-01"]
+hcc_RS = hcc_RS[aggDay > "2015-10-14" & aggDay <= "2016-07-01"]
+ux_RS = ux_RS[aggDay > "2015-10-14" & aggDay <= "2016-07-01"]
 
 
 ## Validate the "duration"
@@ -334,6 +334,10 @@ AllLabs_dt$freq = AllLabs_dt$freq + hcc_dt$freq + ux_dt$freq
 ### Build list of all data tables 
 ##
 dt_list = list(marg_dt, hcc_dt, ux_dt, AllLabs_dt)
+
+
+
+
 
 ### --------------------------- ###
 ### Build tables and functions for extraction & aggregation
@@ -1206,12 +1210,7 @@ aggWeek_weather_dt <- aggWeek_weather_dt[, aggWeek:=NULL]
 ### 
 ## 5. MARG HVAC + weahter(max, avg, min temperature info) 
 ## 
-expDate<-c(as.Date("2015-10-08"),
-           as.Date("2015-12-01"),
-           as.Date("2016-01-11"),
-           as.Date("2016-02-01"),
-           as.Date("2016-05-16"),
-           as.Date("2016-06-13"))
+expDate <- get.expDate.3()
 
 start.time <- Sys.time()
 for(i in 2:length(return_dts)){ 
