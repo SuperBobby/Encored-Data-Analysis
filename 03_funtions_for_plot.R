@@ -1,7 +1,7 @@
 ### ------------------------------------------- ###
 ### Plotting
 windowingByExpDate <- function(data, yName, windowingWeek, rownum_expDate){
-  if((data$get[2]-data$get[1]) > 3) {
+  if((data$get[2] - data$get[1]) > 3) {
     n <- windowingWeek/2
   }else {
     n <- windowingWeek/2*7
@@ -125,7 +125,8 @@ windowingByExpDate <- function(data, yName, windowingWeek, rownum_expDate){
 }
 
 add.window.line <- function(plot_body, data, valueName, windowingWeek, rownum_expDate) {
-  window_df = windowingByExpDate(data,valueName,windowingWeek, rownum_expDate)
+  window_df = windowingByExpDate(data, valueName, windowingWeek, rownum_expDate)
+  
   result = plot_body +
     geom_line(data=window_df, aes_string(y = "mean", linetype = shQuote(valueName)), size=1) +
     geom_ribbon(data=window_df,aes(ymin = mean - sd, ymax = mean + sd), alpha = 0.2)
@@ -133,13 +134,13 @@ add.window.line <- function(plot_body, data, valueName, windowingWeek, rownum_ex
   return (result)
 }
 
-add.colorful.window.line <- function(plot_body, data, valueName, windowingWeek, colorName, ribbon=TRUE) {
-  window_df = windowingByExpDate(data,valueName,windowingWeek, rownum_expDate)
+add.colorful.window.line <- function(plot_body, data, valueName, windowingWeek, colorName, rownum_expDate, ribbon=TRUE) {
+  window_df = windowingByExpDate(data, valueName, windowingWeek, rownum_expDate)
   
   if(ribbon==TRUE) {
     result = plot_body +
       geom_line(data=window_df, aes_string(y = "mean", linetype = shQuote(valueName)), color=colorName, size=1) +
-      geom_ribbon(data=window_df,aes(ymin = mean - sd, ymax = mean + sd), fill=colorName, alpha = 0.2)
+      geom_ribbon(data=window_df, aes(ymin = mean - sd, ymax = mean + sd), fill=colorName, alpha = 0.2)
   }else {
     result = plot_body +
       geom_line(data=window_df, aes_string(y = "mean", color = shQuote(valueName)), size=1)
@@ -162,30 +163,30 @@ insert_minor <- function(major_labs, n_minor) {labs <-
                                                  c( sapply( major_labs, function(x) c(x, rep("", 4) ) ) )
                                                labs[1:(length(labs)-n_minor)]}
 
-add.event.vline.exp1 <- function(plot_body){
+add.event.vline.exp1.1 <- function(plot_body){
   result = plot_body + 
     scale_x_date("Timestamp", labels = date_format("%Y-%m"), breaks = date_breaks("month")) +
 #     scale_x_date("Timestamp", labels = insert_minor(date_format("%Y-%m"), 4), breaks = date_breaks("week")) +
     theme_bw()+
     geom_vline(aes(xintercept = as.numeric(as.Date("2014-11-10"))),color="gray40", linetype = "longdash") +
-    geom_vline(aes(xintercept = as.numeric(as.Date("2014-11-16"))),color="gray40", linetype = "longdash")
+    geom_vline(aes(xintercept = as.numeric(as.Date("2014-11-17"))),color="gray40", linetype = "longdash")
+  
+  return(result)
+}
+
+add.event.vline.exp1.2 <- function(plot_body){
+  result = plot_body + 
+    scale_x_date("Timestamp", labels = date_format("%Y-%m"), breaks = date_breaks("month")) +
+    theme_bw()+
+    geom_vline(aes(xintercept = as.numeric(as.Date("2014-11-10"))),color="gray40", linetype = "longdash") +
+    geom_vline(aes(xintercept = as.numeric(as.Date("2014-11-17"))),color="gray40", linetype = "longdash") +
+    geom_vline(aes(xintercept = as.numeric(as.Date("2015-01-15"))),color="gray40", linetype = "longdash") +
+    geom_vline(aes(xintercept = as.numeric(as.Date("2015-01-22"))),color="gray40", linetype = "longdash")
   
   return(result)
 }
 
 add.event.vline.exp2 <- function(plot_body){
-  result = plot_body + 
-    scale_x_date("Timestamp", labels = date_format("%Y-%m"), breaks = date_breaks("month")) +
-    theme_bw()+
-    geom_vline(aes(xintercept = as.numeric(as.Date("2014-11-10"))),color="gray40", linetype = "longdash") +
-    geom_vline(aes(xintercept = as.numeric(as.Date("2014-11-16"))),color="gray40", linetype = "longdash") +
-    geom_vline(aes(xintercept = as.numeric(as.Date("2015-01-15"))),color="gray40", linetype = "longdash") +
-    geom_vline(aes(xintercept = as.numeric(as.Date("2015-01-21"))),color="gray40", linetype = "longdash")
-  
-  return(result)
-}
-
-add.event.vline <- function(plot_body){
   result = plot_body + 
     scale_x_date("Timestamp", labels = date_format("%Y-%m"), breaks = date_breaks("month")) +
     theme_bw()+
@@ -254,32 +255,69 @@ set.colorful.theme <- function(plot_body, colorName) {
   return(result)
 }
 
-get.expDate.1 <- function() {
-  expDate<-c(as.Date("2014-11-10"),
-             as.Date("2014-11-16"),
+get.expDate.1.1 <- function() {
+  exp_Date<-c(as.Date("2014-11-10"),
+             as.Date("2014-11-17"),
              as.Date("2016-11-16"),
              as.Date("2016-11-16"),
              as.Date("2016-11-16"),
              as.Date("2016-11-16"))
+  return(exp_Date)
+}
+
+set.expDate.1.1 <- function(raw_dt) {
+  cut_dt <- raw_dt[get>= "2014-10-01" & get<= "2014-12-16"]
+  
+  return(cut_dt)
+}
+
+get.expDate.1.2 <- function() {
+  exp_Date<-c(as.Date("2014-11-10"),
+             as.Date("2014-11-17"),
+             as.Date("2015-01-15"),
+             as.Date("2015-01-22"),
+             as.Date("2016-11-16"),
+             as.Date("2016-11-16"))
+  return(exp_Date)
+}
+
+set.expDate.1.2 <- function(raw_dt) {
+  cut_dt <- raw_dt[get>= "2014-10-01" & get<= "2015-02-28"]
+  
+  return(cut_dt)
 }
 
 get.expDate.2 <- function() {
-  expDate<-c(as.Date("2014-11-10"),
-             as.Date("2014-11-16"),
-             as.Date("2015-01-15"),
-             as.Date("2015-01-21"),
-             as.Date("2016-11-16"),
-             as.Date("2016-11-16"))
-}
-
-get.expDate.3 <- function() {
-  expDate<-c(as.Date("2015-10-08"),
+  exp_Date<-c(as.Date("2015-10-08"),
              as.Date("2015-12-01"),
              as.Date("2016-01-11"),
              as.Date("2016-02-01"),
              as.Date("2016-05-16"),
              as.Date("2016-06-13"))
-  return(expDate)
+  return(exp_Date)
+}
+
+set.expDate.2 <- function(raw_dt) {
+  cut_dt <- raw_dt[get>= "2015-03-01" & get<= "2016-07-26"]
+  
+  return(cut_dt)
+}
+
+
+get.expDate <- function() {
+  exp_Date<-list(c(as.Date("2014-10-01"), as.Date("2014-10-31")),
+                 c(as.Date("2014-11-10"), as.Date("2014-11-16")),
+                 c(as.Date("2014-11-17"), as.Date("2014-12-16")),
+                 c(as.Date("2015-01-15"), as.Date("2015-01-21")),
+                 c(as.Date("2015-01-22"), as.Date("2015-02-28")),
+                 c(as.Date("2015-03-01"), as.Date("2015-09-30")),
+                 c(as.Date("2015-10-08"), as.Date("2015-11-30")),
+                 c(as.Date("2015-12-01"), as.Date("2016-01-10")),
+                 c(as.Date("2016-01-11"), as.Date("2016-01-31")),
+                 c(as.Date("2016-02-01"), as.Date("2016-05-15")),
+                 c(as.Date("2016-05-16"), as.Date("2016-06-12")),
+                 c(as.Date("2016-06-13"), as.Date("2016-07-26")))
+  return(exp_Date)
 }
 
 save.plot <- function(file, plot) {

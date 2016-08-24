@@ -100,9 +100,15 @@ for(lab in 1:4){
         partial_light = light_dt[, .(lightON = sum(lightON),
                                      threshold80 = ifelse(sum(lightON)==0,1,sum(peak_80)/sum(lightON))), by=get(agg_Unit)]
         
-        partial_light = partial_light[, .(get = get,
-                                          lightON = lightON*15.0/60.0,
-                                          threshold80 = threshold80*100)]
+        if(agg_Unit == "aggWeek"){
+          partial_light = partial_light[, .(get = get,
+                                            lightON = lightON*15.0/60.0/7.0,
+                                            threshold80 = threshold80*100)]
+        } else{
+          partial_light = partial_light[, .(get = get,
+                                            lightON = lightON*15.0/60.0,
+                                            threshold80 = threshold80*100)]
+        }
         
         return_dt = merge(return_dt, partial_light, by="get")
         
@@ -174,9 +180,15 @@ for(lab in 1){
         partial_light = light_dt[, .(lightON = sum(lightON),
                                      threshold80 = ifelse(sum(lightON)==0,1,sum(peak_80)/sum(lightON))), by=get(agg_Unit)]
         
-        partial_light = partial_light[, .(get = get,
-                                          lightON = lightON*15.0/60.0,
-                                          threshold80 = threshold80*100)]
+        if(agg_Unit == "aggWeek"){
+          partial_light = partial_light[, .(get = get,
+                                            lightON = lightON*15.0/60.0/7.0,
+                                            threshold80 = threshold80*100)]
+        } else{
+          partial_light = partial_light[, .(get = get,
+                                            lightON = lightON*15.0/60.0,
+                                            threshold80 = threshold80*100)]
+        }
         
         return_dt = merge(return_dt, partial_light, by="get")
         
