@@ -1,3 +1,26 @@
+## four stat : peak, base, avg, mid --> c(1,2,3,4)
+get.four.stats <- function(usage, type){
+  peak = quantile(usage, .90, na.rm = T)
+  base = quantile(usage, .10, na.rm = T)
+  avg  = mean(usage, na.rm = T)
+  med  = median(usage, na.rm = T)
+  
+  result=c(peak, base, avg, med)
+  return(result[type])
+}
+
+filter.fault.partial.lightOn <- function(input){
+  light = na.locf(input)
+  
+  for(i in 2:(length(light)-1)){
+    
+    if(sum(light[(i-1):(i+1)]) == 1){
+      light[i] = 0
+    }
+  }
+  return(light)
+}
+
 ### ------------------------------------------- ###
 ### Plotting
 windowingByExpDate <- function(data, data_name, yName, windowingWeek, rownum_expDate){
