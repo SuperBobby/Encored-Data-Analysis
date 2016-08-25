@@ -35,17 +35,41 @@ build.table.lunch.saving <- function(dt_list, target){
         
         before_dt = lab_dt[index %in% before_lunch_index, .(before_lunch = max(get(target))), by=aggDay]
         during_dt = lab_dt[index %in% during_lunch_index, .(during_lunch = min(get(target))), by=aggDay]
-        after_dt = lab_dt[index %in%  after_lunch_index, .( after_lunch = max(get(target))), by=aggDay]
+        after_dt = lab_dt[index %in%  after_lunch_index, .(after_lunch = max(get(target))), by=aggDay]
         
         lunch_dt = merge(before_dt, during_dt, by='aggDay')
         lunch_dt = merge(lunch_dt, after_dt, by='aggDay')
         
-        ## Conditions of lunch saving 
-        lunch_dt[(during_lunch < (before_lunch * lunch_saving_threshold_ratio)) 
-                 & (during_lunch < (after_lunch * lunch_saving_threshold_ratio)) 
-                 & (before_lunch > target_on_threshold_usage), 
-                 ':='(lunch_saving = 1), by=aggDay]
+        lunch_dt = lunch_dt[, ':='(weekday=isWeekday(aggDay))]
         
+        print(head(lunch_dt))
+        
+        lunch_dt = lunch_dt[, ':='(lunch_saving = 0)]
+        
+        if(day_selection == "allDay"){
+          ## Conditions of lunch saving 
+          lunch_dt = lunch_dt[(during_lunch < (before_lunch * lunch_saving_threshold_ratio)) 
+                   & (during_lunch < (after_lunch * lunch_saving_threshold_ratio)) 
+                   & (before_lunch > target_on_threshold_usage), 
+                   ':='(lunch_saving = 1), by=aggDay]
+          
+        } else if(day_selection == "weekDay") {
+          
+          lunch_dt = lunch_dt[(weekday == T)
+                              &(during_lunch < (before_lunch * lunch_saving_threshold_ratio)) 
+                              & (during_lunch < (after_lunch * lunch_saving_threshold_ratio)) 
+                              & (before_lunch > target_on_threshold_usage), 
+                              ':='(lunch_saving = 1), by=aggDay]
+          
+        } else if(day_selection == "weekEnd") {
+          
+          lunch_dt = lunch_dt[(weekday == F)
+                              & (during_lunch < (before_lunch * lunch_saving_threshold_ratio)) 
+                              & (during_lunch < (after_lunch * lunch_saving_threshold_ratio)) 
+                              & (before_lunch > target_on_threshold_usage), 
+                              ':='(lunch_saving = 1), by=aggDay]
+        }
+
         ## aggregation: week table 'lunch_saving_per_week' 
         lunch_dt[, ':='(aggWeek=as.Date(cut(aggDay, breaks = "week", start.on.monday = T)))]
         lunch_saving_per_week = lunch_dt[, .(lunch_saving_count = sum(lunch_saving, na.rm = T)), by=aggWeek]

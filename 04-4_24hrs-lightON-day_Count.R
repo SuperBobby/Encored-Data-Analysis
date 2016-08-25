@@ -25,26 +25,21 @@ build.table.24hr.lightOn.counting <- function(dt_list){
         full_lightON_aggDay_dt = lab_dt[, .(full_lightON_10 = sum(light > (light_peak * 0.1), na.rm = T)==96), by=aggDay]
         setnames(full_lightON_aggDay_dt,old="aggDay",new="get")
         
-        full_lightON_aggWeek_dt = full_lightON_aggDay_dt[, .(full_lightON_10 = sum(full_lightON_10, na.rm = T)), by=.(aggWeek=as.Date(cut(get, breaks = "week", start.on.monday = T)))]
-        setnames(full_lightON_aggWeek_dt,old="aggWeek",new="get")
-        
       } else if(day_selection == "weekDay") {
         
         full_lightON_aggDay_dt = lab_dt[weekday == T, .(full_lightON_10 = sum(light > (light_peak * 0.1), na.rm = T)==96), by=aggDay]
         setnames(full_lightON_aggDay_dt,old="aggDay",new="get")
-        
-        full_lightON_aggWeek_dt = full_lightON_aggDay_dt[, .(full_lightON_10 = sum(full_lightON_10, na.rm = T)), by=.(aggWeek=as.Date(cut(get, breaks = "week", start.on.monday = T)))]
-        setnames(full_lightON_aggWeek_dt,old="aggWeek",new="get")
         
       } else if(day_selection == "weekEnd") {
         
         full_lightON_aggDay_dt = lab_dt[weekday == F, .(full_lightON_10 = sum(light > (light_peak * 0.1), na.rm = T)==96), by=aggDay]
         setnames(full_lightON_aggDay_dt,old="aggDay",new="get")
         
-        full_lightON_aggWeek_dt = full_lightON_aggDay_dt[, .(full_lightON_10 = sum(full_lightON_10, na.rm = T)), by=.(aggWeek=as.Date(cut(get, breaks = "week", start.on.monday = T)))]
-        setnames(full_lightON_aggWeek_dt,old="aggWeek",new="get")
-        
       }
+      
+      full_lightON_aggWeek_dt = full_lightON_aggDay_dt[, .(full_lightON_10 = sum(full_lightON_10, na.rm = T)), by=.(aggWeek=as.Date(cut(get, breaks = "week", start.on.monday = T)))]
+      setnames(full_lightON_aggWeek_dt,old="aggWeek",new="get")
+      
       dt_name = paste(lab_name, "24hr_lightON", "aggWeek", day_selection, sep="_")
       
       assign(dt_name, full_lightON_aggWeek_dt)

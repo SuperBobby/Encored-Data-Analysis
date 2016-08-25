@@ -27,11 +27,11 @@ for(i in 2:length(return_dts)){
     stats = add.window.line(stats, plot_dt, "base", windowingWeek, rownum_expDate)
     stats = add.window.line(stats, plot_dt, "avg", windowingWeek, rownum_expDate)
     
-    if(strsplit(plot_name,"_")[[1]][2] == "aggWeek"){
-      ylim_lightON <- 2000
-    } else{
-      ylim_RS_duration <- 600
-    }   
+#     if(strsplit(plot_name,"_")[[1]][2] == "aggWeek"){
+#       ylim_lightON <- 2000
+#     } else{
+#       ylim_RS_duration <- 600
+#     }   
     
     if(grepl("light", plot_name)){
       partial_lightON <- ggplot(plot_dt, aes(x=get)) +

@@ -15,23 +15,23 @@ build.table.lightOn.duration <- function(dt_list){
     lab_dt = dt_list[[lab]]
     lab_name = lab_names[lab]
     
+    light_min = 0.01
+    light_peak = quantile(lab_dt$light, .90, na.rm = T)
+    
+    light_dt = lab_dt[, .(timestamp = timestamp,
+                          weekday = weekday,
+                          aggDay = aggDay,
+                          aggWeek = aggWeek,
+                          light = na.locf(light),
+                          lightON = ifelse(na.locf(light) > light_min, 1, 0),
+                          peak_80 = filter.fault.partial.lightOn(ifelse((na.locf(light) < light_peak * 0.8) & (na.locf(light) > light_min), 1, 0)))]
+    
     for(agg_Unit in agg_Units){
       
       for(day_selection in day_selections){
 
           dt_name = paste(lab_name, agg_Unit, day_selection,"lightOn-duration", sep="_")
           print(dt_name)
-          
-          light_min = 0.01
-          light_peak = quantile(lab_dt$light, .90, na.rm = T)
-          
-          light_dt = lab_dt[, .(timestamp = timestamp,
-                                weekday = weekday,
-                                aggDay = aggDay,
-                                aggWeek = aggWeek,
-                                light = na.locf(light),
-                                lightON = ifelse(na.locf(light) > light_min, 1, 0),
-                                peak_80 = filter.fault.partial.lightOn(ifelse((na.locf(light) < light_peak * 0.8) & (na.locf(light) > light_min), 1, 0)))]
           
           if(day_selection == "allDay"){
             
@@ -58,7 +58,7 @@ build.table.lightOn.duration <- function(dt_list){
             
             if(agg_Unit == "aggWeek"){
               partial_light = partial_light[, .(get = get,
-                                                lightON = lightON*15.0/60.0/7.0,
+                                                lightON = lightON*15.0/60.0/5.0,
                                                 threshold80 = threshold80*100)]
             } else{
               partial_light = partial_light[, .(get = get,
@@ -76,7 +76,7 @@ build.table.lightOn.duration <- function(dt_list){
             
             if(agg_Unit == "aggWeek"){
               partial_light = partial_light[, .(get = get,
-                                                lightON = lightON*15.0/60.0/7.0,
+                                                lightON = lightON*15.0/60.0/2.0,
                                                 threshold80 = threshold80*100)]
             } else{
               partial_light = partial_light[, .(get = get,
@@ -149,6 +149,14 @@ get.plot.lightOn.duration <- function(dt, expDate, lightON_duration_color = "dar
 table_lightOn_duration <- build.table.lightOn.duration(dt_list)
 
 #plot
+for(lab in 1:length(table_lightOn_duration)){
+  plot_lightOn_duration <- get.plot.lightOn.duration(table_lightOn_duration[lab], get.expDate.1.1())  
+}
+
+for(lab in 1:length(table_lightOn_duration)){
+  plot_lightOn_duration <- get.plot.lightOn.duration(table_lightOn_duration[lab], get.expDate.1.2())  
+}
+
 for(lab in 1:length(table_lightOn_duration)){
   plot_lightOn_duration <- get.plot.lightOn.duration(table_lightOn_duration[lab], get.expDate.2())  
 }
