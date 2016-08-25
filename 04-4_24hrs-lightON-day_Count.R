@@ -58,7 +58,21 @@ build.table.24hr.lightOn.counting <- function(dt_list){
 get.plot.24hr.lightOn.counting <- function(dt, expDate, full_lightON_color = "violetred4"){
   
   plot_dt = dt[[1]]
-  plot_name = names(dt)
+  
+  if(expDate[4] == "2016-11-16"){
+    #exp1-1
+    plot_dt = set.expDate.1.1(plot_dt)
+    plot_name = paste('exp1-1', names(dt), sep="_")
+  } else if(expDate[4] == "2015-01-22"){
+    #exp1-2
+    plot_dt = set.expDate.1.2(plot_dt)
+    plot_name = paste('exp1-2', names(dt), sep="_")
+  } else{
+    #exp3
+    plot_dt = set.expDate.2(plot_dt)
+    plot_name = paste('exp2', names(dt), sep="_")
+  }
+  
   rownum_expDate <- set.expDate.rownum(plot_dt, expDate)
   
   windowingWeek <- 4
@@ -70,11 +84,22 @@ get.plot.24hr.lightOn.counting <- function(dt, expDate, full_lightON_color = "vi
     ggtitle(plot_name)+
     ylab("24hrs light-ON day (count/week)")
   
-  p = add.colorful.window.line(p, plot_dt, 'full_lightON_10', windowingWeek, full_lightON_color, rownum_expDate)
-  p = add.event.vline.exp3(p)
+  p = add.colorful.window.line(p, plot_dt, plot_name, 'full_lightON_10', windowingWeek, full_lightON_color, rownum_expDate)
+  
+  if(expDate[4] == "2016-11-16"){
+    #exp1-1
+    p = add.event.vline.exp1.1(p)
+  } else if(expDate[4] == "2015-01-22"){
+    #exp1-2
+    p = add.event.vline.exp1.2(p)
+  } else{
+    #exp3
+    p = add.event.vline.exp2(p)
+  }
+  
   p = set.colorful.theme(p, full_lightON_color)
 
-  save.plot(paste0("../plots2/", plot_name, ".png"), p)
+  save.plot(paste0("../plots/", plot_name, ".png"), p)
   
   return(p)
 }
@@ -85,7 +110,7 @@ table_full_lightOn <- build.table.24hr.lightOn.counting(dt_list)
 
 #plot
 for(lab in 1:length(table_full_lightOn)){
-  plot_full_lightOn <- get.plot.24hr.lightOn.counting(table_full_lightOn[lab], get.expDate.3())  
+  plot_full_lightOn <- get.plot.24hr.lightOn.counting(table_full_lightOn[lab], get.expDate.2())  
 }
 
 #statistics

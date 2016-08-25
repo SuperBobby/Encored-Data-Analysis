@@ -88,7 +88,21 @@ build.table.partial.lightOn <- function(dt_list){
 get.plot.partial.lightOn <- function(dt, expDate, partial_lightON_color = "orange2"){
   
   plot_dt = dt[[1]]
-  plot_name = names(dt)
+  
+  if(expDate[4] == "2016-11-16"){
+    #exp1-1
+    plot_dt = set.expDate.1.1(plot_dt)
+    plot_name = paste('exp1-1', names(dt), sep="_")
+  } else if(expDate[4] == "2015-01-22"){
+    #exp1-2
+    plot_dt = set.expDate.1.2(plot_dt)
+    plot_name = paste('exp1-2', names(dt), sep="_")
+  } else{
+    #exp3
+    plot_dt = set.expDate.2(plot_dt)
+    plot_name = paste('exp2', names(dt), sep="_")
+  }
+  
   rownum_expDate <- set.expDate.rownum(plot_dt, expDate)
   
   windowingWeek <- 4
@@ -97,12 +111,22 @@ get.plot.partial.lightOn <- function(dt, expDate, partial_lightON_color = "orang
   partial_lightON <- ggplot(plot_dt, aes(x=get)) +
     ggtitle(plot_name)+
     ylab("Partial light-ON (%)")
-  partial_lightON = add.colorful.window.line(partial_lightON, plot_dt, 'threshold80', windowingWeek, partial_lightON_color, rownum_expDate)
+  partial_lightON = add.colorful.window.line(partial_lightON, plot_dt, plot_name, 'threshold80', windowingWeek, partial_lightON_color, rownum_expDate)
   
-  partial_lightON  = add.event.vline.exp3(partial_lightON)
+  if(expDate[4] == "2016-11-16"){
+    #exp1-1
+    partial_lightON = add.event.vline.exp1.1(partial_lightON)
+  } else if(expDate[4] == "2015-01-22"){
+    #exp1-2
+    partial_lightON = add.event.vline.exp1.2(partial_lightON)
+  } else{
+    #exp3
+    partial_lightON = add.event.vline.exp2(partial_lightON)
+  }
+  
   partial_lightON  = set.colorful.theme(partial_lightON, partial_lightON_color)
   
-  save.plot(paste0("../plots2/",plot_name, ".png"), partial_lightON)
+  save.plot(paste0("../plots/",plot_name, ".png"), partial_lightON)
   
   return(lightON_duration)
 }
@@ -113,7 +137,7 @@ table_partial_lightOn <- build.table.partial.lightOn(dt_list)
 
 #plot
 for(lab in 1:length(table_lightOn_duration)){
-  plot_partial_lightOn <- get.plot.partial.lightOn(table_lightOn_duration[lab], get.expDate.3())  
+  plot_partial_lightOn <- get.plot.partial.lightOn(table_lightOn_duration[lab], get.expDate.2())  
 }
 
 #statistics

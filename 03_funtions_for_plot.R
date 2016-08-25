@@ -1,10 +1,20 @@
 ### ------------------------------------------- ###
 ### Plotting
-windowingByExpDate <- function(data, yName, windowingWeek, rownum_expDate){
-  if((data$get[2] - data$get[1]) > 3) {
-    n <- windowingWeek/2
-  }else {
-    n <- windowingWeek/2*7
+windowingByExpDate <- function(data, data_name, yName, windowingWeek, rownum_expDate){
+  if(grepl("aggWeek", data_name)){
+    if(grepl("weekDay", data_name) | grepl("weekEnd", data_name)){
+      n <- windowingWeek/2/2
+    } else{
+      n <- windowingWeek/2
+    }
+  } else{
+    if(grepl("allDay", data_name)){
+      n <- windowingWeek/2*7
+    } else if(grepl("weekDay", data_name)){
+      n <- windowingWeek/2*5
+    } else{
+      n <- windowingWeek/2*2
+    }
   }
   
   y<-data[[yName]]
@@ -124,8 +134,8 @@ windowingByExpDate <- function(data, yName, windowingWeek, rownum_expDate){
   return (windowing)
 }
 
-add.window.line <- function(plot_body, data, valueName, windowingWeek, rownum_expDate) {
-  window_df = windowingByExpDate(data, valueName, windowingWeek, rownum_expDate)
+add.window.line <- function(plot_body, data, data_name, valueName, windowingWeek, rownum_expDate) {
+  window_df = windowingByExpDate(data, data_name, valueName, windowingWeek, rownum_expDate)
   
   result = plot_body +
     geom_line(data=window_df, aes_string(y = "mean", linetype = shQuote(valueName)), size=1) +
@@ -134,8 +144,8 @@ add.window.line <- function(plot_body, data, valueName, windowingWeek, rownum_ex
   return (result)
 }
 
-add.colorful.window.line <- function(plot_body, data, valueName, windowingWeek, colorName, rownum_expDate, ribbon=TRUE) {
-  window_df = windowingByExpDate(data, valueName, windowingWeek, rownum_expDate)
+add.colorful.window.line <- function(plot_body, data, data_name, valueName, windowingWeek, colorName, rownum_expDate, ribbon=TRUE) {
+  window_df = windowingByExpDate(data, data_name, valueName, windowingWeek, rownum_expDate)
   
   if(ribbon==TRUE) {
     result = plot_body +

@@ -97,7 +97,21 @@ build.table.lightOn.duration <- function(dt_list){
 get.plot.lightOn.duration <- function(dt, expDate, lightON_duration_color = "darkolivegreen"){
   
   plot_dt = dt[[1]]
-  plot_name = names(dt)
+
+  if(expDate[4] == "2016-11-16"){
+    #exp1-1
+    plot_dt = set.expDate.1.1(plot_dt)
+    plot_name = paste('exp1-1', names(dt), sep="_")
+  } else if(expDate[4] == "2015-01-22"){
+    #exp1-2
+    plot_dt = set.expDate.1.2(plot_dt)
+    plot_name = paste('exp1-2', names(dt), sep="_")
+  } else{
+    #exp3
+    plot_dt = set.expDate.2(plot_dt)
+    plot_name = paste('exp2', names(dt), sep="_")
+  }
+  
   rownum_expDate <- set.expDate.rownum(plot_dt, expDate)
   
   windowingWeek <- 4
@@ -109,12 +123,23 @@ get.plot.lightOn.duration <- function(dt, expDate, lightON_duration_color = "dar
     scale_y_continuous(limits=c(0,24), oob=rescale_none) +
     ylab("Light-ON duration (hours)")+
     scale_color_discrete(breaks = c("lightON"), labels = c("number of lightON blocks(15min)"))
-  lightON_duration = add.colorful.window.line(lightON_duration, plot_dt, 'lightON',windowingWeek, lightON_duration_color, rownum_expDate)
+  lightON_duration = add.colorful.window.line(lightON_duration, plot_dt, plot_name, 'lightON',windowingWeek, lightON_duration_color, rownum_expDate)
   
-  lightON_duration = add.event.vline.exp3(lightON_duration)
+  if(expDate[4] == "2016-11-16"){
+    #exp1-1
+    lightON_duration = add.event.vline.exp1.1(lightON_duration)
+  } else if(expDate[4] == "2015-01-22"){
+    #exp1-2
+    lightON_duration = add.event.vline.exp1.2(lightON_duration)
+  } else{
+    #exp3
+    lightON_duration = add.event.vline.exp2(lightON_duration)
+  }
+
+#   lightON_duration = add.event.vline.exp2(lightON_duration)
   lightON_duration = set.colorful.theme(lightON_duration, lightON_duration_color)
   
-  save.plot(paste0("../plots2/",plot_name, ".png"), lightON_duration)
+  save.plot(paste0("../plots/",plot_name, ".png"), lightON_duration)
   
   return(lightON_duration)
 }
@@ -125,7 +150,7 @@ table_lightOn_duration <- build.table.lightOn.duration(dt_list)
 
 #plot
 for(lab in 1:length(table_lightOn_duration)){
-  plot_lightOn_duration <- get.plot.lightOn.duration(table_lightOn_duration[lab], get.expDate.3())  
+  plot_lightOn_duration <- get.plot.lightOn.duration(table_lightOn_duration[lab], get.expDate.2())  
 }
 
 #statistics
@@ -137,7 +162,8 @@ for(lab in 1:length(table_lightOn_duration)){
     
     for(i in 1:length(all_expDate)){
       dt = table_lightOn_duration[[lab]][get >= all_expDate[[i]][1] & get <= all_expDate[[i]][2]]
-      print(paste(all_expDate[[i]][1],"~",all_expDate[[i]][2],":",mean(dt$lightON)))
+#       print(paste(all_expDate[[i]][1],"~",all_expDate[[i]][2],":",mean(dt$lightON)))
+      print(mean(dt$lightON))
     }
   }
 }

@@ -98,25 +98,47 @@ build.table.stats <- function(dt_list){
 get.plot.stats <- function(dt, expDate) {
   plot_dt = dt[[1]]
   
+  if(expDate[4] == "2016-11-16"){
+    #exp1-1
+    plot_dt = set.expDate.1.1(plot_dt)
+    plot_name = paste('exp1-1', names(dt), sep="_")
+  } else if(expDate[4] == "2015-01-22"){
+    #exp1-2
+    plot_dt = set.expDate.1.2(plot_dt)
+    plot_name = paste('exp1-2', names(dt), sep="_")
+  } else{
+    #exp3
+    plot_dt = set.expDate.2(plot_dt)
+    plot_name = paste('exp2', names(dt), sep="_")
+  }
+  
   rownum_expDate <- set.expDate.rownum(plot_dt, expDate)
   
   windowingWeek <- 4
-    
-  plot_name = paste(names(dt))  
   
   stats <- ggplot(plot_dt, aes(x=get)) +
     ggtitle(plot_name) +
     ylab("Energy use (kWh/day)")+
     scale_linetype_discrete(breaks=c("peak", "avg", "base"))
   
-  stats = add.window.line(stats, plot_dt, "peak", windowingWeek, rownum_expDate)
-  stats = add.window.line(stats, plot_dt, "base", windowingWeek, rownum_expDate)
-  stats = add.window.line(stats, plot_dt, "avg", windowingWeek, rownum_expDate)
+  stats = add.window.line(stats, plot_dt, plot_name, "peak", windowingWeek, rownum_expDate)
+  stats = add.window.line(stats, plot_dt, plot_name, "base", windowingWeek, rownum_expDate)
+  stats = add.window.line(stats, plot_dt, plot_name, "avg", windowingWeek, rownum_expDate)
     
-  stats = add.event.vline.exp3(stats)
+  if(expDate[4] == "2016-11-16"){
+    #exp1-1
+    stats = add.event.vline.exp1.1(stats)
+  } else if(expDate[4] == "2015-01-22"){
+    #exp1-2
+    stats = add.event.vline.exp1.2(stats)
+  } else{
+    #exp3
+    stats = add.event.vline.exp2(stats)
+  }
+  
   stats = set.default.theme(stats)
   
-  save.plot(paste0("../plots2/", plot_name, ".png"), stats)
+  save.plot(paste0("../plots/", plot_name, ".png"), stats)
   
   return(stats)
 }
@@ -127,7 +149,15 @@ table_stats <- build.table.stats(dt_list)
 
 #plot
 for(lab in 1:length(table_stats)){
-  plot_stats <- get.plot.stats(table_stats[lab], get.expDate.3())
+  plot_stats <- get.plot.stats(table_stats[lab], get.expDate.1.1())
+}
+
+for(lab in 1:length(table_stats)){
+  plot_stats <- get.plot.stats(table_stats[lab], get.expDate.1.2())
+}
+
+for(lab in 1:length(table_stats)){
+  plot_stats <- get.plot.stats(table_stats[lab], get.expDate.2())
 }
 
 #statistics
