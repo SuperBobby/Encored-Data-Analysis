@@ -189,52 +189,47 @@ mean(tmp$base_ratio)
 
 
 
+library(data.table)
 
-
-target_dt = ux_dt
-target_folder = 'ux'
-
-start_date = as.Date('2015-01-05')
-
-for(i in c(0,1:365)){
+plot.point.with.3stats <- function(target_dt, target_folder, start_date, date_len){
   
-  t_date = start_date + i
+  start_date = as.Date(start_date)
   
-  print(t_date)
-  dt = target_dt[aggDay == t_date]
-  
-  peak = quantile(dt$computer, 0.9)
-  avg = mean(dt$computer)
-  base = quantile(dt$computer, 0.1)
-  
-  # Base Something
-  bs = (avg - base) / avg
-  # Peak Something
-  ps = (peak - avg) / peak
-  
-  
-  png(paste0("../plots/",target_folder,"/", paste(t_date, weekdays(t_date)), ".png"))
-  
-  # par(mfrow = c(1,1))  
-  # hist(dt$computer, 96, main=paste(t_date, weekdays(t_date)))
-  
-  plot_title = paste(t_date, weekdays(t_date), round(bs,2), round(ps,2), '\n', 
-                     round(peak,5), round(avg,5), round(base,5))
-  
-  plot(dt$timestamp, dt$computer, main=plot_title, ylim=c(0, peak))
-  abline(h=peak, col=4)
-  abline(h=avg, col=2)
-  abline(h=base, col=3)
-  # readkey()
-  
-  dev.off()
+  for(i in c(0,1:date_len)){
+    
+    t_date = start_date + i
+    
+    print(t_date)
+    dt = target_dt[aggDay == t_date]
+    
+    peak = quantile(dt$computer, 0.9)
+    avg = mean(dt$computer)
+    base = quantile(dt$computer, 0.1)
+    
+    # Base Something
+    bs = (base) / avg
+    # Peak Something
+    ps = (avg) / peak
+    
+    
+    png(paste0("../plots/",target_folder,"/", paste(t_date, weekdays(t_date)), ".png"))
+    
+    # par(mfrow = c(1,1))  
+    # hist(dt$computer, 96, main=paste(t_date, weekdays(t_date)))
+    
+    plot_title = paste(target_folder, t_date, weekdays(t_date), round(bs,2), round(ps,2), '\n\n', 
+                       round(peak,5), round(avg,5), round(base,5))
+    
+    plot(dt$timestamp, dt$computer, main=plot_title, ylim=c(0, peak))
+    abline(h=peak, col=4)
+    abline(h=avg, col=2)
+    abline(h=base, col=3)
+    # readkey()
+    
+    dev.off()
+  }
 }
 
-
-
-
-
-
-
-
-
+plot.point.with.3stats(marg_dt, 'marg', '2015-01-05', 365)
+plot.point.with.3stats(hcc_dt, 'hcc', '2015-01-05', 365)
+plot.point.with.3stats(ux_dt, 'ux', '2015-01-05', 365)
