@@ -28,7 +28,7 @@ load("../rawData/ux_15min.RData")
 
 source("getSNUdata.R")
 update_start = "2014-09-01"
-update_end = "2016-08-30"
+update_end = "2016-08-09"
 
 marg_defalut_table_15min <- reviseSNUData(marg_defalut_table_15min, "marg", update_start, update_end, verbose = T)
 hcc_defalut_table_15min <- reviseSNUData( hcc_defalut_table_15min, "hcc",  update_start, update_end, verbose = T)
@@ -141,36 +141,10 @@ hcc_dt[, ':='(index=rep(1:96, nrow(marg_dt)/96))]
 ux_dt[, ':='(index=rep(1:96, nrow(marg_dt)/96))]
 
 
-### update : day, workingday depending on the aggDay
-Sys.setlocale("LC_TIME", "English")
-marg_dt[, ':='(day = weekdays(aggDay, abbreviate = T), workingday = isWeekday(aggDay))]
-hcc_dt[, ':='(day = weekdays(aggDay, abbreviate = T), workingday = isWeekday(aggDay))]
-ux_dt[, ':='(day = weekdays(aggDay, abbreviate = T), workingday = isWeekday(aggDay))]
-
-### update 'holydays' to 'workingday = F' 
-holydays = c('2014-10-03', '2015-10-03', '2016-10-03', 
-             '2014-10-09', '2015-10-09',
-             '2014-12-25', '2015-12-25',
-             '2015-01-01', '2016-01-01', 
-             '2015-02-18', '2015-02-19', '2015-02-20',
-             '2015-05-05', 
-             '2015-05-25',
-             '2015-06-06',
-             '2015-08-14',
-             '2015-09-28', '2015-09-29',
-             '2016-02-08', '2016-02-09', '2016-02-10',
-             '2015-03-01', '2016-03-01',
-             '2016-04-13', 
-             '2016-05-05', '2016-05-06',
-             '2016-06-06',
-             '2016-08-15',
-             '2016-09-14', '2016-09-15', '2016-09-16')
-holydays = as.Date(holydays)
-
-marg_dt[aggDay %in% holydays, ':='(workingday = FALSE)] 
-hcc_dt[aggDay %in% holydays, ':='(workingday = FALSE)] 
-ux_dt[aggDay %in% holydays, ':='(workingday = FALSE)] 
-
+### update : day, weekday depending on the aggDay
+marg_dt[, ':='(day = weekdays(aggDay, abbreviate = T), weekday = isWeekday(aggDay))]
+hcc_dt[, ':='(day = weekdays(aggDay, abbreviate = T), weekday = isWeekday(aggDay))]
+ux_dt[, ':='(day = weekdays(aggDay, abbreviate = T), weekday = isWeekday(aggDay))]
 
 ## Add aggWeek column
 marg_dt[, ':='(aggWeek=as.Date(cut(aggDay, breaks = "week", start.on.monday = T)))]
@@ -209,12 +183,12 @@ marg_day = marg_dt[, .(computer = sum(computer),
                        total = sum(total)), by=aggDay]
 
 
-marg_day[, ':='(day = weekdays(aggDay, abbreviate = T), workingday = isWeekday(aggDay))]
+marg_day[, ':='(day = weekdays(aggDay, abbreviate = T), weekday = isWeekday(aggDay))]
 
 marg_day[, ':='(total_noHVAC = total-hvac)]
 
 marg_day[year(aggDay)==2014 & month(aggDay)==10, 
-         lapply(.SD, mean, na.rm=TRUE), by=workingday, .SDcols=c("computer", "light", "total_noHVAC") ] 
+         lapply(.SD, mean, na.rm=TRUE), by=weekday, .SDcols=c("computer", "light", "total_noHVAC") ] 
 
 marg_day[year(aggDay)==2015 & month(aggDay)==1 & (day(aggDay)>14) & (day(aggDay)<22)]
 
@@ -252,14 +226,9 @@ ux_RS = table.time2string(RS_ux_raw)
 
 date_adjust_parameter = 7 * 60 * 60 # 7 hours 
 
-marg_RS[, ':='(aggDay=as.Date(joined-date_adjust_parameter, tz="rok"), workingday = isWeekday(joined-date_adjust_parameter))]
-hcc_RS[, ':='(aggDay=as.Date(joined-date_adjust_parameter, tz="rok"), workingday = isWeekday(joined-date_adjust_parameter))]
-ux_RS[, ':='(aggDay=as.Date(joined-date_adjust_parameter, tz="rok"), workingday = isWeekday(joined-date_adjust_parameter))]
-
-marg_RS[aggDay %in% holydays, ':='(workingday = FALSE)] 
-hcc_RS[aggDay %in% holydays, ':='(workingday = FALSE)] 
-ux_RS[aggDay %in% holydays, ':='(workingday = FALSE)] 
-
+marg_RS[, ':='(aggDay=as.Date(joined-date_adjust_parameter, tz="rok"), weekday = isWeekday(joined-date_adjust_parameter))]
+hcc_RS[, ':='(aggDay=as.Date(joined-date_adjust_parameter, tz="rok"), weekday = isWeekday(joined-date_adjust_parameter))]
+ux_RS[, ':='(aggDay=as.Date(joined-date_adjust_parameter, tz="rok"), weekday = isWeekday(joined-date_adjust_parameter))]
 
 ## vaild date 
 marg_RS = marg_RS[aggDay > "2015-10-14" & aggDay <= "2016-07-01"]
