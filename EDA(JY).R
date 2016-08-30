@@ -1,3 +1,65 @@
+### ------------------------------------- ###
+## plot.point.with.3stats
+## 
+## find the matrix(or index) for computer usage pattern 
+## 2016. 8. 30. JY
+### ------------------------------------- ###
+
+library(data.table)
+
+plot.point.with.3stats <- function(target_dt, target_folder, start_date, date_len){
+  
+  start_date = as.Date(start_date)
+  
+  for(i in c(0,1:date_len)){
+    
+    t_date = start_date + i
+    
+    print(t_date)
+    dt = target_dt[aggDay == t_date]
+    
+    peak = quantile(dt$computer, 0.9)
+    avg = mean(dt$computer)
+    base = quantile(dt$computer, 0.1)
+    
+    # Base Something
+    bs = (base) / avg
+    # Peak Something
+    ps = (avg) / peak
+    
+    
+    png(paste0("../plots/",target_folder,"/", paste(t_date, weekdays(t_date)), ".png"))
+    
+    # par(mfrow = c(1,1))  
+    # hist(dt$computer, 96, main=paste(t_date, weekdays(t_date)))
+    
+    plot_title = paste(target_folder, t_date, weekdays(t_date), round(bs,2), round(ps,2), '\n\n', 
+                       round(peak,5), round(avg,5), round(base,5))
+    
+    plot(dt$timestamp, dt$computer, main=plot_title, ylim=c(0, peak))
+    abline(h=peak, col=4)
+    abline(h=avg, col=2)
+    abline(h=base, col=3)
+    # readkey()
+    
+    dev.off()
+  }
+}
+
+plot.point.with.3stats(marg_dt, 'marg', '2015-01-05', 365)
+plot.point.with.3stats(hcc_dt, 'hcc', '2015-01-05', 365)
+plot.point.with.3stats(ux_dt, 'ux', '2015-01-05', 365)
+
+
+
+
+plot(marg_dt[aggDay > '2015-01-05' & aggDay < '2015-01-20']$computer)
+
+
+
+### ------------------------------------------------------ ###
+
+
 par(mfrow=c(1,3))
 pie(colSums(marg_defalut_table_15min[, 2:5]), main="MARG")
 pie(colSums(hcc_defalut_table_15min[, 2:5]), main="HCC")
@@ -188,48 +250,3 @@ plot(as.Date(tmp$get), tmp$base_ratio)
 mean(tmp$base_ratio)
 
 
-
-library(data.table)
-
-plot.point.with.3stats <- function(target_dt, target_folder, start_date, date_len){
-  
-  start_date = as.Date(start_date)
-  
-  for(i in c(0,1:date_len)){
-    
-    t_date = start_date + i
-    
-    print(t_date)
-    dt = target_dt[aggDay == t_date]
-    
-    peak = quantile(dt$computer, 0.9)
-    avg = mean(dt$computer)
-    base = quantile(dt$computer, 0.1)
-    
-    # Base Something
-    bs = (base) / avg
-    # Peak Something
-    ps = (avg) / peak
-    
-    
-    png(paste0("../plots/",target_folder,"/", paste(t_date, weekdays(t_date)), ".png"))
-    
-    # par(mfrow = c(1,1))  
-    # hist(dt$computer, 96, main=paste(t_date, weekdays(t_date)))
-    
-    plot_title = paste(target_folder, t_date, weekdays(t_date), round(bs,2), round(ps,2), '\n\n', 
-                       round(peak,5), round(avg,5), round(base,5))
-    
-    plot(dt$timestamp, dt$computer, main=plot_title, ylim=c(0, peak))
-    abline(h=peak, col=4)
-    abline(h=avg, col=2)
-    abline(h=base, col=3)
-    # readkey()
-    
-    dev.off()
-  }
-}
-
-plot.point.with.3stats(marg_dt, 'marg', '2015-01-05', 365)
-plot.point.with.3stats(hcc_dt, 'hcc', '2015-01-05', 365)
-plot.point.with.3stats(ux_dt, 'ux', '2015-01-05', 365)

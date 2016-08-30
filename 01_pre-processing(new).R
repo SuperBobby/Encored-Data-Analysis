@@ -122,8 +122,7 @@ marg_dt[timestamp >= "2015-02-01 11:00" & timestamp <= "2015-02-02 10:45"]
 
 
 
-
-
+## add aggDay column 
 aggDay = c(rep((as.Date(marg_defalut_table_15min$timestamp[1], tz="rok")-1),28), 
            as.Date(marg_defalut_table_15min$timestamp, tz='rok')[29:(nrow(marg_defalut_table_15min))-28])
 
@@ -199,15 +198,12 @@ summary(ux_dt)
 
 
 
-
 ## build day table (7am - 7am)
-
 marg_day = marg_dt[, .(computer = sum(computer),
                        light = sum(light),
                        hvac = sum(hvac),
                        etc = sum(etc),
                        total = sum(total)), by=aggDay]
-
 
 marg_day[, ':='(day = weekdays(aggDay, abbreviate = T), workingday = isWeekday(aggDay))]
 
@@ -217,6 +213,7 @@ marg_day[year(aggDay)==2014 & month(aggDay)==10,
          lapply(.SD, mean, na.rm=TRUE), by=workingday, .SDcols=c("computer", "light", "total_noHVAC") ] 
 
 marg_day[year(aggDay)==2015 & month(aggDay)==1 & (day(aggDay)>14) & (day(aggDay)<22)]
+
 
 
 

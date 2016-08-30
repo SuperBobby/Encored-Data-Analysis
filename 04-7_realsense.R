@@ -5,7 +5,7 @@ lab_names = c("MARG", "HCC", "UX", "All Labs")
 agg_Units = c("aggWeek", "aggDay")
 
 # 3. day selection
-day_selections = c("allDay", "weekDay", "weekEnd")
+day_selections = c("allDay", "workingday", "non_workingday")
 
 # 4. feeders
 feeders = c("total", "computer", "light", "hvac")
@@ -40,15 +40,15 @@ build.table.realsense <- function(dt_list){
                                     freq = sum(freq, na.rm = T))
                                 , by=get(agg_Unit)]   
           
-        } else if(day_selection == "weekDay") {
+        } else if(day_selection == "workingday") {
           
-          return_rs_dt = lab_dt[weekday == T, .(sum_of_duration = sum(sum_of_duration, na.rm = T), 
+          return_rs_dt = lab_dt[workingday == T, .(sum_of_duration = sum(sum_of_duration, na.rm = T), 
                                                 freq = sum(freq, na.rm = T))
                                 , by=get(agg_Unit)]
           
-        } else if(day_selection == "weekEnd") {
+        } else if(day_selection == "non_workingday") {
           
-          return_rs_dt = lab_dt[weekday == F, .(sum_of_duration = sum(sum_of_duration, na.rm = T), 
+          return_rs_dt = lab_dt[workingday == F, .(sum_of_duration = sum(sum_of_duration, na.rm = T), 
                                                 freq = sum(freq, na.rm = T))
                                 , by=get(agg_Unit)]
         }

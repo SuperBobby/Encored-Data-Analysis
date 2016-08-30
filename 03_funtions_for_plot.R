@@ -25,7 +25,7 @@ filter.fault.partial.lightOn <- function(input){
 ### Plotting
 windowingByExpDate <- function(data, data_name, yName, windowingWeek, rownum_expDate){
   if(grepl("aggWeek", data_name)){
-    if(grepl("weekDay", data_name) | grepl("weekEnd", data_name)){
+    if(grepl("workingday", data_name) | grepl("non_workingday", data_name)){
       n <- windowingWeek/2/2
     } else{
       n <- windowingWeek/2
@@ -33,7 +33,7 @@ windowingByExpDate <- function(data, data_name, yName, windowingWeek, rownum_exp
   } else{
     if(grepl("allDay", data_name)){
       n <- windowingWeek/2*7
-    } else if(grepl("weekDay", data_name)){
+    } else if(grepl("workingday", data_name)){
       n <- windowingWeek/2*5
     } else{
       n <- windowingWeek/2*2
@@ -314,12 +314,6 @@ get.expDate.1.2 <- function() {
   return(exp_Date)
 }
 
-set.expDate.1.2 <- function(raw_dt) {
-  cut_dt <- raw_dt[get>= "2014-10-01" & get<= "2015-02-28"]
-  
-  return(cut_dt)
-}
-
 get.expDate.2 <- function() {
   exp_Date<-c(as.Date("2015-10-08"),
              as.Date("2015-12-01"),
@@ -330,11 +324,21 @@ get.expDate.2 <- function() {
   return(exp_Date)
 }
 
-set.expDate.2 <- function(raw_dt) {
-  cut_dt <- raw_dt[get>= "2015-03-01" & get<= "2016-07-26"]
+
+
+set.expDate.1.2 <- function(raw_dt) {
+  cut_dt <- raw_dt[get>= "2014-10-01" & get < "2015-05-01"]
   
   return(cut_dt)
 }
+
+set.expDate.2 <- function(raw_dt) {
+  cut_dt <- raw_dt[get>= "2015-03-01" & get<= "2016-08-28"]
+  
+  return(cut_dt)
+}
+
+
 
 
 get.expDate <- function() {
@@ -349,18 +353,18 @@ get.expDate <- function() {
                  c(as.Date("2016-01-11"), as.Date("2016-01-31")),
                  c(as.Date("2016-02-01"), as.Date("2016-05-15")),
                  c(as.Date("2016-05-16"), as.Date("2016-06-12")),
-                 c(as.Date("2016-06-13"), as.Date("2016-07-26")))
+                 c(as.Date("2016-06-13"), as.Date("2016-08-28")))
   return(exp_Date)
 }
 
-save.plot <- function(file, plot) {
-  ggsave(file, width = 8, height = 6, dpi = 300, plot, limitsize=FALSE)
-}
 
-save.wide.plot <- function(file, plot) {
-  ggsave(file, width = 10, height = 6, dpi = 300, plot, limitsize=FALSE)
-}
 
+
+save.plot <- function(file, plot, width_ = 8, height_ = 6, dpi_ = 300) {
+  
+  ggsave(file, width = width_, height = height_, 
+         dpi = dpi_, plot, limitsize=FALSE)
+}
 
 
 

@@ -31,7 +31,7 @@ build.table.weather <- function(){
   return(return_dts)
 }
 
-get.plot.hvac.with.weather <- function(dt, weather_dt, expDate){
+plot.hvac.with.weather <- function(dt, weather_dt, expDate){
   plot_name = names(dt)
   
   if((strsplit(plot_name,"_")[[1]][4] != "hvac") | (strsplit(plot_name,"_")[[1]][1] != "MARG")){
@@ -321,7 +321,7 @@ table_weather <- build.table.weather()
 
 #plot
 for(i in 1:length(table_stats)){
-  plot_hvac_with_weather <- get.plot.hvac.with.weather(table_stats[i], table_weather, get.expDate.2())
+  plot_hvac_with_weather <- plot.hvac.with.weather(table_stats[i], table_weather, get.expDate.2())
 }
 
 

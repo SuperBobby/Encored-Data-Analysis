@@ -4,8 +4,8 @@ lab_names = c("MARG", "HCC", "UX", "All Labs")
 # 2. aggregation unit 
 agg_Units = c("aggWeek", "aggDay")
 
-# 3. day selection
-day_selections = c("allDay", "weekDay", "weekEnd")
+# 3. day selections
+day_selections = c("allDay", "workingday", "non_workingday")
 
 # 4. feeders
 feeders = c("total", "computer", "light", "hvac")
@@ -24,17 +24,15 @@ build.table.stats <- function(dt_list){
     
     for(agg_Unit in agg_Units){
       # aggregation unit selection
-      # agg_Units = c("aggWeek", "aggDay")
-      # get(agg_Unit)
+      # agg_Units = c("aggWeek", "aggDay") -- get(agg_Unit)
       
       for(day_selection in day_selections){
-        
-        # day selection
-        # print(day_selection)
+        # day selections
+        # day_selections = c("allDay", "workingday", "non_workingday")
         
         for(feeder in feeders){
           # feeder selection
-          # get(feeder)
+          # feeders = c("total", "computer", "light", "hvac") -- get(feeder)
           
           dt_name = paste(lab_name, agg_Unit, day_selection, feeder, sep="_")
           print(dt_name)
@@ -46,16 +44,16 @@ build.table.stats <- function(dt_list){
                                    avg  = get.four.stats(get(feeder), 3)),
                                by=get(agg_Unit)]
             
-          } else if(day_selection == "weekDay") {
+          } else if(day_selection == "workingday") {
             
-            return_dt = lab_dt[weekday == T, .(peak = get.four.stats(get(feeder), 1),
+            return_dt = lab_dt[workingday == T, .(peak = get.four.stats(get(feeder), 1),
                                                base = get.four.stats(get(feeder), 2),
                                                avg  = get.four.stats(get(feeder), 3)), 
                                by=get(agg_Unit)]
             
-          } else if(day_selection == "weekEnd") {
+          } else if(day_selection == "non_workingday") {
             
-            return_dt = lab_dt[weekday == F, .(peak = get.four.stats(get(feeder), 1),
+            return_dt = lab_dt[workingday == F, .(peak = get.four.stats(get(feeder), 1),
                                                base = get.four.stats(get(feeder), 2),
                                                avg  = get.four.stats(get(feeder), 3)),
                                by=get(agg_Unit)]
@@ -95,7 +93,7 @@ build.table.stats <- function(dt_list){
   return(return_dts)
 }
 
-get.plot.stats <- function(dt, expDate) {
+plot.stats <- function(dt, expDate) {
   plot_dt = dt[[1]]
   
   if(expDate[4] == "2016-11-16"){
@@ -144,20 +142,20 @@ get.plot.stats <- function(dt, expDate) {
 }
 
 
-#build table
+### build table
 table_stats <- build.table.stats(dt_list)
 
-#plot
+### plot
 for(lab in 1:length(table_stats)){
-  plot_stats <- get.plot.stats(table_stats[lab], get.expDate.1.1())
+  plot_stats <- plot.stats(table_stats[lab], get.expDate.1.1())
 }
 
 for(lab in 1:length(table_stats)){
-  plot_stats <- get.plot.stats(table_stats[lab], get.expDate.1.2())
+  plot_stats <- plot.stats(table_stats[lab], get.expDate.1.2())
 }
 
 for(lab in 1:length(table_stats)){
-  plot_stats <- get.plot.stats(table_stats[lab], get.expDate.2())
+  plot_stats <- plot.stats(table_stats[lab], get.expDate.2())
 }
 
 #statistics

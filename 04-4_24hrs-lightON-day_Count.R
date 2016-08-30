@@ -2,7 +2,7 @@
 ## 4. full_lightON counting : 24hours 
 ## ==> # of "over peak*(0.5~0.8)" == 96?
 
-day_selections = c("allDay", "weekDay", "weekEnd")
+day_selections = c("allDay", "workingday", "workingday")
 
 build.table.24hr.lightOn.counting <- function(dt_list){
   return_dts = list()
@@ -25,14 +25,14 @@ build.table.24hr.lightOn.counting <- function(dt_list){
         full_lightON_aggDay_dt = lab_dt[, .(full_lightON_10 = sum(light > (light_peak * 0.1), na.rm = T)==96), by=aggDay]
         setnames(full_lightON_aggDay_dt,old="aggDay",new="get")
         
-      } else if(day_selection == "weekDay") {
+      } else if(day_selection == "workingday") {
         
-        full_lightON_aggDay_dt = lab_dt[weekday == T, .(full_lightON_10 = sum(light > (light_peak * 0.1), na.rm = T)==96), by=aggDay]
+        full_lightON_aggDay_dt = lab_dt[workingday == T, .(full_lightON_10 = sum(light > (light_peak * 0.1), na.rm = T)==96), by=aggDay]
         setnames(full_lightON_aggDay_dt,old="aggDay",new="get")
         
-      } else if(day_selection == "weekEnd") {
+      } else if(day_selection == "non_workingday") {
         
-        full_lightON_aggDay_dt = lab_dt[weekday == F, .(full_lightON_10 = sum(light > (light_peak * 0.1), na.rm = T)==96), by=aggDay]
+        full_lightON_aggDay_dt = lab_dt[workingday == F, .(full_lightON_10 = sum(light > (light_peak * 0.1), na.rm = T)==96), by=aggDay]
         setnames(full_lightON_aggDay_dt,old="aggDay",new="get")
         
       }
@@ -50,7 +50,7 @@ build.table.24hr.lightOn.counting <- function(dt_list){
   return(return_dts)
 }
 
-get.plot.24hr.lightOn.counting <- function(dt, expDate, full_lightON_color = "violetred4"){
+plot.24hr.lightOn.counting <- function(dt, expDate, full_lightON_color = "violetred4"){
   
   plot_dt = dt[[1]]
   
@@ -105,7 +105,7 @@ table_full_lightOn <- build.table.24hr.lightOn.counting(dt_list)
 
 #plot
 for(lab in 1:length(table_full_lightOn)){
-  plot_full_lightOn <- get.plot.24hr.lightOn.counting(table_full_lightOn[lab], get.expDate.2())  
+  plot_full_lightOn <- plot.24hr.lightOn.counting(table_full_lightOn[lab], get.expDate.2())  
 }
 
 #statistics

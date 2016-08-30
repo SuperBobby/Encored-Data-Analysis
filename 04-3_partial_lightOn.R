@@ -5,7 +5,7 @@ lab_names = c("MARG", "HCC", "UX", "All Labs")
 agg_Units = c("aggWeek", "aggDay")
 
 # 3. day selection
-day_selections = c("allDay", "weekDay", "weekEnd")
+day_selections = c("allDay", "workingday", "non_workingday")
 
 build.table.partial.lightOn <- function(dt_list){
   return_dts = list()
@@ -19,7 +19,7 @@ build.table.partial.lightOn <- function(dt_list){
     light_peak = quantile(lab_dt$light, .90, na.rm = T)
     
     light_dt = lab_dt[, .(timestamp = timestamp,
-                          weekday = weekday,
+                          workingday = workingday,
                           aggDay = aggDay,
                           aggWeek = aggWeek,
                           light = na.locf(light),
@@ -37,13 +37,13 @@ build.table.partial.lightOn <- function(dt_list){
 
           partial_light = light_dt[, .(threshold80 = ifelse(sum(lightON)==0,1,sum(peak_80)/sum(lightON))), by=get(agg_Unit)]
           
-        } else if(day_selection == "weekDay") {
+        } else if(day_selection == "workingday") {
           
-          partial_light = light_dt[weekday == T, .(threshold80 = ifelse(sum(lightON)==0,1,sum(peak_80)/sum(lightON))), by=get(agg_Unit)]
+          partial_light = light_dt[workingday == T, .(threshold80 = ifelse(sum(lightON)==0,1,sum(peak_80)/sum(lightON))), by=get(agg_Unit)]
 
-        } else if(day_selection == "weekEnd") {
+        } else if(day_selection == "non_workingday") {
 
-          partial_light = light_dt[weekday == F, .(threshold80 = ifelse(sum(lightON)==0,1,sum(peak_80)/sum(lightON))), by=get(agg_Unit)]
+          partial_light = light_dt[workingday == F, .(threshold80 = ifelse(sum(lightON)==0,1,sum(peak_80)/sum(lightON))), by=get(agg_Unit)]
         }
         
         partial_light = partial_light[, .(get = get,
@@ -57,7 +57,7 @@ build.table.partial.lightOn <- function(dt_list){
   return(return_dts)
 }
 
-get.plot.partial.lightOn <- function(dt, expDate, partial_lightON_color = "orange2"){
+plot.partial.lightOn <- function(dt, expDate, partial_lightON_color = "orange2"){
   
   plot_dt = dt[[1]]
   
@@ -109,7 +109,7 @@ table_partial_lightOn <- build.table.partial.lightOn(dt_list)
 
 #plot
 for(lab in 1:length(table_partial_lightOn)){
-  plot_partial_lightOn <- get.plot.partial.lightOn(table_partial_lightOn[lab], get.expDate.2())  
+  plot_partial_lightOn <- plot.partial.lightOn(table_partial_lightOn[lab], get.expDate.2())  
 }
 
 #statistics

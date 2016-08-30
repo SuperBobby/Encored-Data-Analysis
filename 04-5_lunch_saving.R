@@ -5,7 +5,7 @@ lab_names = c("MARG", "HCC", "UX", "All Labs")
 agg_Units = c("aggWeek", "aggDay")
 
 # 3. day selection
-day_selections = c("allDay", "weekDay", "weekEnd")
+day_selections = c("allDay", "workingday", "non_workingday")
 
 build.table.lunch.saving <- function(dt_list, target){
   return_dts = list()
@@ -53,17 +53,17 @@ build.table.lunch.saving <- function(dt_list, target){
                    & (before_lunch > target_on_threshold_usage), 
                    ':='(lunch_saving = 1), by=aggDay]
           
-        } else if(day_selection == "weekDay") {
+        } else if(day_selection == "workingday") {
           
-          lunch_dt = lunch_dt[(weekday == T)
+          lunch_dt = lunch_dt[(workingday == T)
                               &(during_lunch < (before_lunch * lunch_saving_threshold_ratio)) 
                               & (during_lunch < (after_lunch * lunch_saving_threshold_ratio)) 
                               & (before_lunch > target_on_threshold_usage), 
                               ':='(lunch_saving = 1), by=aggDay]
           
-        } else if(day_selection == "weekEnd") {
+        } else if(day_selection == "non_workingday") {
           
-          lunch_dt = lunch_dt[(weekday == F)
+          lunch_dt = lunch_dt[(workingday == F)
                               & (during_lunch < (before_lunch * lunch_saving_threshold_ratio)) 
                               & (during_lunch < (after_lunch * lunch_saving_threshold_ratio)) 
                               & (before_lunch > target_on_threshold_usage), 
@@ -84,7 +84,7 @@ build.table.lunch.saving <- function(dt_list, target){
   return(return_dts)
 }
 
-get.plot.lunch.saving <- function(dt, expDate){
+plot.lunch.saving <- function(dt, expDate){
   
   plot_dt = dt[[1]]
   
@@ -138,10 +138,10 @@ table_lunch_saving_computer <- build.table.lunch.saving(dt_list, 'computer')
 
 #plot
 for(lab in 1:length(table_lunch_saving_light)){
-  plot_lunch_saving <- get.plot.lunch.saving(table_lunch_saving_light[lab], get.expDate.2())  
+  plot_lunch_saving <- plot.lunch.saving(table_lunch_saving_light[lab], get.expDate.2())  
 }
 for(lab in 1:length(table_lunch_saving_computer)){
-  plot_lunch_saving <- get.plot.lunch.saving(table_lunch_saving_computer[lab], get.expDate.2())  
+  plot_lunch_saving <- plot.lunch.saving(table_lunch_saving_computer[lab], get.expDate.2())  
 }
 
 #statistics
