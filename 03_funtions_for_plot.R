@@ -139,10 +139,61 @@ windowingByExpDate <- function(data, data_name, yName, windowingWeek, rownum_exp
   return (windowing)
 }
 
-
-add.window.line <- function(plot_body, data, data_name, valueName, windowingWeek, rownum_expDate) {
-  window_df = windowingByExpDate(data, data_name, valueName, windowingWeek, rownum_expDate)
+windowingByExpDate2 <- function(data, data_name, target, windowingWeek, expDate){
+  #windowing before and after n days
+  n <- windowingWeek/2*7
   
+  windowing <- data.table(matrix(rep(0,nrow(data)*3),ncol=3))
+  setnames(windowing,c("timestamp","mean","sd"))
+  
+  for (k in 1:nrow(data)) {
+    point_date = data$timestamp[k]
+    start_date = (point_date - n)
+    end_date = (point_date + n)
+    
+    for(i in 1:length(expDate)){
+      if(start_date < expDate[i]){
+        if(point_date < expDate[i]){
+          start_date = start_date
+        } else{
+          start_date = expDate[i]
+        }
+      } else{
+        start_date = start_date
+      }
+      
+      if(end_date > expDate[i]){
+        if(point_date < expDate[i]){
+          end_date = expDate[i]-1
+        } else{
+          end_date = end_date
+        }
+      } else if(end_date == expDate[i]){
+        end_date = expDate[i]-1
+      } else{
+        end_date = end_date
+      }
+    }
+    
+    cut_data <- data[(timestamp >= start_date) & (timestamp <= end_date)]
+    
+    #     print(paste("start:",start_date,"->",cut_data$timestamp[1]))
+    #     print(paste("end:",end_date,"->",cut_data$timestamp[nrow(cut_data)]))
+    #     print(nrow(cut_data))
+    
+    windowing$mean[k] <- mean(cut_data[[target]])
+    windowing$sd[k] <- ifelse(is.na(sd(cut_data[[target]])),0,sd(cut_data[[target]]))
+  }
+  
+  windowing$timestamp <- data$timestamp
+  
+  return (windowing)
+}
+
+add.window.line <- function(plot_body, data, data_name, valueName, windowingWeek, rownum_expDate, expDate) {
+#   window_df = windowingByExpDate(data, data_name, valueName, windowingWeek, rownum_expDate)
+  window_df = windowingByExpDate2(data, data_name, valueName, windowingWeek, expDate)
+
   result = plot_body +
     geom_line(data=window_df, aes_string(y = "mean", linetype = shQuote(valueName)), size=1) +
     geom_ribbon(data=window_df,aes(ymin = mean - sd, ymax = mean + sd), alpha = 0.2)

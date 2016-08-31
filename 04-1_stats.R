@@ -107,9 +107,9 @@ plot.stats <- function(dt, expDate) {
     ylab("Energy use (kWh/day)")+
     scale_linetype_discrete(breaks=c("peak", "avg", "base"))
   
-  stats = add.window.line(stats, plot_dt, plot_name, "peak", windowingWeek, rownum_expDate)
-  stats = add.window.line(stats, plot_dt, plot_name, "base", windowingWeek, rownum_expDate)
-  stats = add.window.line(stats, plot_dt, plot_name, "avg", windowingWeek, rownum_expDate)
+  stats = add.window.line(stats, plot_dt, plot_name, "peak", windowingWeek, rownum_expDate, expDate)
+  stats = add.window.line(stats, plot_dt, plot_name, "base", windowingWeek, rownum_expDate, expDate)
+  stats = add.window.line(stats, plot_dt, plot_name, "avg", windowingWeek, rownum_expDate, expDate)
     
   if(expDate[4] == "2016-11-16"){
     #exp1-1
