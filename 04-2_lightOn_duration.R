@@ -145,6 +145,10 @@ plot.lightOn.duration <- function(dt, expDate, lightON_duration_color = "darkoli
 }
 
 
+
+
+
+
 #build table
 table_lightOn_duration <- build.table.lightOn.duration(dt_list)
 
@@ -160,6 +164,10 @@ for(lab in 1:length(table_lightOn_duration)){
 for(lab in 1:length(table_lightOn_duration)){
   plot_lightOn_duration <- plot.lightOn.duration(table_lightOn_duration[lab], get.expDate.2())  
 }
+
+
+
+
 
 #statistics
 all_expDate <- get.expDate()

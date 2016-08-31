@@ -1,120 +1,108 @@
-# 1. lab
-lab_names = c("MARG", "HCC", "UX", "All Labs")
+### ------------------------------------------------------------ ###
+### Basic statistics(peak, base, average, median) of 15min data
+### 
+### JY, EJ @ ADSL, SNU 
+###                                   last update : 2016. 8. 30.
+### ------------------------------------------------------------ ###
 
-# 2. aggregation unit 
-agg_Units = c("aggWeek", "aggDay")
+### -------------------------------- ###
+### Build list: STATS_list
+### 
+### category = lab + day_type + label 
+### (label = feeder_stats)
+### -------------------------------- ### 
 
-# 3. day selections
-day_selections = c("allDay", "workingday", "non_workingday")
+PEAK_PERCENTILE = 0.9
+BASE_PERCENTILE = 0.1
 
-# 4. feeders
-feeders = c("total", "computer", "light", "hvac")
-# feeders = c("hvac")
-
-
-build.table.stats <- function(dt_list){
-  return_dts = list()
+## four stat : peak, base, avg, med 
+get.four.stats <- function(usage, thre_peak, thre_base){
+  peak = quantile(usage, thre_peak, na.rm = T)
+  base = quantile(usage, thre_base, na.rm = T)
+  avg  = mean(usage, na.rm = T)
+  # med  = median(usage, na.rm = T)
   
-  for(lab in 1:4){ 
-    # for(lab in 1){
-    #   lab_dt & name selection 
-    lab_dt = dt_list[[lab]]
-    #   lab_dt = marg_dt
-    lab_name = lab_names[lab]
+  return(list(peak=peak, base=base, avg=avg))
+}
+
+## Loop parameters 
+# 1. lab
+# 2. aggregation unit 
+# 3. types of day (working day?)
+# 4. target feeder
+
+labs = c("MARG", "HCC", "UX", "All_Labs")                    # lab
+agg_units = c("aggWeek", "aggDay")                           # agg_unit
+types_of_day = c("allDay", "workingday", "non_workingday")   # day_type
+feeders = c("total", "computer", "light", "hvac")            # feeder
+
+dt_list = setNames(dt_list, labs)
+STATS_list = list()
+
+for(lab in labs){ 
+  # 1. lab
+  lab_dt = dt_list[[lab]]
+  
+  # 2. Aggregation unit
+  for(agg_unit in agg_units){
     
-    for(agg_Unit in agg_Units){
-      # aggregation unit selection
-      # agg_Units = c("aggWeek", "aggDay") -- get(agg_Unit)
+    # 3. Types of day
+    for(day_type in types_of_day){
       
-      for(day_selection in day_selections){
-        # day selections
-        # day_selections = c("allDay", "workingday", "non_workingday")
+      # 4. Target feeder ----> feeder_stats = label
+      for(feeder in feeders){
         
-        for(feeder in feeders){
-          # feeder selection
-          # feeders = c("total", "computer", "light", "hvac") -- get(feeder)
+        dt_name = paste(lab, agg_unit, day_type, feeder, sep="_")
+        
+        if(day_type == "allDay"){
+          stats_dt = lab_dt[, as.list(get.four.stats(get(feeder), PEAK_PERCENTILE, BASE_PERCENTILE)), 
+                            by=.(timestamp=get(agg_unit))]
           
-          dt_name = paste(lab_name, agg_Unit, day_selection, feeder, sep="_")
-          print(dt_name)
+        } else if(day_type == "workingday") {
+          stats_dt = lab_dt[workingday == T, as.list(get.four.stats(get(feeder), PEAK_PERCENTILE, BASE_PERCENTILE)), 
+                            by=.(timestamp=get(agg_unit))]
           
-          if(day_selection == "allDay"){
-            
-            return_dt = lab_dt[, .(peak = get.four.stats(get(feeder), 1),
-                                   base = get.four.stats(get(feeder), 2),
-                                   avg  = get.four.stats(get(feeder), 3)),
-                               by=get(agg_Unit)]
-            
-          } else if(day_selection == "workingday") {
-            
-            return_dt = lab_dt[workingday == T, .(peak = get.four.stats(get(feeder), 1),
-                                               base = get.four.stats(get(feeder), 2),
-                                               avg  = get.four.stats(get(feeder), 3)), 
-                               by=get(agg_Unit)]
-            
-          } else if(day_selection == "non_workingday") {
-            
-            return_dt = lab_dt[workingday == F, .(peak = get.four.stats(get(feeder), 1),
-                                               base = get.four.stats(get(feeder), 2),
-                                               avg  = get.four.stats(get(feeder), 3)),
-                               by=get(agg_Unit)]
-          }
-          
-          light_min = 0.01
-          light_peak = quantile(lab_dt$light, .90, na.rm = T)
-          light_dt = lab_dt[, .(timestamp = timestamp,
-                                aggDay = aggDay,
-                                aggWeek = aggWeek,
-                                light = na.locf(light),
-                                lightON = ifelse(na.locf(light) > light_min, 1, 0),
-                                peak_80 = filter.fault.partial.lightOn(ifelse((na.locf(light) < light_peak * 0.8) & (na.locf(light) > light_min), 1, 0)))]
-          
-          partial_light = light_dt[, .(lightON = sum(lightON),
-                                       threshold80 = ifelse(sum(lightON)==0,1,sum(peak_80)/sum(lightON))), by=get(agg_Unit)]
-          
-          if(agg_Unit == "aggWeek"){
-            partial_light = partial_light[, .(get = get,
-                                              lightON = lightON*15.0/60.0/7.0,
-                                              threshold80 = threshold80*100)]
-          } else{
-            partial_light = partial_light[, .(get = get,
-                                              lightON = lightON*15.0/60.0,
-                                              threshold80 = threshold80*100)]
-          }
-          
-          return_dt = merge(return_dt, partial_light, by="get")
-          
-          assign(dt_name, return_dt)
-          return_dts = append(return_dts, setNames(list(return_dt),dt_name))
+        } else if(day_type == "non_workingday") {
+          stats_dt = lab_dt[workingday == F, as.list(get.four.stats(get(feeder), PEAK_PERCENTILE, BASE_PERCENTILE)), 
+                            by=.(timestamp=get(agg_unit))]
         }
+        
+        print(paste("Build table:", dt_name))
+        # assign(dt_name, stats_dt)
+        
+        STATS_list = append(STATS_list, setNames(list(stats_dt),dt_name))
       }
     }
   }
-  
-  return(return_dts)
 }
+
+
+### -------------------------------- ###
+### Plot: stats    
+### -------------------------------- ### 
 
 plot.stats <- function(dt, expDate) {
   plot_dt = dt[[1]]
   
   if(expDate[4] == "2016-11-16"){
     #exp1-1
-    plot_dt = set.expDate.1.1(plot_dt)
+    plot_dt = cut.expDate.1.1(plot_dt)
     plot_name = paste('exp1-1', names(dt), sep="_")
   } else if(expDate[4] == "2015-01-22"){
     #exp1-2
-    plot_dt = set.expDate.1.2(plot_dt)
+    plot_dt = cut.expDate.1.2(plot_dt)
     plot_name = paste('exp1-2', names(dt), sep="_")
   } else{
     #exp3
-    plot_dt = set.expDate.2(plot_dt)
+    plot_dt = cut.expDate.2(plot_dt)
     plot_name = paste('exp2', names(dt), sep="_")
   }
   
-  rownum_expDate <- set.expDate.rownum(plot_dt, expDate)
+  rownum_expDate = get.expDate.rownum(plot_dt, expDate)
   
-  windowingWeek <- 4
+  windowingWeek = 4
   
-  stats <- ggplot(plot_dt, aes(x=get)) +
+  stats <- ggplot(plot_dt, aes(x=timestamp)) +
     ggtitle(plot_name) +
     ylab("Energy use (kWh/day)")+
     scale_linetype_discrete(breaks=c("peak", "avg", "base"))
@@ -136,41 +124,122 @@ plot.stats <- function(dt, expDate) {
   
   stats = set.default.theme(stats)
   
-  save.plot(paste0("../plots/", plot_name, ".png"), stats)
+  save.plot(paste0("../plots/stats/", plot_name, ".png"), stats)
   
+  print(paste("plot:", plot_name))
   return(stats)
 }
 
 
-### build table
-table_stats <- build.table.stats(dt_list)
-
 ### plot
-for(lab in 1:length(table_stats)){
-  plot_stats <- plot.stats(table_stats[lab], get.expDate.1.1())
+for(lab in 1:length(STATS_list)){
+  plot_stats <- plot.stats(STATS_list[lab], get.expDate.1.1())
 }
 
-for(lab in 1:length(table_stats)){
-  plot_stats <- plot.stats(table_stats[lab], get.expDate.1.2())
+for(lab in 1:length(STATS_list)){
+  plot_stats <- plot.stats(STATS_list[lab], get.expDate.1.2())
 }
 
-for(lab in 1:length(table_stats)){
-  plot_stats <- plot.stats(table_stats[lab], get.expDate.2())
+for(lab in 1:length(STATS_list)){
+  plot_stats <- plot.stats(STATS_list[lab], get.expDate.2())
 }
 
-#statistics
-all_expDate <- get.expDate()
 
-for(lab in 1:length(table_stats)){  
-  if(grepl("allDay", names(table_stats[lab])) & grepl("aggDay", names(table_stats[lab]))){
-    print(names(table_stats[lab]))
+
+# statistics
+# all_expDate <- get.expDate.all()
+# 
+# for(lab in 1:length(STATS_list)){  
+#   if(grepl("allDay", names(STATS_list[lab])) & grepl("aggDay", names(STATS_list[lab]))){
+#     print(names(STATS_list[lab]))
+#     
+#     for(i in 1:length(all_expDate)){
+#       dt = STATS_list[[lab]][get >= all_expDate[[i]][1] & get <= all_expDate[[i]][2]]
+# #       print(paste(all_expDate[[i]][1],"~",all_expDate[[i]][2],":",mean(dt$peak),",",mean(dt$base),",",mean(dt$avg)))
+#       print(paste(mean(dt$peak),",",mean(dt$base),",",mean(dt$avg)))
+#     }
+#   }
+# }
+
+
+### -------------------------------- ###
+### summary_list
+### Added category: feeders + stats    
+### -------------------------------- ### 
+
+## initialize summary list 
+summary_list = list()
+
+target_list = STATS_list
+all_expDate = get.expDate.all()
+
+target_labs         = c("MARG", "HCC", "UX")                      # lab 
+target_types_of_day = c("allDay", "workingday", "non_workingday") # day_type
+target_feeders      = c("total", "computer", "light", "hvac")     # feeder  
+target_stats        = c('peak','base','avg')                      # stats ----> feeder + stats = label
+
+agg_unit = "aggDay"
+
+for(lab in target_labs){
+  
+  for(day_type in target_types_of_day){
     
-    for(i in 1:length(all_expDate)){
-      dt = table_stats[[lab]][get >= all_expDate[[i]][1] & get <= all_expDate[[i]][2]]
-#       print(paste(all_expDate[[i]][1],"~",all_expDate[[i]][2],":",mean(dt$peak),",",mean(dt$base),",",mean(dt$avg)))
-      print(paste(mean(dt$peak),",",mean(dt$base),",",mean(dt$avg)))
+    for(feeder in target_feeders){
+      
+      for(stats in target_stats){
+        
+        dt_name = paste(lab, agg_unit, day_type, feeder, sep="_")
+        target_dt = target_list[[dt_name]][,c('timestamp',stats),with=F]
+        
+        # print(head(target_dt))
+        
+        label = paste(feeder, stats, sep='_')
+        category_name = paste(lab, day_type, label, sep='_')
+        
+        print(category_name)
+        
+        split_list = split.table.by.expDate(target_dt, all_expDate)
+        
+        summary_list = append(summary_list, setNames(list(split_list), category_name))
+        
+      }
     }
   }
 }
+
+
+### -------------------------------- ###
+### representation_table
+### -------------------------------- ### 
+
+## initialize summary list 
+representation_table = data.frame(exp_label = names(get.expDate.all()))
+
+representation_func = mean
+
+for(category in names(summary_list)[1:1]){
+  
+  one_category = summary_list[[category]]
+  
+  category_values
+  
+  for(exp_label in names(one_category)){
+    
+    exp_dt = one_category[[exp_label]]
+    
+    exp_data = data.frame(exp_dt)[,2]
+    
+    representative_value = representation_func(exp_data)
+    
+    
+    print(paste(category, exp_label))
+    # print(exp_dt)
+    # print(exp_data)
+    print(representative_value)
+  }
+}
+
+
+
 
 

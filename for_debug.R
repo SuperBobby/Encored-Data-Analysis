@@ -1,9 +1,30 @@
+tmp = summary_list$MARG_allDay_total_avg$`1-2`
+
+data.frame(tmp)[,2]
+
+names(summary_list)
+
+
+representation_func = mean
 
 
 
-day_start = "2014-09-01"
-day_end   = "2014-09-02"
-
-marg_table_day = getSNUData.feeder.day("marg", day_start, day_end)
-hcc_table_day = getSNUData.feeder.day( "hcc", day_start, day_end)
-# ux_table_day = getSNUData.feeder.day(  "ux", day_start, day_end)
+for(category in names(summary_list)[1:1]){
+  
+  one_category = summary_list[[category]]
+  
+  for(exp_label in names(one_category)){
+  
+    exp_dt = one_category[[exp_label]]
+  
+    exp_data = data.frame(exp_dt)[,2]
+    
+    representative_value = representation_func(exp_data)
+    
+    
+    print(paste(category, exp_label))
+    print(exp_dt)
+    print(exp_data)
+    print(representative_value)
+  }
+}

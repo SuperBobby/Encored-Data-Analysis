@@ -176,3 +176,7 @@ AllLabs_dt$count_per_day = AllLabs_dt$count_per_day + hcc_dt$count_per_day + ux_
 ##
 dt_list = list(marg_dt, hcc_dt, ux_dt, AllLabs_dt)
 
+summary(marg_dt)
+summary(hcc_dt)
+summary(ux_dt)
+summary(AllLabs_dt)

@@ -1,3 +1,18 @@
+
+filter.fault.partial.lightOn <- function(input){
+  light = na.locf(input)
+  
+  for(i in 2:(length(light)-1)){
+    
+    if(sum(light[(i-1):(i+1)]) == 1){
+      light[i] = 0
+    }
+  }
+  return(light)
+}
+
+
+
 # 1. lab
 lab_names = c("MARG", "HCC", "UX", "All Labs")
 

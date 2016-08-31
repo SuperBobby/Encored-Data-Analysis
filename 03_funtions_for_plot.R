@@ -1,28 +1,10 @@
-## four stat : peak, base, avg, mid --> c(1,2,3,4)
-get.four.stats <- function(usage, type){
-  peak = quantile(usage, .90, na.rm = T)
-  base = quantile(usage, .10, na.rm = T)
-  avg  = mean(usage, na.rm = T)
-  med  = median(usage, na.rm = T)
-  
-  result=c(peak, base, avg, med)
-  return(result[type])
-}
+### ------------------------------------------------------------ ###
+## Functions for plotting 
+##
+### EJ, JY @ ADSL, SNU 
+###                                   last update : 2016. 8. 30.
+### ------------------------------------------------------------ ###
 
-filter.fault.partial.lightOn <- function(input){
-  light = na.locf(input)
-  
-  for(i in 2:(length(light)-1)){
-    
-    if(sum(light[(i-1):(i+1)]) == 1){
-      light[i] = 0
-    }
-  }
-  return(light)
-}
-
-### ------------------------------------------- ###
-### Plotting
 windowingByExpDate <- function(data, data_name, yName, windowingWeek, rownum_expDate){
   if(grepl("aggWeek", data_name)){
     if(grepl("workingday", data_name) | grepl("non_workingday", data_name)){
@@ -42,7 +24,7 @@ windowingByExpDate <- function(data, data_name, yName, windowingWeek, rownum_exp
   
   y<-data[[yName]]
   windowing <- data.table(matrix(rep(0,length(y)*3),ncol=3))
-  setnames(windowing,c("get","mean","sd"))
+  setnames(windowing,c("timestamp","mean","sd"))
   
   for (k in 1:length(y)) {
     start<-1
@@ -151,11 +133,12 @@ windowingByExpDate <- function(data, data_name, yName, windowingWeek, rownum_exp
 #     print(paste(data.frame(data)[k,1],":",start,end, windowing$mean[k]))
   }
   windowing$sd <- ifelse(is.na(windowing$sd),0,windowing$sd)
-#   windowing$get <- data.frame(data)[,1]
-  windowing$get <- data$get
+#   windowing$timestamp <- data.frame(data)[,1]
+  windowing$timestamp <- data$timestamp
   
   return (windowing)
 }
+
 
 add.window.line <- function(plot_body, data, data_name, valueName, windowingWeek, rownum_expDate) {
   window_df = windowingByExpDate(data, data_name, valueName, windowingWeek, rownum_expDate)
@@ -166,6 +149,7 @@ add.window.line <- function(plot_body, data, data_name, valueName, windowingWeek
   
   return (result)
 }
+
 
 add.colorful.window.line <- function(plot_body, data, data_name, valueName, windowingWeek, colorName, rownum_expDate, ribbon=TRUE) {
   window_df = windowingByExpDate(data, data_name, valueName, windowingWeek, rownum_expDate)
@@ -182,7 +166,7 @@ add.colorful.window.line <- function(plot_body, data, data_name, valueName, wind
   return (result)
 }
 
-set.expDate.rownum <- function(plot_dt, expDate) {
+get.expDate.rownum <- function(plot_dt, expDate) {
   rownum_expDate <- 1
   
   for (d in expDate) {
@@ -196,6 +180,9 @@ insert_minor <- function(major_labs, n_minor) {labs <-
                                                  c( sapply( major_labs, function(x) c(x, rep("", 4) ) ) )
                                                labs[1:(length(labs)-n_minor)]}
 
+
+
+# add.event.vline.exp1.1
 add.event.vline.exp1.1 <- function(plot_body){
   result = plot_body + 
     scale_x_date("Timestamp", labels = date_format("%Y-%m"), breaks = date_breaks("month")) +
@@ -233,6 +220,7 @@ add.event.vline.exp2 <- function(plot_body){
   return(result)
 }
 
+# set default theme
 set.default.theme <- function(plot_body) {
   result = plot_body + 
     theme_bw()+
@@ -288,148 +276,12 @@ set.colorful.theme <- function(plot_body, colorName) {
   return(result)
 }
 
-get.expDate.1.1 <- function() {
-  exp_Date<-c(as.Date("2014-11-10"),
-             as.Date("2014-11-17"),
-             as.Date("2016-11-16"),
-             as.Date("2016-11-16"),
-             as.Date("2016-11-16"),
-             as.Date("2016-11-16"))
-  return(exp_Date)
-}
 
-set.expDate.1.1 <- function(raw_dt) {
-  cut_dt <- raw_dt[get>= "2014-10-01" & get<= "2014-12-16"]
-  
-  return(cut_dt)
-}
-
-get.expDate.1.2 <- function() {
-  exp_Date<-c(as.Date("2014-11-10"),
-             as.Date("2014-11-17"),
-             as.Date("2015-01-15"),
-             as.Date("2015-01-22"),
-             as.Date("2016-11-16"),
-             as.Date("2016-11-16"))
-  return(exp_Date)
-}
-
-get.expDate.2 <- function() {
-  exp_Date<-c(as.Date("2015-10-08"),
-             as.Date("2015-12-01"),
-             as.Date("2016-01-11"),
-             as.Date("2016-02-01"),
-             as.Date("2016-05-16"),
-             as.Date("2016-06-13"))
-  return(exp_Date)
-}
-
-
-
-set.expDate.1.2 <- function(raw_dt) {
-  cut_dt <- raw_dt[get>= "2014-10-01" & get < "2015-05-01"]
-  
-  return(cut_dt)
-}
-
-set.expDate.2 <- function(raw_dt) {
-  cut_dt <- raw_dt[get>= "2015-03-01" & get<= "2016-08-28"]
-  
-  return(cut_dt)
-}
-
-
-
-
-get.expDate <- function() {
-  exp_Date<-list(c(as.Date("2014-10-01"), as.Date("2014-10-31")),
-                 c(as.Date("2014-11-10"), as.Date("2014-11-16")),
-                 c(as.Date("2014-11-17"), as.Date("2014-12-16")),
-                 c(as.Date("2015-01-15"), as.Date("2015-01-21")),
-                 c(as.Date("2015-01-22"), as.Date("2015-02-28")),
-                 c(as.Date("2015-03-01"), as.Date("2015-09-30")),
-                 c(as.Date("2015-10-08"), as.Date("2015-11-30")),
-                 c(as.Date("2015-12-01"), as.Date("2016-01-10")),
-                 c(as.Date("2016-01-11"), as.Date("2016-01-31")),
-                 c(as.Date("2016-02-01"), as.Date("2016-05-15")),
-                 c(as.Date("2016-05-16"), as.Date("2016-06-12")),
-                 c(as.Date("2016-06-13"), as.Date("2016-08-28")))
-  return(exp_Date)
-}
-
-
-
-
+# save plot 
 save.plot <- function(file, plot, width_ = 8, height_ = 6, dpi_ = 300) {
   
   ggsave(file, width = width_, height = height_, 
          dpi = dpi_, plot, limitsize=FALSE)
 }
 
-
-
-
-
-# 마그 지난 1월 점심시간 컴퓨터 절전 대박
-plot.lunch.saving <- function(lab, dt, target){    
-  
-  if (expDate[4]=="2016-11-16"){
-    dt = dt[aggDay >= "2014-09-11" & aggDay <= "2014-12-16"]
-  } else if (expDate[4]=="2015-01-21"){
-    dt = dt[aggDay >= "2014-09-11" & aggDay < "2015-06-01"]
-  }
-  
-  # * before lunch usage: 11:00 ~ 12:00 — index 17:20
-  # * during lunch usage: 11:30 ~ 13:30 — index 19:26
-  # *  after lunch usage: 13:00 ~ 14:00 — index 25:28
-  before_lunch_index = 17:20
-  during_lunch_index = 19:26
-  after_lunch_index  = 25:28
-  
-  peak_of_target = quantile(data.frame(dt[, .(get(target))])[,1], .90)
-  target_on_threshold = peak_of_target * 0.1
-  
-  lunch_saving_threshold_ratio = 0.8
-  target_on_threshold_usage = peak_of_target * 0.1
-  
-  before_dt = dt[index %in% before_lunch_index, .(before_lunch = max(get(target))), by=aggDay]
-  during_dt = dt[index %in% during_lunch_index, .(during_lunch = min(get(target))), by=aggDay]
-  after_dt = dt[index %in%  after_lunch_index, .( after_lunch = max(get(target))), by=aggDay]
-  
-  lunch_dt = merge(before_dt, during_dt, by='aggDay')
-  lunch_dt = merge(lunch_dt, after_dt, by='aggDay')
-  
-  ## Conditions of lunch saving 
-  lunch_dt[(during_lunch < (before_lunch * lunch_saving_threshold_ratio)) 
-           & (during_lunch < (after_lunch * lunch_saving_threshold_ratio)) 
-           & (before_lunch > target_on_threshold_usage), 
-           ':='(lunch_saving = 1), by=aggDay]
-  
-  ## aggregation: week table 'lunch_saving_per_week' 
-  lunch_dt[, ':='(aggWeek=as.Date(cut(aggDay, breaks = "week", start.on.monday = T)))]
-  lunch_saving_per_week = lunch_dt[, .(lunch_saving_count = sum(lunch_saving, na.rm = T)), by=aggWeek]
-
-  setnames(lunch_saving_per_week,old="aggWeek",new="get")
-
-  rownum_expDate <- set.expDate.rownum(lunch_saving_per_week, expDate)
-  
-
-  ## plot 
-  p1 = ggplot(lunch_saving_per_week, aes(x=get)) +
-    ggtitle(paste(lab, target))
-
-  p1 = add.window.line(p1, lunch_saving_per_week, 'lunch_saving_count', windowingWeek = 4, rownum_expDate)
-
-  if (expDate[4]=="2016-11-16"){
-    p1 = add.event.vline.exp1(p1)
-  } else if (expDate[4]=="2015-01-21"){
-    p1 = add.event.vline.exp2(p1)
-  } else{
-    p1 = add.event.vline(p1)
-  }
-  
-  p1 = set.default.theme(p1)
-
-  print(p1)
-}
 
