@@ -5,12 +5,12 @@
 ###                                   last update : 2016. 8. 30.
 ### ------------------------------------------------------------ ###
 
-### -------------------------------- ###
+### ------------------------------------------------------- ###
 ### Build list: STATS_list
 ### 
-### category = lab + day_type + label 
-### (label = feeder_stats)
-### -------------------------------- ### 
+### category = {lab} + {day_type} + {label} 
+###                                 {label} = {feeder} + {stats}
+### ------------------------------------------------------- ### 
 
 PEAK_PERCENTILE = 0.9
 BASE_PERCENTILE = 0.1
@@ -146,22 +146,6 @@ for(lab in 1:length(STATS_list)){
 
 
 
-# statistics
-# all_expDate <- get.expDate.all()
-# 
-# for(lab in 1:length(STATS_list)){  
-#   if(grepl("allDay", names(STATS_list[lab])) & grepl("aggDay", names(STATS_list[lab]))){
-#     print(names(STATS_list[lab]))
-#     
-#     for(i in 1:length(all_expDate)){
-#       dt = STATS_list[[lab]][get >= all_expDate[[i]][1] & get <= all_expDate[[i]][2]]
-# #       print(paste(all_expDate[[i]][1],"~",all_expDate[[i]][2],":",mean(dt$peak),",",mean(dt$base),",",mean(dt$avg)))
-#       print(paste(mean(dt$peak),",",mean(dt$base),",",mean(dt$avg)))
-#     }
-#   }
-# }
-
-
 ### -------------------------------- ###
 ### summary_list
 ### Added category: feeders + stats    
@@ -170,7 +154,7 @@ for(lab in 1:length(STATS_list)){
 ## initialize summary list 
 summary_list = list()
 
-target_list = STATS_list
+target_summary_list = STATS_list
 all_expDate = get.expDate.all()
 
 
@@ -190,8 +174,7 @@ for(lab in target_labs){
       for(stats in target_stats){
         
         dt_name = paste(lab, agg_unit, day_type, feeder, sep="_")
-        target_dt = target_list[[dt_name]][,c('timestamp',stats),with=F]
-        
+        target_dt = target_summary_list[[dt_name]][,c('timestamp',stats),with=F]
         # print(head(target_dt))
         
         label = paste(feeder, stats, sep='_')
@@ -202,7 +185,6 @@ for(lab in target_labs){
         split_list = split.table.by.expDate(target_dt, all_expDate)
         
         summary_list = append(summary_list, setNames(list(split_list), category_name))
-        
       }
     }
   }
@@ -215,7 +197,6 @@ for(lab in target_labs){
 
 ## initialize summary list 
 representation_table = data.frame(exp_label = names(get.expDate.all()))
-
 representation_func = mean
 
 for(category in names(summary_list)){
@@ -245,9 +226,3 @@ for(category in names(summary_list)){
   representation_table = cbind(representation_table, category_values)
   names(representation_table)[length(representation_table)] = category
 }
-
-
-
-
-
-
