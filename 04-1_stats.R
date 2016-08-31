@@ -31,26 +31,26 @@ get.four.stats <- function(usage, thre_peak, thre_base){
 # 3. types of day (working day?)
 # 4. target feeder
 
-labs = c("MARG", "HCC", "UX", "All_Labs")                    # lab
-agg_units = c("aggWeek", "aggDay")                           # agg_unit
-types_of_day = c("allDay", "workingday", "non_workingday")   # day_type
-feeders = c("total", "computer", "light", "hvac")            # feeder
+LABS = c("MARG", "HCC", "UX", "All_Labs")                    # lab
+AGG_UNITS = c("aggWeek", "aggDay")                           # agg_unit
+TYPES_OF_DAY = c("allDay", "workingday", "non_workingday")   # day_type
+FEEDERS = c("total", "computer", "light", "hvac")            # feeder
 
-dt_list = setNames(dt_list, labs)
+dt_list = setNames(dt_list, LABS)
 STATS_list = list()
 
-for(lab in labs){ 
+for(lab in LABS){ 
   # 1. lab
   lab_dt = dt_list[[lab]]
   
   # 2. Aggregation unit
-  for(agg_unit in agg_units){
+  for(agg_unit in AGG_UNITS){
     
     # 3. Types of day
-    for(day_type in types_of_day){
+    for(day_type in TYPES_OF_DAY){
       
       # 4. Target feeder ----> feeder_stats = label
-      for(feeder in feeders){
+      for(feeder in FEEDERS){
         
         dt_name = paste(lab, agg_unit, day_type, feeder, sep="_")
         
@@ -173,10 +173,11 @@ summary_list = list()
 target_list = STATS_list
 all_expDate = get.expDate.all()
 
-target_labs         = c("MARG", "HCC", "UX")                      # lab 
-target_types_of_day = c("allDay", "workingday", "non_workingday") # day_type
-target_feeders      = c("total", "computer", "light", "hvac")     # feeder  
-target_stats        = c('peak','base','avg')                      # stats ----> feeder + stats = label
+
+target_labs         = LABS                    # lab 
+target_types_of_day = TYPES_OF_DAY            # day_type
+target_feeders      = FEEDERS                 # feeder  
+target_stats        = c('peak','base','avg')  # stats ----> feeder + stats = label
 
 agg_unit = "aggDay"
 
@@ -217,11 +218,11 @@ representation_table = data.frame(exp_label = names(get.expDate.all()))
 
 representation_func = mean
 
-for(category in names(summary_list)[1:1]){
+for(category in names(summary_list)){
   
   one_category = summary_list[[category]]
   
-  category_values
+  category_values = numeric(0)
   
   for(exp_label in names(one_category)){
     
@@ -231,13 +232,20 @@ for(category in names(summary_list)[1:1]){
     
     representative_value = representation_func(exp_data)
     
+    category_values = c(category_values, representative_value)
+    # names(category_values)[length(category_values)] = exp_label
     
     print(paste(category, exp_label))
     # print(exp_dt)
     # print(exp_data)
     print(representative_value)
+    
   }
+  print(category_values)
+  representation_table = cbind(representation_table, category_values)
+  names(representation_table)[length(representation_table)] = category
 }
+
 
 
 
