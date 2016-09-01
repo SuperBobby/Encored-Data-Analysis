@@ -82,9 +82,9 @@ plot.hvac.with.weather <- function(dt, weather_dt, expDate){
     ylim(-20,40)+
     scale_color_manual(values=c("dodgerblue2", "skyblue", "midnightblue"), 
                        breaks=c("max_temp", "avg_temp", "min_temp"))
-  p2 = add.colorful.window.line(p2, temp_weather_dt, weather_name, 'max_temp', windowingWeek, "dodgerblue2", rownum_expDate, ribbon=FALSE)
-  p2 = add.colorful.window.line(p2, temp_weather_dt, weather_name, 'avg_temp', windowingWeek, "skyblue", rownum_expDate, ribbon=FALSE)
-  p2 = add.colorful.window.line(p2, temp_weather_dt, weather_name, 'min_temp', windowingWeek, "midnightblue", rownum_expDate, ribbon=FALSE)
+  p2 = add.colorful.window.line(p2, temp_weather_dt, weather_name, 'max_temp', windowingWeek, "dodgerblue2", expDate, ribbon=FALSE)
+  p2 = add.colorful.window.line(p2, temp_weather_dt, weather_name, 'avg_temp', windowingWeek, "skyblue", expDate, ribbon=FALSE)
+  p2 = add.colorful.window.line(p2, temp_weather_dt, weather_name, 'min_temp', windowingWeek, "midnightblue", expDate, ribbon=FALSE)
   
   p2 = p2 + 
     theme_bw()+
@@ -111,14 +111,12 @@ plot.hvac.with.weather <- function(dt, weather_dt, expDate){
   p2 <- p2 +
     guides(colour=guide_legend(override.aes = list(size=2)))
   #         p2            = add.event.vline.exp2(p2)
-  
-  rownum_expDate <- set.expDate.rownum(plot_dt, expDate)
 
   stats <- ggplot(plot_dt, aes(x=get)) +
     #       geom_point(aes(y=peak, color='peak')) +
     ylab("electricity usage(kWh)")+
     ggtitle(plot_name)
-  stats = add.window.line(stats, plot_dt, plot_name, "peak", windowingWeek, rownum_expDate)
+  stats = add.window.line(stats, plot_dt, plot_name, "peak", windowingWeek, expDate)
   
   stats = stats + 
     scale_linetype_discrete(breaks=c("peak"), labels=c("90% of peak"))+

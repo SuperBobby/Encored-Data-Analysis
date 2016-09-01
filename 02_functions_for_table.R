@@ -8,11 +8,11 @@
 ## get Experiment date 
 get.expDate.1.1 <- function() {
   exp_Date<-c(as.Date("2014-11-10"),
-              as.Date("2014-11-17"),
-              as.Date("2016-11-16"),
-              as.Date("2016-11-16"),
-              as.Date("2016-11-16"),
-              as.Date("2016-11-16"))
+              as.Date("2014-11-17"))
+#               as.Date("2016-11-16"),
+#               as.Date("2016-11-16"),
+#               as.Date("2016-11-16"),
+#               as.Date("2016-11-16"))
   return(exp_Date)
 }
 
@@ -20,9 +20,9 @@ get.expDate.1.2 <- function() {
   exp_Date<-c(as.Date("2014-11-10"),
               as.Date("2014-11-17"),
               as.Date("2015-01-15"),
-              as.Date("2015-01-22"),
-              as.Date("2016-11-16"),
-              as.Date("2016-11-16"))
+              as.Date("2015-01-22"))
+#               as.Date("2016-11-16"),
+#               as.Date("2016-11-16"))
   return(exp_Date)
 }
 

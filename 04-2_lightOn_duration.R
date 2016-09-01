@@ -112,8 +112,6 @@ plot.lightOn.duration <- function(dt, expDate, lightON_duration_color = "darkoli
     plot_name = paste('exp2', names(dt), sep="_")
   }
   
-  rownum_expDate <- set.expDate.rownum(plot_dt, expDate)
-  
   windowingWeek <- 4
   
 #   print(plot_name)
@@ -123,7 +121,7 @@ plot.lightOn.duration <- function(dt, expDate, lightON_duration_color = "darkoli
     scale_y_continuous(limits=c(0,24), oob=rescale_none) +
     ylab("Light-ON duration (hours)")+
     scale_color_discrete(breaks = c("lightON"), labels = c("number of lightON blocks(15min)"))
-  lightON_duration = add.colorful.window.line(lightON_duration, plot_dt, plot_name, 'lightON',windowingWeek, lightON_duration_color, rownum_expDate)
+  lightON_duration = add.colorful.window.line(lightON_duration, plot_dt, plot_name, 'lightON',windowingWeek, lightON_duration_color, expDate)
   
   if(expDate[4] == "2016-11-16"){
     #exp1-1
@@ -170,7 +168,7 @@ for(lab in 1:length(table_lightOn_duration)){
 
 
 #statistics
-all_expDate <- get.expDate()
+all_expDate <- get.expDate.all()
 
 for(lab in 1:length(table_lightOn_duration)){
   if(grepl("allDay", names(table_lightOn_duration[lab])) & grepl("aggDay", names(table_lightOn_duration[lab]))){
