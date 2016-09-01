@@ -203,7 +203,7 @@ for(lab in target_labs){
 ### representation_table
 ### -------------------------------- ### 
 
-## initialize summary list 
+## initialize representation_table 
 representation_table = data.frame(exp_label = names(get.expDate.all()))
 representation_func = mean
 
