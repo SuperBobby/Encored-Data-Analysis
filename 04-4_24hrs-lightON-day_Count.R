@@ -67,9 +67,7 @@ plot.24hr.lightOn.counting <- function(dt, expDate, full_lightON_color = "violet
     plot_dt = set.expDate.2(plot_dt)
     plot_name = paste('exp2', names(dt), sep="_")
   }
-  
-  rownum_expDate <- set.expDate.rownum(plot_dt, expDate)
-  
+
   windowingWeek <- 4
 
   print(plot_name)
@@ -79,7 +77,7 @@ plot.24hr.lightOn.counting <- function(dt, expDate, full_lightON_color = "violet
     ggtitle(plot_name)+
     ylab("24hrs light-ON day (count/week)")
   
-  p = add.colorful.window.line(p, plot_dt, plot_name, 'full_lightON_10', windowingWeek, full_lightON_color, rownum_expDate)
+  p = add.colorful.window.line(p, plot_dt, plot_name, 'full_lightON_10', windowingWeek, full_lightON_color, expDate)
   
   if(expDate[4] == "2016-11-16"){
     #exp1-1

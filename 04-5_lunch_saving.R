@@ -102,8 +102,6 @@ plot.lunch.saving <- function(dt, expDate){
     plot_name = paste('exp2', names(dt), sep="_")
   }
   
-  rownum_expDate <- set.expDate.rownum(plot_dt, expDate)
-  
   windowingWeek <- 4
   
   #   print(plot_name)
@@ -111,7 +109,7 @@ plot.lunch.saving <- function(dt, expDate){
   p1 = ggplot(plot_dt, aes(x=get)) +
     ggtitle(plot_name)
 
-  p1 = add.window.line(p1, plot_dt, plot_name, 'lunch_saving_count',windowingWeek, rownum_expDate)
+  p1 = add.window.line(p1, plot_dt, plot_name, 'lunch_saving_count',windowingWeek, expDate)
   
   if(expDate[4] == "2016-11-16"){
     #exp1-1

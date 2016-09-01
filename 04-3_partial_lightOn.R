@@ -78,15 +78,13 @@ plot.partial.lightOn <- function(dt, expDate, partial_lightON_color = "orange2")
     plot_name = paste('exp2', names(dt), sep="_")
   }
   
-  rownum_expDate <- set.expDate.rownum(plot_dt, expDate)
-  
   windowingWeek <- 4
   
   #   print(plot_name)
   partial_lightON <- ggplot(plot_dt, aes(x=get)) +
     ggtitle(plot_name)+
     ylab("Partial light-ON (%)")
-  partial_lightON = add.colorful.window.line(partial_lightON, plot_dt, plot_name, 'threshold80', windowingWeek, partial_lightON_color, rownum_expDate)
+  partial_lightON = add.colorful.window.line(partial_lightON, plot_dt, plot_name, 'threshold80', windowingWeek, partial_lightON_color, expDate)
   
   if(expDate[4] == "2016-11-16"){
     #exp1-1

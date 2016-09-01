@@ -122,8 +122,8 @@ get.plot.realsense <- function(dt, expDate) {
     theme_bw()+
     ylab("(counts / day)")
   
-  RS_duration      = add.window.line(RS_duration, plot_dt, plot_name, "sum_of_duration", windowingWeek, rownum_expDate)
-  RS_freq          = add.window.line(RS_freq, plot_dt, plot_name, "freq", windowingWeek, rownum_expDate)
+  RS_duration      = add.window.line(RS_duration, plot_dt, plot_name, "sum_of_duration", windowingWeek, expDate)
+  RS_freq          = add.window.line(RS_freq, plot_dt, plot_name, "freq", windowingWeek, expDate)
   
   if(expDate[4] == "2016-11-16"){
     #exp1-1

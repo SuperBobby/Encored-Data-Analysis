@@ -90,11 +90,11 @@ for(lab in LABS){
 plot.stats <- function(dt, expDate) {
   plot_dt = dt[[1]]
   
-  if(expDate[4] == "2016-11-16"){
+  if(expDate[length(expDate)] == "2014-11-17"){
     #exp1-1
     plot_dt = cut.expDate.1.1(plot_dt)
     plot_name = paste('exp1-1', names(dt), sep="_")
-  } else if(expDate[4] == "2015-01-22"){
+  } else if(expDate[length(expDate)] == "2015-01-22"){
     #exp1-2
     plot_dt = cut.expDate.1.2(plot_dt)
     plot_name = paste('exp1-2', names(dt), sep="_")
@@ -103,9 +103,7 @@ plot.stats <- function(dt, expDate) {
     plot_dt = cut.expDate.2(plot_dt)
     plot_name = paste('exp2', names(dt), sep="_")
   }
-  
-  rownum_expDate = get.expDate.rownum(plot_dt, expDate)
-  
+ 
   windowingWeek = 4
   
   stats <- ggplot(plot_dt, aes(x=timestamp)) +
@@ -113,14 +111,14 @@ plot.stats <- function(dt, expDate) {
     ylab("Energy use (kWh/day)")+
     scale_linetype_discrete(breaks=c("peak", "avg", "base"))
   
-  stats = add.window.line(stats, plot_dt, plot_name, "peak", windowingWeek, rownum_expDate)
-  stats = add.window.line(stats, plot_dt, plot_name, "base", windowingWeek, rownum_expDate)
-  stats = add.window.line(stats, plot_dt, plot_name, "avg", windowingWeek, rownum_expDate)
+  stats = add.window.line(stats, plot_dt, plot_name, "peak", windowingWeek, expDate)
+  stats = add.window.line(stats, plot_dt, plot_name, "base", windowingWeek, expDate)
+  stats = add.window.line(stats, plot_dt, plot_name, "avg", windowingWeek, expDate)
     
-  if(expDate[4] == "2016-11-16"){
+  if(expDate[length(expDate)] == "2014-11-17"){
     #exp1-1
     stats = add.event.vline.exp1.1(stats)
-  } else if(expDate[4] == "2015-01-22"){
+  } else if(expDate[length(expDate)] == "2015-01-22"){
     #exp1-2
     stats = add.event.vline.exp1.2(stats)
   } else{
