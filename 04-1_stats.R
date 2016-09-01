@@ -5,12 +5,18 @@
 ###                                   last update : 2016. 8. 30.
 ### ------------------------------------------------------------ ###
 
-### ------------------------------------------------------- ###
-### Build list: STATS_list
+# * peak : 90th percentile of usage in the aggregate unit 
+# * base : 10th percentile of usage in the aggregate unit 
+# * average : average of usage in the aggregate unit 
+
+### --------------------------------------------------------------------- ###
+### Build list of tables : STATS_list
 ### 
-### category = {lab} + {day_type} + {label} 
-###                                 {label} = {feeder} + {stats}
-### ------------------------------------------------------- ### 
+### table_name = {lab}_{agg_unit}_{day_type}_{label} 
+###                                          {label} = {feeder}_{stats}
+### --------------------------------------------------------------------- ### 
+
+STATS_list = list()
 
 PEAK_PERCENTILE = 0.9
 BASE_PERCENTILE = 0.1
@@ -37,10 +43,9 @@ TYPES_OF_DAY = c("allDay", "workingday", "non_workingday")   # day_type
 FEEDERS = c("total", "computer", "light", "hvac")            # feeder
 
 dt_list = setNames(dt_list, LABS)
-STATS_list = list()
 
+# 1. lab
 for(lab in LABS){ 
-  # 1. lab
   lab_dt = dt_list[[lab]]
   
   # 2. Aggregation unit
@@ -52,6 +57,7 @@ for(lab in LABS){
       # 4. Target feeder ----> feeder_stats = label
       for(feeder in FEEDERS){
         
+        # table name
         dt_name = paste(lab, agg_unit, day_type, feeder, sep="_")
         
         if(day_type == "allDay"){
@@ -146,10 +152,12 @@ for(lab in 1:length(STATS_list)){
 
 
 
-### -------------------------------- ###
+### ------------------------------------------------------------ ###
 ### summary_list
-### Added category: feeders + stats    
-### -------------------------------- ### 
+###
+### category = {lab} + {day_type} + {label} 
+###                                 {label} = {feeder}_{stats}
+### ------------------------------------------------------------ ### 
 
 ## initialize summary list 
 summary_list = list()
