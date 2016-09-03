@@ -19,6 +19,8 @@
 LIGHT_ON_DURATION_list = list()
 LIGHT_ON_MIN_USAGE = 0.01
 
+LABEL = 'light_on_duration'
+
 ## Loop parameters 
 # 1. lab
 # 2. aggregation unit 
@@ -42,25 +44,27 @@ for(lab in LABS){
     for(day_type in TYPES_OF_DAY){
       
       # table name 
-      dt_name = paste(lab, agg_unit, day_type,"light_on_duration", sep="_")
+      dt_name = paste(lab, agg_unit, day_type, LABEL, sep="_")
       print(paste("Build table:", dt_name))
       
       if(day_type == "allDay"){
         
-        light_on_duration_dt = lab_dt[, .(light_on_duration = sum(light > LIGHT_ON_MIN_USAGE)), 
-                                      by=.(timestamp=get(agg_unit))]
+        light_on_duration_dt = lab_dt[, .(sum(light > LIGHT_ON_MIN_USAGE)), 
+                                      by=get(agg_unit)]
         
       } else if(day_type == "workingday") {
         
-        light_on_duration_dt = lab_dt[workingday == T, .(light_on_duration = sum(light > LIGHT_ON_MIN_USAGE)), 
-                                      by=.(timestamp=get(agg_unit))]
-        
+        light_on_duration_dt = lab_dt[workingday == T, .(sum(light > LIGHT_ON_MIN_USAGE)), 
+                                      by=get(agg_unit)]
         
       } else if(day_type == "non_workingday") {
         
-        light_on_duration_dt = lab_dt[workingday == F, .(light_on_duration = sum(light > LIGHT_ON_MIN_USAGE)), 
-                                      by=.(timestamp=get(agg_unit))]
+        light_on_duration_dt = lab_dt[workingday == F, .(sum(light > LIGHT_ON_MIN_USAGE)), 
+                                      by=get(agg_unit)]
       }
+      
+      # change column name
+      names(light_on_duration_dt) = c("timestamp", LABEL)
       
       # change unit: '(count of 15min) / (day or week)' to 'hours/day'
       if(agg_unit == 'aggDay'){
@@ -72,6 +76,7 @@ for(lab in LABS){
         light_on_duration_dt$light_on_duration = light_on_duration_dt$light_on_duration * 15 / 60 / 7
       }
       
+      # append data.table to list 
       LIGHT_ON_DURATION_list = append(LIGHT_ON_DURATION_list, setNames(list(light_on_duration_dt),dt_name))
     }
   }
@@ -158,7 +163,7 @@ for(lab in 1:length(LIGHT_ON_DURATION_list)){
 
 
 ### ------------------------------------------------------------ ###
-### summary_list
+### Update summary_list
 ###
 ### category = {lab} + {day_type} + {label} 
 ###                                 {label} = 'light_on_duration' 
@@ -176,11 +181,10 @@ for(lab in target_labs){
   
   for(day_type in target_types_of_day){
     
-    dt_name = paste(lab, agg_unit, day_type, "light_on_duration", sep="_")
-    target_dt = target_summary_list[[dt_name]][,c('timestamp','light_on_duration'),with=F]
+    dt_name = paste(lab, agg_unit, day_type, LABEL, sep="_")
+    target_dt = target_summary_list[[dt_name]][,c('timestamp', LABEL),with=F]
 
-    label = "light_on_duration"
-    category_name = paste(lab, day_type, label, sep='_')
+    category_name = paste(lab, day_type, LABEL, sep='_')
     
     print(category_name)
     
@@ -191,42 +195,4 @@ for(lab in target_labs){
   }
 }
 
-
-### -------------------------------- ###
-### representation_table
-### -------------------------------- ### 
-
-## initialize representation_table 
-representation_table = data.frame(exp_label = names(get.expDate.all()))
-representation_func  = mean
-
-for(category in names(summary_list)){
-  
-  one_category = summary_list[[category]]
-  
-  category_values = numeric(0)
-  
-  for(exp_label in names(one_category)){
-    
-    exp_dt = one_category[[exp_label]]
-    
-    exp_data = data.frame(exp_dt)[,2]
-    
-    representative_value = representation_func(exp_data)
-    
-    category_values = c(category_values, representative_value)
-    # names(category_values)[length(category_values)] = exp_label
-    
-    print(paste(category, exp_label))
-    # print(exp_dt)
-    # print(exp_data)
-    print(representative_value)
-    
-  }
-  print(category_values)
-  representation_table = cbind(representation_table, category_values)
-  names(representation_table)[length(representation_table)] = category
-}
-
-
-View(t(representation_table))
+source('10_representation_table.R')

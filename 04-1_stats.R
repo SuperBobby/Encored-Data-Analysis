@@ -12,8 +12,7 @@
 ### --------------------------------------------------------------------- ###
 ### Build list of tables : STATS_list
 ### 
-### table_name = {lab}_{agg_unit}_{day_type}_{label} 
-###                                          {label} = {feeder}_{stats}
+### table_name = {lab}_{agg_unit}_{day_type}_{feeder} 
 ### --------------------------------------------------------------------- ### 
 
 STATS_list = list()
@@ -59,7 +58,8 @@ for(lab in LABS){
         
         # table name
         dt_name = paste(lab, agg_unit, day_type, feeder, sep="_")
-        
+        print(paste("Build table:", dt_name))
+
         if(day_type == "allDay"){
           stats_dt = lab_dt[, as.list(get.four.stats(get(feeder), PEAK_PERCENTILE, BASE_PERCENTILE)), 
                             by=.(timestamp=get(agg_unit))]
@@ -72,10 +72,6 @@ for(lab in LABS){
           stats_dt = lab_dt[workingday == F, as.list(get.four.stats(get(feeder), PEAK_PERCENTILE, BASE_PERCENTILE)), 
                             by=.(timestamp=get(agg_unit))]
         }
-        
-        print(paste("Build table:", dt_name))
-        # assign(dt_name, stats_dt)
-        
         STATS_list = append(STATS_list, setNames(list(stats_dt),dt_name))
       }
     }
@@ -149,9 +145,8 @@ for(lab in 1:length(STATS_list)){
 }
 
 
-
 ### ------------------------------------------------------------ ###
-### summary_list
+### Update summary_list
 ###
 ### category = {lab} + {day_type} + {label} 
 ###                                 {label} = {feeder}_{stats}
@@ -162,7 +157,6 @@ summary_list = list()
 
 target_summary_list = STATS_list
 all_expDate = get.expDate.all()
-
 
 target_labs         = LABS                    # lab 
 target_types_of_day = TYPES_OF_DAY            # day_type
@@ -196,39 +190,4 @@ for(lab in target_labs){
   }
 }
 
-
-### -------------------------------- ###
-### representation_table
-### -------------------------------- ### 
-
-## initialize representation_table 
-representation_table = data.frame(exp_label = names(get.expDate.all()))
-representation_func = mean
-
-for(category in names(summary_list)){
-  
-  one_category = summary_list[[category]]
-  
-  category_values = numeric(0)
-  
-  for(exp_label in names(one_category)){
-    
-    exp_dt = one_category[[exp_label]]
-    
-    exp_data = data.frame(exp_dt)[,2]
-    
-    representative_value = representation_func(exp_data)
-    
-    category_values = c(category_values, representative_value)
-    # names(category_values)[length(category_values)] = exp_label
-    
-    print(paste(category, exp_label))
-    # print(exp_dt)
-    # print(exp_data)
-    print(representative_value)
-    
-  }
-  print(category_values)
-  representation_table = cbind(representation_table, category_values)
-  names(representation_table)[length(representation_table)] = category
-}
+source('10_representation_table.R')
