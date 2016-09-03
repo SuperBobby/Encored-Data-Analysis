@@ -5,19 +5,19 @@
 ###                                   last update : 2016. 8. 30.
 ### ------------------------------------------------------------ ###
 
-# * Light-on duration: sum of 'light-on' duration per day
-#   ('light-on': over 0 consumption) 
+# * Light-on_duration: sum of 'light-on' duration per day
+#   ('light-on': over 0.01 consumption(for 15min))
 # * unit: hours / day
 # * Down is good
 
 ### -------------------------------------------------------------------- ###
-### Build list of tables : LIGHT_ON_list
+### Build list of tables : LIGHT_ON_DURATION_list
 ### 
-### table_name = {lab}_{agg_unit}_{day_type}_{label} 
-###                                          {label} = 'light_on_duration' 
+### table_name = {lab}_{agg_unit}_{day_type}_'light_on_duration'
 ### -------------------------------------------------------------------- ### 
 
-LIGHT_ON_list = list()
+LIGHT_ON_DURATION_list = list()
+LIGHT_ON_MIN_USAGE = 0.01
 
 ## Loop parameters 
 # 1. lab
@@ -43,26 +43,24 @@ for(lab in LABS){
       
       # table name 
       dt_name = paste(lab, agg_unit, day_type,"light_on_duration", sep="_")
-      
+      print(paste("Build table:", dt_name))
       
       if(day_type == "allDay"){
         
-        light_on_duration_dt = lab_dt[, .(light_on_duration = sum(light > 0)), 
+        light_on_duration_dt = lab_dt[, .(light_on_duration = sum(light > LIGHT_ON_MIN_USAGE)), 
                                       by=.(timestamp=get(agg_unit))]
         
       } else if(day_type == "workingday") {
         
-        light_on_duration_dt = lab_dt[workingday == T, .(light_on_duration = sum(light > 0)), 
+        light_on_duration_dt = lab_dt[workingday == T, .(light_on_duration = sum(light > LIGHT_ON_MIN_USAGE)), 
                                       by=.(timestamp=get(agg_unit))]
         
         
       } else if(day_type == "non_workingday") {
         
-        light_on_duration_dt = lab_dt[workingday == F, .(light_on_duration = sum(light > 0)), 
+        light_on_duration_dt = lab_dt[workingday == F, .(light_on_duration = sum(light > LIGHT_ON_MIN_USAGE)), 
                                       by=.(timestamp=get(agg_unit))]
       }
-      
-      print(paste("Build table:", dt_name))
       
       # change unit: '(count of 15min) / (day or week)' to 'hours/day'
       if(agg_unit == 'aggDay'){
@@ -74,7 +72,7 @@ for(lab in LABS){
         light_on_duration_dt$light_on_duration = light_on_duration_dt$light_on_duration * 15 / 60 / 7
       }
       
-      LIGHT_ON_list = append(LIGHT_ON_list, setNames(list(light_on_duration_dt),dt_name))
+      LIGHT_ON_DURATION_list = append(LIGHT_ON_DURATION_list, setNames(list(light_on_duration_dt),dt_name))
     }
   }
 }
@@ -144,16 +142,16 @@ plot.light.On.duration <- function(dt, expDate, lightON_duration_color = "darkol
 
 
 #plot
-for(lab in 1:length(LIGHT_ON_list)){
-  plot_lightOn_duration <- plot.light.On.duration(LIGHT_ON_list[lab], get.expDate.1.1())  
+for(lab in 1:length(LIGHT_ON_DURATION_list)){
+  plot_lightOn_duration <- plot.light.On.duration(LIGHT_ON_DURATION_list[lab], get.expDate.1.1())  
 }
 
-for(lab in 1:length(LIGHT_ON_list)){
-  plot_lightOn_duration <- plot.light.On.duration(LIGHT_ON_list[lab], get.expDate.1.2())  
+for(lab in 1:length(LIGHT_ON_DURATION_list)){
+  plot_lightOn_duration <- plot.light.On.duration(LIGHT_ON_DURATION_list[lab], get.expDate.1.2())  
 }
 
-for(lab in 1:length(LIGHT_ON_list)){
-  plot_lightOn_duration <- plot.light.On.duration(LIGHT_ON_list[lab], get.expDate.2())  
+for(lab in 1:length(LIGHT_ON_DURATION_list)){
+  plot_lightOn_duration <- plot.light.On.duration(LIGHT_ON_DURATION_list[lab], get.expDate.2())  
 }
 
 
@@ -166,7 +164,7 @@ for(lab in 1:length(LIGHT_ON_list)){
 ###                                 {label} = 'light_on_duration' 
 ### ------------------------------------------------------------ ### 
 
-target_summary_list = LIGHT_ON_list
+target_summary_list = LIGHT_ON_DURATION_list
 all_expDate = get.expDate.all()
 
 target_labs         = LABS                    # lab 
