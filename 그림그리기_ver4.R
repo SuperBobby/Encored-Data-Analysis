@@ -15,13 +15,9 @@ library(scales)
 
 ## -------------------- ##
 ### data loading 
-# load("Encored-Data-Analysis/marg_15min.RData")
-# load("Encored-Data-Analysis/hcc_15min.RData")
-# load("Encored-Data-Analysis/ux_15min.RData")
-
-load("../rawData/marg_15min.RData")
-load("../rawData/hcc_15min.RData")
-load("../rawData/ux_15min.RData")
+# load("../rawData/marg_15min.RData")
+# load("../rawData/hcc_15min.RData")
+# load("../rawData/ux_15min.RData")
 
 source("getSNUdata.R")
 update_start = "2014-09-01"
