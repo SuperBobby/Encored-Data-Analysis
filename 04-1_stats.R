@@ -1,5 +1,5 @@
 ### ------------------------------------------------------------ ###
-### Basic statistics(peak, base, average, median) of 15min data
+### Basic statistics(peak, base, average, median) of each feeder
 ### 
 ### JY, EJ @ ADSL, SNU 
 ###                                   last update : 2016. 8. 30.

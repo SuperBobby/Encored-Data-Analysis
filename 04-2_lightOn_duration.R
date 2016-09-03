@@ -1,5 +1,5 @@
 ### ------------------------------------------------------------ ###
-### Light-on duration per day
+### light_on_duration per day
 ### 
 ### JY, EJ @ ADSL, SNU 
 ###                                   last update : 2016. 8. 30.

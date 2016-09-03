@@ -1,5 +1,5 @@
 ### ------------------------------------------------------------ ###
-### Partial Light-on ratio per day
+### partial_light_on_ratio per day
 ### 
 ### JY, EJ @ ADSL, SNU 
 ###                                   last update : 2016. 9. 3.
@@ -37,10 +37,11 @@ dt_list = setNames(dt_list, LABS)
 
 get.partial.light.on.ratio <- function(light, LIGHT_ON_MIN_USAGE, light_peak, PARTIAL_ON_RATIO){
   
-  # filter '010' partial-light-on pattern
+  # filter 'FTF' partial-light-on pattern  <--- update needed~!
   filter.fault.partial.light.on <- function(raw_partial_light_on){
     filtered_partial_light_on = raw_partial_light_on    
     for(i in 2:(length(raw_partial_light_on)-1)){
+      if(raw_partial_light_on[(i-1)] == FALSE & raw_partial_light_on[(i+1)] == FALSE){
         filtered_partial_light_on[i] = F
       }
     }
@@ -67,10 +68,15 @@ get.partial.light.on.ratio <- function(light, LIGHT_ON_MIN_USAGE, light_peak, PA
 # tmp_light_peak = quantile(tmp$light, .9)
 # 
 # 
+# tmp_dt = tmp[, .(light = light,
+#                  light_on = light > LIGHT_ON_MIN_USAGE,
 #                  partial = light > LIGHT_ON_MIN_USAGE & light < tmp_light_peak*0.8,
 #                  filtered_partial = filter.fault.partial.light.on(light > LIGHT_ON_MIN_USAGE & light < tmp_light_peak*0.8) ),
 #              by=aggDay]
+# View(tmp_dt)
 # 
+# tmp[, .(partial_light_on_ratio = sum(light > LIGHT_ON_MIN_USAGE & light < (tmp_light_peak*.8)) / sum(light > 0)), by=aggDay]
+  
 # # 
 # tmp_dt = tmp[, .(get.partial.light.on.ratio(light, LIGHT_ON_MIN_USAGE, tmp_light_peak, PARTIAL_ON_RATIO)), 
 #     by=aggDay]

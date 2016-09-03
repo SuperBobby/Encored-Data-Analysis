@@ -1,123 +1,195 @@
+### ------------------------------------------------------------ ###
+### whole_day_ligit_on_count per week 
 ### 
-## 4. full_lightON counting : 24hours 
-## ==> # of "over peak*(0.5~0.8)" == 96?
+### JY, EJ @ ADSL, SNU 
+###                                   last update : 2016. 9. 3.
+### ------------------------------------------------------------ ###
 
-day_selections = c("allDay", "workingday", "workingday")
+# * Def: number of days which is ‘light-on duration == 24hrs’ per week 
+# * Unit: # of days / week 
+# * Down is good
 
-build.table.24hr.lightOn.counting <- function(dt_list){
-  return_dts = list()
+### -------------------------------------------------------------------- ###
+### Build list of tables : WHOLE_DAY_LIGHT_ON_COUNT_list
+### 
+### table_name = {lab}_{agg_unit}_{day_type}_'whole_day_ligit_on_count' 
+### -------------------------------------------------------------------- ### 
+
+WHOLE_DAY_LIGHT_ON_COUNT_list = list()
+LIGHT_ON_MIN_USAGE = 0.01
+
+LABEL = "whole_day_ligit_on_count"
+
+## Loop parameters 
+# 1. lab
+# 2. aggregation unit 
+# 3. types of day (working day?)
+# 4. target feeder
+
+LABS = c("MARG", "HCC", "UX", "All_Labs")                    # lab
+AGG_UNITS = c("aggWeek")                                     # agg_unit
+TYPES_OF_DAY = c("allDay", "workingday", "non_workingday")   # day_type
+
+dt_list = setNames(dt_list, LABS)
+
+
+get.whole.day.ligit.on.count <- function(sub_dt){
+  whole_day_ligit_on_dt = sub_dt[, .(whole_day_ligit_on = (sum(light > LIGHT_ON_MIN_USAGE)==96)), by=aggDay]
   
-  for(lab in 1:length(dt_list)){ 
-    # lab_dt & name selection 
-    lab_dt = dt_list[[lab]]
-    lab_name = lab_names[lab]
+  return(sum(whole_day_ligit_on_dt$whole_day_ligit_on))
+}
+
+## EDA & varification logic
+{
+  
+# tmp <- marg_dt
+# 
+# tmp_dt1 = tmp[, .(whole_day_ligit_on = (sum(light > LIGHT_ON_MIN_USAGE)==96)), by=aggDay]
+# tmp_dt1[, ':='(aggWeek=as.Date(cut(aggDay, breaks = "week", start.on.monday = T)))]
+# tmp_dt1[, .(whole_day_ligit_on_count = sum(whole_day_ligit_on)), by=aggWeek]
+# 
+# 
+# tmp_dt1[whole_day_ligit_on==T]
+# View(tmp_dt1)
+# 
+# tmp_dt1[aggWeek == "2016-07-11"]
+# 67: 2016-01-04                        3
+# 94: 2016-07-11                        4
+# marg_dt[aggDay == "2016-01-08"]
+# 
+# 
+# tmp[, .(whole_day_ligit_on_count = get.whole.day.ligit.on.count(.SD)), by=aggWeek]
+
+}
+
+
+# 1. lab
+for(lab in LABS){ 
+  lab_dt = dt_list[[lab]]
+  
+  # 2. Aggregation unit
+  for(agg_unit in AGG_UNITS){
     
-    print(lab_name)
-    
-    #   lab_dt$light <- na.locf(lab_dt$light)
-    
-    light_peak = quantile(lab_dt$light, .90, na.rm = T)
-    print(light_peak)
-    
-    for(day_selection in day_selections){
-      if(day_selection == "allDay"){
+    # 3. Types of day
+    for(day_type in TYPES_OF_DAY){
+      
+      # table name 
+      dt_name = paste(lab, agg_unit, day_type, LABEL, sep="_")
+      print(paste("Build table:", dt_name))
+      
+      if(day_type == "allDay"){
         
-        full_lightON_aggDay_dt = lab_dt[, .(full_lightON_10 = sum(light > (light_peak * 0.1), na.rm = T)==96), by=aggDay]
-        setnames(full_lightON_aggDay_dt,old="aggDay",new="get")
+        whole_day_ligit_on_count_dt = lab_dt[, .(whole_day_ligit_on_count = get.whole.day.ligit.on.count(.SD)), by=aggWeek]
         
-      } else if(day_selection == "workingday") {
+      } else if(day_type == "workingday") {
         
-        full_lightON_aggDay_dt = lab_dt[workingday == T, .(full_lightON_10 = sum(light > (light_peak * 0.1), na.rm = T)==96), by=aggDay]
-        setnames(full_lightON_aggDay_dt,old="aggDay",new="get")
+        whole_day_ligit_on_count_dt = lab_dt[workingday == T, .(whole_day_ligit_on_count = get.whole.day.ligit.on.count(.SD)), by=aggWeek]
         
-      } else if(day_selection == "non_workingday") {
+      } else if(day_type == "non_workingday") {
         
-        full_lightON_aggDay_dt = lab_dt[workingday == F, .(full_lightON_10 = sum(light > (light_peak * 0.1), na.rm = T)==96), by=aggDay]
-        setnames(full_lightON_aggDay_dt,old="aggDay",new="get")
-        
+        whole_day_ligit_on_count_dt = lab_dt[workingday == F, .(whole_day_ligit_on_count = get.whole.day.ligit.on.count(.SD)), by=aggWeek]
       }
       
-      full_lightON_aggWeek_dt = full_lightON_aggDay_dt[, .(full_lightON_10 = sum(full_lightON_10, na.rm = T)), by=.(aggWeek=as.Date(cut(get, breaks = "week", start.on.monday = T)))]
-      setnames(full_lightON_aggWeek_dt,old="aggWeek",new="get")
+      # change column name
+      names(whole_day_ligit_on_count_dt) = c("timestamp", LABEL)
       
-      dt_name = paste(lab_name, "24hr_lightON", "aggWeek", day_selection, sep="_")
-      
-      assign(dt_name, full_lightON_aggWeek_dt)
-      return_dts = append(return_dts, setNames(list(full_lightON_aggWeek_dt),dt_name)) 
+      # append data.table to list 
+      WHOLE_DAY_LIGHT_ON_COUNT_list = append(WHOLE_DAY_LIGHT_ON_COUNT_list, setNames(list(whole_day_ligit_on_count_dt),dt_name))
     }
   }
-  
-  return(return_dts)
-}
-
-plot.24hr.lightOn.counting <- function(dt, expDate, full_lightON_color = "violetred4"){
-  
-  plot_dt = dt[[1]]
-  
-  if(expDate[4] == "2016-11-16"){
-    #exp1-1
-    plot_dt = set.expDate.1.1(plot_dt)
-    plot_name = paste('exp1-1', names(dt), sep="_")
-  } else if(expDate[4] == "2015-01-22"){
-    #exp1-2
-    plot_dt = set.expDate.1.2(plot_dt)
-    plot_name = paste('exp1-2', names(dt), sep="_")
-  } else{
-    #exp3
-    plot_dt = set.expDate.2(plot_dt)
-    plot_name = paste('exp2', names(dt), sep="_")
-  }
-
-  windowingWeek <- 4
-
-  print(plot_name)
-  
-  p <- ggplot(plot_dt, aes(x=get)) +
-    geom_point(aes(y=full_lightON_10), colour='gray70') +
-    ggtitle(plot_name)+
-    ylab("24hrs light-ON day (count/week)")
-  
-  p = add.colorful.window.line(p, plot_dt, plot_name, 'full_lightON_10', windowingWeek, full_lightON_color, expDate)
-  
-  if(expDate[4] == "2016-11-16"){
-    #exp1-1
-    p = add.event.vline.exp1.1(p)
-  } else if(expDate[4] == "2015-01-22"){
-    #exp1-2
-    p = add.event.vline.exp1.2(p)
-  } else{
-    #exp3
-    p = add.event.vline.exp2(p)
-  }
-  
-  p = set.colorful.theme(p, full_lightON_color)
-
-  save.plot(paste0("../plots/", plot_name, ".png"), p)
-  
-  return(p)
 }
 
 
-#build table
-table_full_lightOn <- build.table.24hr.lightOn.counting(dt_list)
+### -------------------------------- ###
+### Plot: whole_day_ligit_on_count     
+### -------------------------------- ### 
+# 
+# plot.24hr.lightOn.counting <- function(dt, expDate, full_lightON_color = "violetred4"){
+#   
+#   plot_dt = dt[[1]]
+#   
+#   if(expDate[4] == "2016-11-16"){
+#     #exp1-1
+#     plot_dt = set.expDate.1.1(plot_dt)
+#     plot_name = paste('exp1-1', names(dt), sep="_")
+#   } else if(expDate[4] == "2015-01-22"){
+#     #exp1-2
+#     plot_dt = set.expDate.1.2(plot_dt)
+#     plot_name = paste('exp1-2', names(dt), sep="_")
+#   } else{
+#     #exp3
+#     plot_dt = set.expDate.2(plot_dt)
+#     plot_name = paste('exp2', names(dt), sep="_")
+#   }
+# 
+#   windowingWeek <- 4
+# 
+#   print(plot_name)
+#   
+#   p <- ggplot(plot_dt, aes(x=get)) +
+#     geom_point(aes(y=full_lightON_10), colour='gray70') +
+#     ggtitle(plot_name)+
+#     ylab("24hrs light-ON day (count/week)")
+#   
+#   p = add.colorful.window.line(p, plot_dt, plot_name, 'full_lightON_10', windowingWeek, full_lightON_color, expDate)
+#   
+#   if(expDate[4] == "2016-11-16"){
+#     #exp1-1
+#     p = add.event.vline.exp1.1(p)
+#   } else if(expDate[4] == "2015-01-22"){
+#     #exp1-2
+#     p = add.event.vline.exp1.2(p)
+#   } else{
+#     #exp3
+#     p = add.event.vline.exp2(p)
+#   }
+#   
+#   p = set.colorful.theme(p, full_lightON_color)
+# 
+#   save.plot(paste0("../plots/", plot_name, ".png"), p)
+#   
+#   return(p)
+# }
 
 #plot
-for(lab in 1:length(table_full_lightOn)){
-  plot_full_lightOn <- plot.24hr.lightOn.counting(table_full_lightOn[lab], get.expDate.2())  
-}
+# for(lab in 1:length(table_full_lightOn)){
+#   plot_full_lightOn <- plot.24hr.lightOn.counting(table_full_lightOn[lab], get.expDate.2())  
+# }
 
-#statistics
-all_expDate <- get.expDate()
 
-for(lab in 1:length(table_full_lightOn)){
-  if(grepl("allDay", names(table_full_lightOn[lab]))){
-    print(names(table_full_lightOn[lab]))
+### ------------------------------------------------------------ ###
+### Update summary_list
+###
+### category = {lab} + {day_type} + {label} 
+###                                 {label} = 'whole_day_ligit_on_count' 
+### ------------------------------------------------------------ ### 
+
+target_summary_list = WHOLE_DAY_LIGHT_ON_COUNT_list
+all_expDate = get.expDate.all()
+
+target_labs         = LABS                    # lab 
+target_types_of_day = TYPES_OF_DAY            # day_type
+
+agg_unit = "aggWeek"
+
+for(lab in target_labs){
+  
+  for(day_type in target_types_of_day){
     
-    for(i in 1:length(all_expDate)){
-      dt = table_full_lightOn[[lab]][get >= all_expDate[[i]][1] & get <= all_expDate[[i]][2]]
-      print(paste(all_expDate[[i]][1],"~",all_expDate[[i]][2],":",mean(dt$full_lightON_10)))
-    }
+    dt_name = paste(lab, agg_unit, day_type, LABEL, sep="_")
+    target_dt = target_summary_list[[dt_name]][,c('timestamp', LABEL),with=F]
+    
+    category_name = paste(lab, day_type, LABEL, sep='_')
+    
+    print(category_name)
+    
+    split_list = split.table.by.expDate(target_dt, all_expDate)
+    
+    ## update summary_list 
+    summary_list = append(summary_list, setNames(list(split_list), category_name))
   }
 }
+
+source('10_representation_table.R')
 
 
