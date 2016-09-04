@@ -88,78 +88,78 @@ for(lab in LABS){
 ### -------------------------------- ###
 ### Plot: light_on duration     
 ### -------------------------------- ### 
-
-
-plot.light.On.duration <- function(dt, expDate, lightON_duration_color = "darkolivegreen"){
-  
-  plot_dt = dt[[1]]
-
-  if(expDate[4] == "2016-11-16"){
-    #exp1-1
-    plot_dt = cut.expDate.1.1(plot_dt)
-    plot_name = paste('exp1-1', names(dt), sep="_")
-    
-  } else if(expDate[4] == "2015-01-22"){
-    #exp1-2
-    plot_dt = cut.expDate.1.2(plot_dt)
-    plot_name = paste('exp1-2', names(dt), sep="_")
-    
-  } else{
-    #exp3
-    plot_dt = cut.expDate.2(plot_dt)
-    plot_name = paste('exp2', names(dt), sep="_")
-  }
-  
-  rownum_expDate <- get.expDate.rownum(plot_dt, expDate)
-  
-  windowingWeek <- 4
-  
-#   print(plot_name)
-  
-  light_on_duration <- ggplot(plot_dt, aes(x=timestamp)) +
-    ggtitle(plot_name)+
-    scale_y_continuous(limits=c(0,24), oob=rescale_none) +
-    ylab("Light-ON duration (hours)")+
-    scale_color_discrete(breaks = c("light_on_duration"), labels = c("light on duration (hours/day)"))
-  
-  light_on_duration = add.colorful.window.line(light_on_duration, plot_dt, plot_name, 'light_on_duration', 
-                                               windowingWeek, lightON_duration_color, rownum_expDate)
-  
-  if(expDate[4] == "2016-11-16"){
-    #exp1-1
-    light_on_duration = add.event.vline.exp1.1(light_on_duration)
-  } else if(expDate[4] == "2015-01-22"){
-    #exp1-2
-    light_on_duration = add.event.vline.exp1.2(light_on_duration)
-  } else{
-    #exp3
-    light_on_duration = add.event.vline.exp2(light_on_duration)
-  }
-
-  light_on_duration = set.colorful.theme(light_on_duration, lightON_duration_color)
-  
-  
-  save.plot(paste0("../plots/light_on_duration/", plot_name, ".png"), light_on_duration)
-  
-  return(light_on_duration)
-}
-
-
-
-#plot
-for(lab in 1:length(LIGHT_ON_DURATION_list)){
-  plot_lightOn_duration <- plot.light.On.duration(LIGHT_ON_DURATION_list[lab], get.expDate.1.1())  
-}
-
-for(lab in 1:length(LIGHT_ON_DURATION_list)){
-  plot_lightOn_duration <- plot.light.On.duration(LIGHT_ON_DURATION_list[lab], get.expDate.1.2())  
-}
-
-for(lab in 1:length(LIGHT_ON_DURATION_list)){
-  plot_lightOn_duration <- plot.light.On.duration(LIGHT_ON_DURATION_list[lab], get.expDate.2())  
-}
-
-
+# 
+# 
+# plot.light.On.duration <- function(dt, expDate, lightON_duration_color = "darkolivegreen"){
+#   
+#   plot_dt = dt[[1]]
+# 
+#   if(expDate[4] == "2016-11-16"){
+#     #exp1-1
+#     plot_dt = cut.expDate.1.1(plot_dt)
+#     plot_name = paste('exp1-1', names(dt), sep="_")
+#     
+#   } else if(expDate[4] == "2015-01-22"){
+#     #exp1-2
+#     plot_dt = cut.expDate.1.2(plot_dt)
+#     plot_name = paste('exp1-2', names(dt), sep="_")
+#     
+#   } else{
+#     #exp3
+#     plot_dt = cut.expDate.2(plot_dt)
+#     plot_name = paste('exp2', names(dt), sep="_")
+#   }
+#   
+#   rownum_expDate <- get.expDate.rownum(plot_dt, expDate)
+#   
+#   windowingWeek <- 4
+#   
+# #   print(plot_name)
+#   
+#   light_on_duration <- ggplot(plot_dt, aes(x=timestamp)) +
+#     ggtitle(plot_name)+
+#     scale_y_continuous(limits=c(0,24), oob=rescale_none) +
+#     ylab("Light-ON duration (hours)")+
+#     scale_color_discrete(breaks = c("light_on_duration"), labels = c("light on duration (hours/day)"))
+#   
+#   light_on_duration = add.colorful.window.line(light_on_duration, plot_dt, plot_name, 'light_on_duration', 
+#                                                windowingWeek, lightON_duration_color, rownum_expDate)
+#   
+#   if(expDate[4] == "2016-11-16"){
+#     #exp1-1
+#     light_on_duration = add.event.vline.exp1.1(light_on_duration)
+#   } else if(expDate[4] == "2015-01-22"){
+#     #exp1-2
+#     light_on_duration = add.event.vline.exp1.2(light_on_duration)
+#   } else{
+#     #exp3
+#     light_on_duration = add.event.vline.exp2(light_on_duration)
+#   }
+# 
+#   light_on_duration = set.colorful.theme(light_on_duration, lightON_duration_color)
+#   
+#   
+#   save.plot(paste0("../plots/light_on_duration/", plot_name, ".png"), light_on_duration)
+#   
+#   return(light_on_duration)
+# }
+# 
+# 
+# 
+# #plot
+# for(lab in 1:length(LIGHT_ON_DURATION_list)){
+#   plot_lightOn_duration <- plot.light.On.duration(LIGHT_ON_DURATION_list[lab], get.expDate.1.1())  
+# }
+# 
+# for(lab in 1:length(LIGHT_ON_DURATION_list)){
+#   plot_lightOn_duration <- plot.light.On.duration(LIGHT_ON_DURATION_list[lab], get.expDate.1.2())  
+# }
+# 
+# for(lab in 1:length(LIGHT_ON_DURATION_list)){
+#   plot_lightOn_duration <- plot.light.On.duration(LIGHT_ON_DURATION_list[lab], get.expDate.2())  
+# }
+# 
+# 
 
 
 ### ------------------------------------------------------------ ###
@@ -195,4 +195,4 @@ for(lab in target_labs){
   }
 }
 
-source('10_representation_table.R')
+# source('10_representation_table.R')

@@ -36,3 +36,5 @@ for(category in names(summary_list)){
 
 
 View(t(representation_table))
+
+write.csv(t(representation_table), "energy_saving_exp_summary.csv")

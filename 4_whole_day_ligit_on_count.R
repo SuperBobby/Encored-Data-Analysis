@@ -39,29 +39,6 @@ get.whole.day.ligit.on.count <- function(sub_dt){
   return(sum(whole_day_ligit_on_dt$whole_day_ligit_on))
 }
 
-## EDA & varification logic
-{
-  
-# tmp <- marg_dt
-# 
-# tmp_dt1 = tmp[, .(whole_day_ligit_on = (sum(light > LIGHT_ON_MIN_USAGE)==96)), by=aggDay]
-# tmp_dt1[, ':='(aggWeek=as.Date(cut(aggDay, breaks = "week", start.on.monday = T)))]
-# tmp_dt1[, .(whole_day_ligit_on_count = sum(whole_day_ligit_on)), by=aggWeek]
-# 
-# 
-# tmp_dt1[whole_day_ligit_on==T]
-# View(tmp_dt1)
-# 
-# tmp_dt1[aggWeek == "2016-07-11"]
-# 67: 2016-01-04                        3
-# 94: 2016-07-11                        4
-# marg_dt[aggDay == "2016-01-08"]
-# 
-# 
-# tmp[, .(whole_day_ligit_on_count = get.whole.day.ligit.on.count(.SD)), by=aggWeek]
-
-}
-
 
 # 1. lab
 for(lab in LABS){ 
@@ -190,6 +167,4 @@ for(lab in target_labs){
   }
 }
 
-source('10_representation_table.R')
-
-
+# source('10_representation_table.R')

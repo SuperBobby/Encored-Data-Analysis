@@ -12,7 +12,7 @@
 ### --------------------------------------------------------------------- ###
 ### Build list of tables : STATS_list
 ### 
-### table_name = {lab}_{agg_unit}_{day_type}_{feeder} 
+### table_name = {lab}_{agg_unit}_{day_type}_{feeder} (with peak, base, avg columns)
 ### --------------------------------------------------------------------- ### 
 
 STATS_list = list()
@@ -82,67 +82,67 @@ for(lab in LABS){
 ### -------------------------------- ###
 ### Plot: stats    
 ### -------------------------------- ### 
-
-plot.stats <- function(dt, expDate) {
-  plot_dt = dt[[1]]
-  
-  if(expDate[length(expDate)] == "2014-11-17"){
-    #exp1-1
-    plot_dt = cut.expDate.1.1(plot_dt)
-    plot_name = paste('exp1-1', names(dt), sep="_")
-  } else if(expDate[length(expDate)] == "2015-01-22"){
-    #exp1-2
-    plot_dt = cut.expDate.1.2(plot_dt)
-    plot_name = paste('exp1-2', names(dt), sep="_")
-  } else{
-    #exp3
-    plot_dt = cut.expDate.2(plot_dt)
-    plot_name = paste('exp2', names(dt), sep="_")
-  }
- 
-  windowingWeek = 4
-  
-  stats <- ggplot(plot_dt, aes(x=timestamp)) +
-    ggtitle(plot_name) +
-    ylab("Energy use (kWh/day)")+
-    scale_linetype_discrete(breaks=c("peak", "avg", "base"))
-  
-  stats = add.window.line(stats, plot_dt, plot_name, "peak", windowingWeek, expDate)
-  stats = add.window.line(stats, plot_dt, plot_name, "base", windowingWeek, expDate)
-  stats = add.window.line(stats, plot_dt, plot_name, "avg", windowingWeek, expDate)
-    
-  if(expDate[length(expDate)] == "2014-11-17"){
-    #exp1-1
-    stats = add.event.vline.exp1.1(stats)
-  } else if(expDate[length(expDate)] == "2015-01-22"){
-    #exp1-2
-    stats = add.event.vline.exp1.2(stats)
-  } else{
-    #exp3
-    stats = add.event.vline.exp2(stats)
-  }
-  
-  stats = set.default.theme(stats)
-  
-  save.plot(paste0("../plots/stats/", plot_name, ".png"), stats)
-  
-  print(paste("plot:", plot_name))
-  return(stats)
-}
-
-
-### plot
-for(lab in 1:length(STATS_list)){
-  plot_stats <- plot.stats(STATS_list[lab], get.expDate.1.1())
-}
-
-for(lab in 1:length(STATS_list)){
-  plot_stats <- plot.stats(STATS_list[lab], get.expDate.1.2())
-}
-
-for(lab in 1:length(STATS_list)){
-  plot_stats <- plot.stats(STATS_list[lab], get.expDate.2())
-}
+# 
+# plot.stats <- function(dt, expDate) {
+#   plot_dt = dt[[1]]
+#   
+#   if(expDate[length(expDate)] == "2014-11-17"){
+#     #exp1-1
+#     plot_dt = cut.expDate.1.1(plot_dt)
+#     plot_name = paste('exp1-1', names(dt), sep="_")
+#   } else if(expDate[length(expDate)] == "2015-01-22"){
+#     #exp1-2
+#     plot_dt = cut.expDate.1.2(plot_dt)
+#     plot_name = paste('exp1-2', names(dt), sep="_")
+#   } else{
+#     #exp3
+#     plot_dt = cut.expDate.2(plot_dt)
+#     plot_name = paste('exp2', names(dt), sep="_")
+#   }
+#  
+#   windowingWeek = 4
+#   
+#   stats <- ggplot(plot_dt, aes(x=timestamp)) +
+#     ggtitle(plot_name) +
+#     ylab("Energy use (kWh/day)")+
+#     scale_linetype_discrete(breaks=c("peak", "avg", "base"))
+#   
+#   stats = add.window.line(stats, plot_dt, plot_name, "peak", windowingWeek, expDate)
+#   stats = add.window.line(stats, plot_dt, plot_name, "base", windowingWeek, expDate)
+#   stats = add.window.line(stats, plot_dt, plot_name, "avg", windowingWeek, expDate)
+#     
+#   if(expDate[length(expDate)] == "2014-11-17"){
+#     #exp1-1
+#     stats = add.event.vline.exp1.1(stats)
+#   } else if(expDate[length(expDate)] == "2015-01-22"){
+#     #exp1-2
+#     stats = add.event.vline.exp1.2(stats)
+#   } else{
+#     #exp3
+#     stats = add.event.vline.exp2(stats)
+#   }
+#   
+#   stats = set.default.theme(stats)
+#   
+#   save.plot(paste0("../plots/stats/", plot_name, ".png"), stats)
+#   
+#   print(paste("plot:", plot_name))
+#   return(stats)
+# }
+# 
+# 
+# ### plot
+# for(lab in 1:length(STATS_list)){
+#   plot_stats <- plot.stats(STATS_list[lab], get.expDate.1.1())
+# }
+# 
+# for(lab in 1:length(STATS_list)){
+#   plot_stats <- plot.stats(STATS_list[lab], get.expDate.1.2())
+# }
+# 
+# for(lab in 1:length(STATS_list)){
+#   plot_stats <- plot.stats(STATS_list[lab], get.expDate.2())
+# }
 
 
 ### ------------------------------------------------------------ ###
@@ -161,7 +161,7 @@ all_expDate = get.expDate.all()
 target_labs         = LABS                    # lab 
 target_types_of_day = TYPES_OF_DAY            # day_type
 target_feeders      = FEEDERS                 # feeder  
-target_stats        = c('peak','base','avg')  # stats ----> feeder + stats = label
+target_stats        = c('peak','base','avg')  # stats ----> {feeder}_{stats} = label
 
 agg_unit = "aggDay"
 
@@ -190,4 +190,4 @@ for(lab in target_labs){
   }
 }
 
-source('10_representation_table.R')
+# source('10_representation_table.R')

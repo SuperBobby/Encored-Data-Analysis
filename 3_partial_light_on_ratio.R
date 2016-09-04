@@ -62,47 +62,6 @@ get.partial.light.on.ratio <- function(light, LIGHT_ON_MIN_USAGE, light_peak, PA
   return(partial_light_on_ratio)
 }
 
-{
-# #---#
-# tmp <- dt_list[[LABS[3]]]
-# tmp_light_peak = quantile(tmp$light, .9)
-# 
-# 
-# tmp_dt = tmp[, .(light = light,
-#                  light_on = light > LIGHT_ON_MIN_USAGE,
-#                  partial = light > LIGHT_ON_MIN_USAGE & light < tmp_light_peak*0.8,
-#                  filtered_partial = filter.fault.partial.light.on(light > LIGHT_ON_MIN_USAGE & light < tmp_light_peak*0.8) ),
-#              by=aggDay]
-# View(tmp_dt)
-# 
-# tmp[, .(partial_light_on_ratio = sum(light > LIGHT_ON_MIN_USAGE & light < (tmp_light_peak*.8)) / sum(light > 0)), by=aggDay]
-  
-# # 
-# tmp_dt = tmp[, .(get.partial.light.on.ratio(light, LIGHT_ON_MIN_USAGE, tmp_light_peak, PARTIAL_ON_RATIO)), 
-#     by=aggDay]
-# names(tmp_dt) <- c("timestamp", LABEL)
-
-# 
-# aggDay partial_ratio
-# 1: 2014-10-01     1.0000000
-# 2: 2014-10-02     0.3414634
-# 3: 2014-10-03     0.1186441
-# 4: 2014-10-04     0.2142857
-# 5: 2014-10-05     0.2131148
-# 694: 2016-08-24     0.6052632
-# 695: 2016-08-25     0.7763158
-# 696: 2016-08-26     0.7500000
-# 697: 2016-08-27     1.0000000
-# 698: 2016-08-28     1.0000000
-# 
-# 
-# tmp_date = "2014-12-06"
-# tmp_dt[aggDay == tmp_date]
-# 
-# sum(tmp_dt[aggDay == tmp_date]$filtered_partial) / sum(tmp_dt[aggDay == tmp_date]$light_on)
-# 
-# #---#
-}
 
 # 1. lab
 for(lab in LABS){ 
@@ -136,8 +95,8 @@ for(lab in LABS){
                                            by=get(agg_unit)]
       }
       names(partial_light_on_ratio_dt) = c("timestamp", LABEL)
-#       print(summary(partial_light_on_ratio_dt))
-      PARTIAL_LIGHT_ON_RATIO_list = append(PARTIAL_LIGHT_ON_RATIO_list, setNames(list(partial_light_on_ratio_dt),dt_name))
+
+            PARTIAL_LIGHT_ON_RATIO_list = append(PARTIAL_LIGHT_ON_RATIO_list, setNames(list(partial_light_on_ratio_dt),dt_name))
     }
   }
 }
@@ -234,4 +193,4 @@ for(lab in target_labs){
   }
 }
 
-source('10_representation_table.R')
+# source('10_representation_table.R')

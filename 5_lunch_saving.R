@@ -1,181 +1,219 @@
+### ------------------------------------------------------------ ###
+### lunch_time_saving_count per week (computer & light feeder) 
+### 
+### JY, EJ @ ADSL, SNU 
+###                                   last update : 2016. 8. 30.
+### ------------------------------------------------------------ ###
+
+# * Def: number of ‘target-off(including partial off)’ action during lunch-time per week 
+# * ‘target-off’ action: (minimum of ‘during lunch’) < (maximum of ‘before & after lunch’) * 80% when (maximum of before lunch > 10% of peak)
+# * before lunch usage: 11:00 ~ 12:00 — index 17:20
+# * during lunch usage: 11:30 ~ 13:30 — index 19:26
+# * after lunch usage: 13:00 ~ 14:00    — index 25:28
+# * Unit: # of action / week
+
+### --------------------------------------------------------------------- ###
+### Build list of tables : LUNCH_TIME_SAVING_COUNT_list
+### 
+### table_name = {lab}_{agg_unit}_{day_type}_{feeder} (with lunch_time_saving_count column)
+### --------------------------------------------------------------------- ### 
+
+LUNCH_TIME_SAVING_COUNT_list = list()
+
+LABEL = "lunch_time_saving_count"
+
+## Loop parameters 
 # 1. lab
-lab_names = c("MARG", "HCC", "UX", "All Labs")
-
 # 2. aggregation unit 
-agg_Units = c("aggWeek", "aggDay")
+# 3. types of day (working day?)
+# 4. target feeder
 
-# 3. day selection
-day_selections = c("allDay", "workingday", "non_workingday")
+LABS = c("MARG", "HCC", "UX", "All_Labs")                    # lab
+AGG_UNITS = c("aggWeek")                                     # agg_unit
+TYPES_OF_DAY = c("allDay", "workingday", "non_workingday")   # day_type
+FEEDERS = c("computer", "light")                             # feeder
 
-build.table.lunch.saving <- function(dt_list, target){
-  return_dts = list()
+dt_list = setNames(dt_list, LABS)
+
+
+get.lunch.time.saving.count <- function(sub_dt, feeder){
   
-  for(lab in 1:length(dt_list)){ 
-    #   lab_dt & name selection 
-    lab_dt = dt_list[[lab]]
-    lab_name = lab_names[lab]
+  # * before lunch usage: 11:00 ~ 12:00 — index 17:20
+  # * during lunch usage: 11:30 ~ 13:30 — index 19:26
+  # *  after lunch usage: 13:00 ~ 14:00 — index 25:28
+  before_lunch_index = 17:20
+  during_lunch_index = 19:26
+  after_lunch_index  = 25:28
+  
+  lunch_saving_threshold_ratio = 0.8
+  target_on_usage = 0.01
+  
+  before_dt = sub_dt[index %in% before_lunch_index, .(before_lunch_max = max(get(feeder))), by=aggDay]
+  during_dt = sub_dt[index %in% during_lunch_index, .(during_lunch_min = min(get(feeder))), by=aggDay]
+   after_dt = sub_dt[index %in%  after_lunch_index, .( after_lunch_max = max(get(feeder))), by=aggDay]
+  
+  lunch_dt = merge(before_dt, during_dt, by='aggDay')
+  lunch_dt = merge(lunch_dt, after_dt, by='aggDay')
+  
+  
+  lunch_dt[, ':='(lunch_saving = 0)]
+  lunch_dt[    (during_lunch_min < (before_lunch_max * lunch_saving_threshold_ratio)) 
+             & (during_lunch_min < ( after_lunch_max * lunch_saving_threshold_ratio)) 
+             & (before_lunch_max > target_on_usage), ':='(lunch_saving = 1), by=aggDay]
+  
+  lunch_time_saving_count = sum(lunch_dt$lunch_saving)
+  
+  return(lunch_time_saving_count)
+}
+
+
+# 1. lab
+for(lab in LABS){ 
+  lab_dt = dt_list[[lab]]
+  
+  # 2. Aggregation unit
+  for(agg_unit in AGG_UNITS){
+    
+    # 3. Types of day
+    for(day_type in TYPES_OF_DAY){
       
-      for(day_selection in day_selections){
+      # 4. Target feeder ----> {feeder}_lunch_time_saving_count = label
+      for(feeder in FEEDERS){
         
-        dt_name = paste(lab_name, "aggWeek", day_selection, target, "lunch_saving", sep="_")
-        print(dt_name)
+        # table name
+        dt_name = paste(lab, agg_unit, day_type, feeder, LABEL, sep="_")
+        print(paste("Build table:", dt_name))
         
-        # * before lunch usage: 11:00 ~ 12:00 — index 17:20
-        # * during lunch usage: 11:30 ~ 13:30 — index 19:26
-        # *  after lunch usage: 13:00 ~ 14:00 — index 25:28
-        before_lunch_index = 17:20
-        during_lunch_index = 19:26
-        after_lunch_index  = 25:28
-        
-        peak_of_target = quantile(data.frame(lab_dt[, .(get(target))])[,1], .90)
-        target_on_threshold = peak_of_target * 0.1
-        
-        lunch_saving_threshold_ratio = 0.8
-        target_on_threshold_usage = peak_of_target * 0.1
-        
-        before_dt = lab_dt[index %in% before_lunch_index, .(before_lunch = max(get(target))), by=aggDay]
-        during_dt = lab_dt[index %in% during_lunch_index, .(during_lunch = min(get(target))), by=aggDay]
-        after_dt = lab_dt[index %in%  after_lunch_index, .(after_lunch = max(get(target))), by=aggDay]
-        
-        lunch_dt = merge(before_dt, during_dt, by='aggDay')
-        lunch_dt = merge(lunch_dt, after_dt, by='aggDay')
-        
-        lunch_dt = lunch_dt[, ':='(weekday=isWeekday(aggDay))]
-        
-        print(head(lunch_dt))
-        
-        lunch_dt = lunch_dt[, ':='(lunch_saving = 0)]
-        
-        if(day_selection == "allDay"){
-          ## Conditions of lunch saving 
-          lunch_dt = lunch_dt[(during_lunch < (before_lunch * lunch_saving_threshold_ratio)) 
-                   & (during_lunch < (after_lunch * lunch_saving_threshold_ratio)) 
-                   & (before_lunch > target_on_threshold_usage), 
-                   ':='(lunch_saving = 1), by=aggDay]
+        # # subset by day_type ------------------> Why it doesn't work? should be figured out!
+        # if(day_type == "workingday"){ 
+        #   lab_dt = lab_dt[workingday == T] 
+        # } else if(day_type == "non_workingday"){ 
+        #   lab_dt = lab_dt[workingday == F] 
+        # } 
+
+        if(day_type == "allDay"){
           
-        } else if(day_selection == "workingday") {
+          lunch_time_saving_count_dt = lab_dt[, .(get.lunch.time.saving.count(.SD, feeder)), by=agg_unit]
           
-          lunch_dt = lunch_dt[(workingday == T)
-                              &(during_lunch < (before_lunch * lunch_saving_threshold_ratio)) 
-                              & (during_lunch < (after_lunch * lunch_saving_threshold_ratio)) 
-                              & (before_lunch > target_on_threshold_usage), 
-                              ':='(lunch_saving = 1), by=aggDay]
+        } else if(day_type == "workingday") {
           
-        } else if(day_selection == "non_workingday") {
+          lunch_time_saving_count_dt = lab_dt[workingday == T, .(get.lunch.time.saving.count(.SD, feeder)), by=agg_unit]
           
-          lunch_dt = lunch_dt[(workingday == F)
-                              & (during_lunch < (before_lunch * lunch_saving_threshold_ratio)) 
-                              & (during_lunch < (after_lunch * lunch_saving_threshold_ratio)) 
-                              & (before_lunch > target_on_threshold_usage), 
-                              ':='(lunch_saving = 1), by=aggDay]
+        } else if(day_type == "non_workingday") {
+          
+          lunch_time_saving_count_dt = lab_dt[workingday == F, .(get.lunch.time.saving.count(.SD, feeder)), by=agg_unit]
         }
-
-        ## aggregation: week table 'lunch_saving_per_week' 
-        lunch_dt[, ':='(aggWeek=as.Date(cut(aggDay, breaks = "week", start.on.monday = T)))]
-        lunch_saving_per_week = lunch_dt[, .(lunch_saving_count = sum(lunch_saving, na.rm = T)), by=aggWeek]
-        setnames(lunch_saving_per_week, old="aggWeek", new="get")
         
-        assign(dt_name, lunch_saving_per_week)
-        return_dts = append(return_dts, setNames(list(lunch_saving_per_week),dt_name))
+        # change column name
+        names(lunch_time_saving_count_dt) = c("timestamp", paste(feeder, LABEL, sep='_'))
         
-      }#day selection 
+        LUNCH_TIME_SAVING_COUNT_list = append(LUNCH_TIME_SAVING_COUNT_list, setNames(list(lunch_time_saving_count_dt),dt_name))
+      }
     }
-  
-  return(return_dts)
-}
-
-plot.lunch.saving <- function(dt, expDate){
-  
-  plot_dt = dt[[1]]
-  
-  if(expDate[4] == "2016-11-16"){
-    #exp1-1
-    plot_dt = set.expDate.1.1(plot_dt)
-    plot_name = paste('exp1-1', names(dt), sep="_")
-  } else if(expDate[4] == "2015-01-22"){
-    #exp1-2
-    plot_dt = set.expDate.1.2(plot_dt)
-    plot_name = paste('exp1-2', names(dt), sep="_")
-  } else{
-    #exp3
-    plot_dt = set.expDate.2(plot_dt)
-    plot_name = paste('exp2', names(dt), sep="_")
   }
-  
-  windowingWeek <- 4
-  
-  #   print(plot_name)
-  
-  p1 = ggplot(plot_dt, aes(x=get)) +
-    ggtitle(plot_name)
-
-  p1 = add.window.line(p1, plot_dt, plot_name, 'lunch_saving_count',windowingWeek, expDate)
-  
-  if(expDate[4] == "2016-11-16"){
-    #exp1-1
-    p1 = add.event.vline.exp1.1(p1)
-  } else if(expDate[4] == "2015-01-22"){
-    #exp1-2
-    p1 = add.event.vline.exp1.2(p1)
-  } else{
-    #exp3
-    p1 = add.event.vline.exp2(p1)
-  }
-  
-  p1 = set.default.theme(p1)
-  
-  save.plot(paste0("../plots/", plot_name, ".png"), p1)
-  
-  return(p1)
 }
 
 
-#build table
-table_lunch_saving_light <- build.table.lunch.saving(dt_list, 'light')
-table_lunch_saving_computer <- build.table.lunch.saving(dt_list, 'computer')
 
-#plot
-for(lab in 1:length(table_lunch_saving_light)){
-  plot_lunch_saving <- plot.lunch.saving(table_lunch_saving_light[lab], get.expDate.2())  
-}
-for(lab in 1:length(table_lunch_saving_computer)){
-  plot_lunch_saving <- plot.lunch.saving(table_lunch_saving_computer[lab], get.expDate.2())  
-}
-
-#statistics
-all_expDate <- get.expDate()
-
-# print.mean <- function(dt,colName,all_expDate){
-#   for(lab in 1:length(dt)){
-#       print(names(dt[lab]))
-#       
-#       for(i in 1:length(all_expDate)){
-#         dt = dt[[lab]][get >= all_expDate[[i]][1] & get <= all_expDate[[i]][2]]
-#         print(mean(dt[[colName]]))
-#       }
+### -------------------------------- ###
+### Plot: lunch_time_saving_count     
+### -------------------------------- ### 
+# 
+# 
+# plot.lunch.saving <- function(dt, expDate){
+#   
+#   plot_dt = dt[[1]]
+#   
+#   if(expDate[4] == "2016-11-16"){
+#     #exp1-1
+#     plot_dt = set.expDate.1.1(plot_dt)
+#     plot_name = paste('exp1-1', names(dt), sep="_")
+#   } else if(expDate[4] == "2015-01-22"){
+#     #exp1-2
+#     plot_dt = set.expDate.1.2(plot_dt)
+#     plot_name = paste('exp1-2', names(dt), sep="_")
+#   } else{
+#     #exp3
+#     plot_dt = set.expDate.2(plot_dt)
+#     plot_name = paste('exp2', names(dt), sep="_")
 #   }
+#   
+#   windowingWeek <- 4
+#   
+#   #   print(plot_name)
+#   
+#   p1 = ggplot(plot_dt, aes(x=get)) +
+#     ggtitle(plot_name)
+# 
+#   p1 = add.window.line(p1, plot_dt, plot_name, 'lunch_saving_count',windowingWeek, expDate)
+#   
+#   if(expDate[4] == "2016-11-16"){
+#     #exp1-1
+#     p1 = add.event.vline.exp1.1(p1)
+#   } else if(expDate[4] == "2015-01-22"){
+#     #exp1-2
+#     p1 = add.event.vline.exp1.2(p1)
+#   } else{
+#     #exp3
+#     p1 = add.event.vline.exp2(p1)
+#   }
+#   
+#   p1 = set.default.theme(p1)
+#   
+#   save.plot(paste0("../plots/", plot_name, ".png"), p1)
+#   
+#   return(p1)
 # }
 # 
-# print.mean(table_lunch_saving_light, 'lunch_saving_count', all_expDate)
+# 
+# #plot
+# for(lab in 1:length(table_lunch_saving_light)){
+#   plot_lunch_saving <- plot.lunch.saving(table_lunch_saving_light[lab], get.expDate.2())  
+# }
+# for(lab in 1:length(table_lunch_saving_computer)){
+#   plot_lunch_saving <- plot.lunch.saving(table_lunch_saving_computer[lab], get.expDate.2())  
+# }
 
-for(lab in 1:length(table_lunch_saving_light)){
-  if(grepl("allDay", names(table_lunch_saving_light[lab]))){
-    print(names(table_lunch_saving_light[lab]))
+
+
+
+### ------------------------------------------------------------ ###
+### Update summary_list
+###
+### category = {lab} + {day_type} + {label} 
+###                                 {label} = {feeder}_lunch_time_saving_count
+### ------------------------------------------------------------ ### 
+
+target_summary_list = LUNCH_TIME_SAVING_COUNT_list
+all_expDate = get.expDate.all()
+
+target_labs         = LABS                    # lab 
+target_types_of_day = TYPES_OF_DAY            # day_type
+target_feeders      = FEEDERS                 # feeder  
+
+agg_unit = "aggWeek"
+
+for(lab in target_labs){
+  
+  for(day_type in target_types_of_day){
     
-    for(i in 1:length(all_expDate)){
-      dt = table_lunch_saving_light[[lab]][get >= all_expDate[[i]][1] & get <= all_expDate[[i]][2]]
-      print(mean(dt$lunch_saving_count))
+    for(feeder in target_feeders){
+      
+      local_label = paste(feeder, LABEL, sep='_')
+      
+      dt_name = paste(lab, agg_unit, day_type, local_label, sep="_")
+      target_dt = target_summary_list[[dt_name]][,c('timestamp', local_label),with=F]
+      
+      category_name = paste(lab, day_type, local_label, sep='_')
+      
+      print(category_name)
+      
+      split_list = split.table.by.expDate(target_dt, all_expDate)
+      
+      ## update summary_list 
+      summary_list = append(summary_list, setNames(list(split_list), category_name))
     }
   }
 }
 
-for(lab in 1:length(table_lunch_saving_computer)){
-  if(grepl("allDay", names(table_lunch_saving_computer[lab]))){
-    print(names(table_lunch_saving_computer[lab]))
-    
-    for(i in 1:length(all_expDate)){
-      dt = table_lunch_saving_computer[[lab]][get >= all_expDate[[i]][1] & get <= all_expDate[[i]][2]]
-      print(mean(dt$lunch_saving_count))
-    }
-  }
-}
+# source('10_representation_table.R')
