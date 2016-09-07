@@ -7,20 +7,20 @@ build.table.weather <- function(){
   
   weather_dt = fread("../rawData/Suwon_weather.csv")
   weather_dt$date_index = as.Date(weather_dt$date_index)
-  setnames(weather_dt,old="date_index",new="get")
+  setnames(weather_dt,old="date_index",new="timestamp")
   str(weather_dt)
   
-  weather_dt <- weather_dt[, ':='(get = get,
-                                  aggWeek = as.Date(cut(get, breaks = "week", start.on.monday = T)))]
+  weather_dt <- weather_dt[, ':='(timestamp = timestamp,
+                                  aggWeek = as.Date(cut(timestamp, breaks = "week", start.on.monday = T)))]
   
-  aggWeek_weather_dt <- weather_dt[, .(get = aggWeek,
+  aggWeek_weather_dt <- weather_dt[, .(timestamp = aggWeek,
                                        avg_temp = mean(avg_temp),
                                        max_temp = mean(max_temp),
                                        min_temp = mean(min_temp)), by=aggWeek] 
   aggWeek_weather_dt <- aggWeek_weather_dt[, aggWeek:=NULL]
   
-  weather_dt <- weather_dt[get >= "2014-10-01" & get <= "2016-07-26"]
-  aggWeek_weather_dt <- aggWeek_weather_dt[get >= "2014-09-29" & get <= "2016-07-26"]
+  weather_dt <- weather_dt[timestamp >= "2014-10-01" & timestamp <= "2016-07-26"]
+  aggWeek_weather_dt <- aggWeek_weather_dt[timestamp >= "2014-09-29" & timestamp <= "2016-07-26"]
   
   assign("weather_aggDay", weather_dt)
   return_dts = append(return_dts, setNames(list(weather_dt),"weather_aggDay"))
@@ -40,17 +40,17 @@ plot.hvac.with.weather <- function(dt, weather_dt, expDate){
 
   plot_dt = dt[[1]]
   
-  if(expDate[4] == "2016-11-17"){
+  if(expDate[length(expDate)] == "2014-11-17"){
     #exp1-1
-    plot_dt = set.expDate.1.1(plot_dt)
+    plot_dt = cut.expDate.1.1(plot_dt)
     plot_name = paste('exp1-1', names(dt), sep="_")
-  } else if(expDate[4] == "2015-01-22"){
+  } else if(expDate[length(expDate)] == "2015-01-22"){
     #exp1-2
-    plot_dt = set.expDate.1.2(plot_dt)
+    plot_dt = cut.expDate.1.2(plot_dt)
     plot_name = paste('exp1-2', names(dt), sep="_")
   } else{
-    #exp3
-    plot_dt = set.expDate.2(plot_dt)
+    #exp2
+    plot_dt = cut.expDate.2(plot_dt)
     plot_name = paste('exp2', names(dt), sep="_")
   }
   
@@ -62,9 +62,9 @@ plot.hvac.with.weather <- function(dt, weather_dt, expDate){
     weather_name <- "aggWeek"
   }
   
-  rownum_expDate <- set.expDate.rownum(temp_weather_dt, expDate)
+#   rownum_expDate <- cut.expDate.rownum(temp_weather_dt, expDate)
   
-  windowingWeek <- 4
+  windowingWeek = 4
   
   grid.newpage()
   plot_name = paste(plot_name, "+ Temperature")  
@@ -76,7 +76,7 @@ plot.hvac.with.weather <- function(dt, weather_dt, expDate){
   #     print(head(w_max_tmp))
   #     print(nrow(w_max_tmp))
   
-  p2 <- ggplot(temp_weather_dt, aes(x=get)) +
+  p2 <- ggplot(temp_weather_dt, aes(x=timestamp)) +
     ylab("temperature(°C)")+
     scale_x_date(labels = date_format("%Y-%m"), breaks = date_breaks("month"), limits = c(as.Date("2014-10-01"), as.Date("2016-07-26"))) +
     ylim(-20,40)+
@@ -112,7 +112,7 @@ plot.hvac.with.weather <- function(dt, weather_dt, expDate){
     guides(colour=guide_legend(override.aes = list(size=2)))
   #         p2            = add.event.vline.exp2(p2)
 
-  stats <- ggplot(plot_dt, aes(x=get)) +
+  stats <- ggplot(plot_dt, aes(x=timestamp)) +
     #       geom_point(aes(y=peak, color='peak')) +
     ylab("electricity usage(kWh)")+
     ggtitle(plot_name)
@@ -122,14 +122,14 @@ plot.hvac.with.weather <- function(dt, weather_dt, expDate){
     scale_linetype_discrete(breaks=c("peak"), labels=c("90% of peak"))+
     scale_linetype_manual(values=c("dashed"))
   
-  if(expDate[4] == "2016-11-16"){
-    #exp1-1
+  if(expDate[length(expDate)] == "2014-11-17"){
+  #exp1-1
     stats = add.event.vline.exp1.1(stats)
-  } else if(expDate[4] == "2015-01-22"){
+  } else if(expDate[length(expDate)] == "2015-01-22"){
     #exp1-2
     stats = add.event.vline.exp1.2(stats)
   } else{
-    #exp3
+    #exp2
     stats = add.event.vline.exp2(stats)
   }
 
@@ -171,7 +171,7 @@ plot.hvac.with.weather <- function(dt, weather_dt, expDate){
   #     
   #     grid.arrange(g, ncol=1, heights=c(10, 1),widths =c(1) ,as.table =TRUE)
   
-  png(file = paste0("../plots/weather_",plot_name, ".png"), width = 800, height = 600)
+  png(file = paste0("../plots/hvac_with_weather/",plot_name, ".png"), width = 800, height = 600)
   grid.draw(g)
   dev.off()
   
@@ -200,7 +200,7 @@ plot.hvac.with.weather <- function(dt, weather_dt, expDate){
 #   ##windowingWeek must be even
 #   for(windowingWeek in c(4)) {
 #     
-#     rownum_expDate <- set.expDate.rownum(temp_weather_dt, expDate)
+#     rownum_expDate <- cut.expDate.rownum(temp_weather_dt, expDate)
 #     
 #     grid.newpage()
 #     plot_name = names(return_dts[i])
@@ -249,7 +249,7 @@ plot.hvac.with.weather <- function(dt, weather_dt, expDate){
 #       guides(colour=guide_legend(override.aes = list(size=2)))
 #     #         p2            = add.event.vline.exp3(p2)
 #     
-#     rownum_expDate <- set.expDate.rownum(plot_dt, expDate)
+#     rownum_expDate <- cut.expDate.rownum(plot_dt, expDate)
 #     
 #     #     print("plot_dt")
 #     #     print(rownum_expDate)
@@ -318,8 +318,14 @@ plot.hvac.with.weather <- function(dt, weather_dt, expDate){
 table_weather <- build.table.weather()
 
 #plot
-for(i in 1:length(table_stats)){
-  plot_hvac_with_weather <- plot.hvac.with.weather(table_stats[i], table_weather, get.expDate.2())
+for(i in 1:length(STATS_list)){
+  plot_hvac_with_weather <- plot.hvac.with.weather(STATS_list[i], table_weather, get.expDate.1.1())
+}
+for(i in 1:length(STATS_list)){
+  plot_hvac_with_weather <- plot.hvac.with.weather(STATS_list[i], table_weather, get.expDate.1.2())
+}
+for(i in 1:length(STATS_list)){
+  plot_hvac_with_weather <- plot.hvac.with.weather(STATS_list[i], table_weather, get.expDate.2())
 }
 
 

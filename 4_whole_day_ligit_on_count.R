@@ -80,58 +80,66 @@ for(lab in LABS){
 ### -------------------------------- ###
 ### Plot: whole_day_ligit_on_count     
 ### -------------------------------- ### 
-# 
-# plot.24hr.lightOn.counting <- function(dt, expDate, full_lightON_color = "violetred4"){
-#   
-#   plot_dt = dt[[1]]
-#   
-#   if(expDate[4] == "2016-11-16"){
-#     #exp1-1
-#     plot_dt = set.expDate.1.1(plot_dt)
-#     plot_name = paste('exp1-1', names(dt), sep="_")
-#   } else if(expDate[4] == "2015-01-22"){
-#     #exp1-2
-#     plot_dt = set.expDate.1.2(plot_dt)
-#     plot_name = paste('exp1-2', names(dt), sep="_")
-#   } else{
-#     #exp3
-#     plot_dt = set.expDate.2(plot_dt)
-#     plot_name = paste('exp2', names(dt), sep="_")
-#   }
-# 
-#   windowingWeek <- 4
-# 
-#   print(plot_name)
-#   
-#   p <- ggplot(plot_dt, aes(x=get)) +
-#     geom_point(aes(y=full_lightON_10), colour='gray70') +
-#     ggtitle(plot_name)+
-#     ylab("24hrs light-ON day (count/week)")
-#   
-#   p = add.colorful.window.line(p, plot_dt, plot_name, 'full_lightON_10', windowingWeek, full_lightON_color, expDate)
-#   
-#   if(expDate[4] == "2016-11-16"){
-#     #exp1-1
-#     p = add.event.vline.exp1.1(p)
-#   } else if(expDate[4] == "2015-01-22"){
-#     #exp1-2
-#     p = add.event.vline.exp1.2(p)
-#   } else{
-#     #exp3
-#     p = add.event.vline.exp2(p)
-#   }
-#   
-#   p = set.colorful.theme(p, full_lightON_color)
-# 
-#   save.plot(paste0("../plots/", plot_name, ".png"), p)
-#   
-#   return(p)
-# }
 
-#plot
-# for(lab in 1:length(table_full_lightOn)){
-#   plot_full_lightOn <- plot.24hr.lightOn.counting(table_full_lightOn[lab], get.expDate.2())  
-# }
+plot.24hr.lightOn.counting <- function(dt, expDate, whole_day_ligit_on_count_color = "violetred4"){
+  
+  plot_dt = dt[[1]]
+  
+  if(expDate[length(expDate)] == "2014-11-17"){
+    #exp1-1
+    plot_dt = cut.expDate.1.1(plot_dt)
+    plot_name = paste('exp1-1', names(dt), sep="_")
+  } else if(expDate[length(expDate)] == "2015-01-22"){
+    #exp1-2
+    plot_dt = cut.expDate.1.2(plot_dt)
+    plot_name = paste('exp1-2', names(dt), sep="_")
+  } else{
+    #exp2
+    plot_dt = cut.expDate.2(plot_dt)
+    plot_name = paste('exp2', names(dt), sep="_")
+  }
+
+  windowingWeek <- 4
+
+#   print(plot_name)
+  
+  p <- ggplot(plot_dt, aes(x=timestamp)) +
+    geom_point(aes(y=whole_day_ligit_on_count), colour='gray70') +
+    ggtitle(plot_name)+
+    ylab("24hrs light-ON day (count/week)")
+  
+  p = add.colorful.window.line(p, plot_dt, plot_name, 'whole_day_ligit_on_count', windowingWeek, whole_day_ligit_on_count_color, expDate)
+  
+  if(expDate[length(expDate)] == "2014-11-17"){
+    #exp1-1
+    p = add.event.vline.exp1.1(p)
+  } else if(expDate[length(expDate)] == "2015-01-22"){
+    #exp1-2
+    p = add.event.vline.exp1.2(p)
+  } else{
+    #exp2
+    p = add.event.vline.exp2(p)
+  }
+  
+  p = set.colorful.theme(p)
+
+  save.plot(paste0("../plots/whole_day_light_on_count/", plot_name, ".png"), p)
+  
+  return(p)
+}
+
+##plot
+for(lab in 1:length(WHOLE_DAY_LIGHT_ON_COUNT_list)){
+  plot_24hr_lightOn_counting <- plot.24hr.lightOn.counting(WHOLE_DAY_LIGHT_ON_COUNT_list[lab], get.expDate.1.1())  
+}
+
+for(lab in 1:length(WHOLE_DAY_LIGHT_ON_COUNT_list)){
+  plot_24hr_lightOn_counting <- plot.24hr.lightOn.counting(WHOLE_DAY_LIGHT_ON_COUNT_list[lab], get.expDate.1.2())  
+}
+
+for(lab in 1:length(WHOLE_DAY_LIGHT_ON_COUNT_list)){
+  plot_24hr_lightOn_counting <- plot.24hr.lightOn.counting(WHOLE_DAY_LIGHT_ON_COUNT_list[lab], get.expDate.2())  
+}
 
 
 ### ------------------------------------------------------------ ###

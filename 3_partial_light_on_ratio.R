@@ -105,58 +105,65 @@ for(lab in LABS){
 ### -------------------------------- ###
 ### Plot: partial_light_on_ratio     
 ### -------------------------------- ### 
-# 
-# plot.partial.lightOn <- function(dt, expDate, partial_lightON_color = "orange2"){
-#   
-#   plot_dt = dt[[1]]
-#   
-#   if(expDate[4] == "2016-11-16"){
-#     #exp1-1
-#     plot_dt = set.expDate.1.1(plot_dt)
-#     plot_name = paste('exp1-1', names(dt), sep="_")
-#   } else if(expDate[4] == "2015-01-22"){
-#     #exp1-2
-#     plot_dt = set.expDate.1.2(plot_dt)
-#     plot_name = paste('exp1-2', names(dt), sep="_")
-#   } else{
-#     #exp3
-#     plot_dt = set.expDate.2(plot_dt)
-#     plot_name = paste('exp2', names(dt), sep="_")
-#   }
-#   
-#   windowingWeek <- 4
-#   
-#   #   print(plot_name)
-#   partial_lightON <- ggplot(plot_dt, aes(x=get)) +
-#     ggtitle(plot_name)+
-#     ylab("Partial light-ON (%)")
-#   partial_lightON = add.colorful.window.line(partial_lightON, plot_dt, plot_name, 'threshold80', windowingWeek, partial_lightON_color, expDate)
-#   
-#   if(expDate[4] == "2016-11-16"){
-#     #exp1-1
-#     partial_lightON = add.event.vline.exp1.1(partial_lightON)
-#   } else if(expDate[4] == "2015-01-22"){
-#     #exp1-2
-#     partial_lightON = add.event.vline.exp1.2(partial_lightON)
-#   } else{
-#     #exp3
-#     partial_lightON = add.event.vline.exp2(partial_lightON)
-#   }
-#   
-#   partial_lightON  = set.colorful.theme(partial_lightON, partial_lightON_color)
-#   
-#   save.plot(paste0("../plots/",plot_name, ".png"), partial_lightON)
-#   
-#   return(partial_lightON)
-# }
-# 
-# 
-# #plot
-# for(lab in 1:length(table_partial_lightOn)){
-#   plot_partial_lightOn <- plot.partial.lightOn(table_partial_lightOn[lab], get.expDate.2())  
-# }
-# 
 
+plot.partial.lightOn <- function(dt, expDate, partial_lightON_color = "orange2"){
+  
+  plot_dt = dt[[1]]
+  
+  if(expDate[length(expDate)] == "2014-11-17"){
+    #exp1-1
+    plot_dt = cut.expDate.1.1(plot_dt)
+    plot_name = paste('exp1-1', names(dt), sep="_")
+  } else if(expDate[length(expDate)] == "2015-01-22"){
+    #exp1-2
+    plot_dt = cut.expDate.1.2(plot_dt)
+    plot_name = paste('exp1-2', names(dt), sep="_")
+  } else{
+    #exp2
+    plot_dt = cut.expDate.2(plot_dt)
+    plot_name = paste('exp2', names(dt), sep="_")
+  }
+  
+  windowingWeek = 4
+  
+  #   print(plot_name)
+  partial_lightON <- ggplot(plot_dt, aes(x=timestamp)) +
+    ggtitle(plot_name)+
+    ylab("Partial light-ON (%)")
+  
+  partial_lightON = add.colorful.window.line(partial_lightON, plot_dt, plot_name, 'partial_light_on_ratio', windowingWeek, partial_lightON_color, expDate)
+  
+  if(expDate[length(expDate)] == "2014-11-17"){
+    #exp1-1
+    partial_lightON = add.event.vline.exp1.1(partial_lightON)
+  } else if(expDate[length(expDate)] == "2015-01-22"){
+    #exp1-2
+    partial_lightON = add.event.vline.exp1.2(partial_lightON)
+  } else{
+    #exp2
+    partial_lightON = add.event.vline.exp2(partial_lightON)
+  }
+  
+  partial_lightON = set.colorful.theme(partial_lightON)
+  
+  save.plot(paste0("../plots/partial_light_on_ratio/", plot_name, ".png"), partial_lightON)
+  
+  return(partial_lightON)
+}
+
+
+#plot
+for(lab in 1:length(PARTIAL_LIGHT_ON_RATIO_list)){
+  plot_partial_lightOn <- plot.partial.lightOn(PARTIAL_LIGHT_ON_RATIO_list[lab], get.expDate.1.1())  
+}
+
+for(lab in 1:length(PARTIAL_LIGHT_ON_RATIO_list)){
+  plot_partial_lightOn <- plot.partial.lightOn(PARTIAL_LIGHT_ON_RATIO_list[lab], get.expDate.1.2())  
+}
+
+for(lab in 1:length(PARTIAL_LIGHT_ON_RATIO_list)){
+  plot_partial_lightOn <- plot.partial.lightOn(PARTIAL_LIGHT_ON_RATIO_list[lab], get.expDate.2())  
+}
 
 
 

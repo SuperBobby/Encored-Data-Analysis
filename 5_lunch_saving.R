@@ -118,61 +118,65 @@ for(lab in LABS){
 ### -------------------------------- ###
 ### Plot: lunch_time_saving_count     
 ### -------------------------------- ### 
-# 
-# 
-# plot.lunch.saving <- function(dt, expDate){
-#   
-#   plot_dt = dt[[1]]
-#   
-#   if(expDate[4] == "2016-11-16"){
-#     #exp1-1
-#     plot_dt = set.expDate.1.1(plot_dt)
-#     plot_name = paste('exp1-1', names(dt), sep="_")
-#   } else if(expDate[4] == "2015-01-22"){
-#     #exp1-2
-#     plot_dt = set.expDate.1.2(plot_dt)
-#     plot_name = paste('exp1-2', names(dt), sep="_")
-#   } else{
-#     #exp3
-#     plot_dt = set.expDate.2(plot_dt)
-#     plot_name = paste('exp2', names(dt), sep="_")
-#   }
-#   
-#   windowingWeek <- 4
-#   
-#   #   print(plot_name)
-#   
-#   p1 = ggplot(plot_dt, aes(x=get)) +
-#     ggtitle(plot_name)
-# 
-#   p1 = add.window.line(p1, plot_dt, plot_name, 'lunch_saving_count',windowingWeek, expDate)
-#   
-#   if(expDate[4] == "2016-11-16"){
-#     #exp1-1
-#     p1 = add.event.vline.exp1.1(p1)
-#   } else if(expDate[4] == "2015-01-22"){
-#     #exp1-2
-#     p1 = add.event.vline.exp1.2(p1)
-#   } else{
-#     #exp3
-#     p1 = add.event.vline.exp2(p1)
-#   }
-#   
-#   p1 = set.default.theme(p1)
-#   
-#   save.plot(paste0("../plots/", plot_name, ".png"), p1)
-#   
-#   return(p1)
-# }
-# 
-# 
-# #plot
-# for(lab in 1:length(table_lunch_saving_light)){
-#   plot_lunch_saving <- plot.lunch.saving(table_lunch_saving_light[lab], get.expDate.2())  
-# }
-# for(lab in 1:length(table_lunch_saving_computer)){
-#   plot_lunch_saving <- plot.lunch.saving(table_lunch_saving_computer[lab], get.expDate.2())  
-# }
+
+
+plot.lunch.saving <- function(dt, expDate){
+  
+  plot_dt = dt[[1]]
+  
+  if(expDate[length(expDate)] == "2014-11-17"){
+    #exp1-1
+    plot_dt = cut.expDate.1.1(plot_dt)
+    plot_name = paste('exp1-1', names(dt), sep="_")
+  } else if(expDate[length(expDate)] == "2015-01-22"){
+    #exp1-2
+    plot_dt = cut.expDate.1.2(plot_dt)
+    plot_name = paste('exp1-2', names(dt), sep="_")
+  } else{
+    #exp2
+    plot_dt = cut.expDate.2(plot_dt)
+    plot_name = paste('exp2', names(dt), sep="_")
+  }
+  
+  windowingWeek <- 4
+  
+  #   print(plot_name)
+  
+  p1 = ggplot(plot_dt, aes(x=timestamp)) +
+    ggtitle(plot_name)
+
+  target_col = colnames(plot_dt)[2]
+  p1 = add.window.line(p1, plot_dt, plot_name, target_col, windowingWeek, expDate)
+  
+  if(expDate[length(expDate)] == "2014-11-17"){
+    #exp1-1
+    p1 = add.event.vline.exp1.1(p1)
+  } else if(expDate[length(expDate)] == "2015-01-22"){
+    #exp1-2
+    p1 = add.event.vline.exp1.2(p1)
+  } else{
+    #exp2
+    p1 = add.event.vline.exp2(p1)
+  }
+  
+  p1 = set.default.theme(p1)
+  
+  save.plot(paste0("../plots/lunch_saving/", plot_name, ".png"), p1)
+  
+  return(p1)
+}
+
+
+#plot
+for(lab in 1:length(LUNCH_TIME_SAVING_COUNT_list)){
+  plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_COUNT_list[lab], get.expDate.1.1())  
+}
+for(lab in 1:length(LUNCH_TIME_SAVING_COUNT_list)){
+  plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_COUNT_list[lab], get.expDate.1.2())  
+}
+for(lab in 1:length(LUNCH_TIME_SAVING_COUNT_list)){
+  plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_COUNT_list[lab], get.expDate.2())  
+}
 
 
 

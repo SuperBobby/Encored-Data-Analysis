@@ -299,7 +299,7 @@ set.default.theme <- function(plot_body) {
 }
 
 ##theme for light pattern plot; without legend box
-set.colorful.theme <- function(plot_body, colorName) {
+set.colorful.theme <- function(plot_body) {
   result = plot_body + 
     theme_bw()+
     theme(axis.line = element_line(colour = "black"),
@@ -320,9 +320,9 @@ set.colorful.theme <- function(plot_body, colorName) {
           panel.background = element_blank())+
     guides(fill = guide_legend(keywidth = 1, keyheight = 1),
            linetype = guide_legend(keywidth = 4, keyheight = 1),
-           colour = guide_legend(keywidth = 3, keyheight = 1))+
-    scale_color_manual(values=colorName)+
-    scale_fill_manual(values=colorName)
+           colour = guide_legend(keywidth = 3, keyheight = 1))
+#     scale_color_manual(values=colorName)+
+#     scale_fill_manual(values=colorName)
   
   return(result)
 }

@@ -37,41 +37,43 @@ build.table.realsense <- function(dt_list){
         if(day_selection == "allDay"){
           
           return_rs_dt = lab_dt[, .(sum_of_duration = sum(sum_of_duration, na.rm = T),
-                                    freq = sum(freq, na.rm = T))
+                                    count_per_day = sum(count_per_day, na.rm = T))
                                 , by=get(agg_Unit)]   
           
         } else if(day_selection == "workingday") {
           
           return_rs_dt = lab_dt[workingday == T, .(sum_of_duration = sum(sum_of_duration, na.rm = T), 
-                                                freq = sum(freq, na.rm = T))
+                                                count_per_day = sum(count_per_day, na.rm = T))
                                 , by=get(agg_Unit)]
           
         } else if(day_selection == "non_workingday") {
           
           return_rs_dt = lab_dt[workingday == F, .(sum_of_duration = sum(sum_of_duration, na.rm = T), 
-                                                freq = sum(freq, na.rm = T))
+                                                count_per_day = sum(count_per_day, na.rm = T))
                                 , by=get(agg_Unit)]
         }
         
+        names(return_rs_dt) = c("timestamp", "sum_of_duration", "count_per_day")
+        
         if((agg_Unit=="aggWeek") & (day_selection=="allDay")){
-          return_rs_dt = return_rs_dt[, .(get = get,
+          return_rs_dt = return_rs_dt[, .(timestamp = timestamp,
                                           sum_of_duration = sum_of_duration/7.0,
-                                          freq = freq/7.0)]
-        } else if((agg_Unit=="aggWeek") & (day_selection=="weekDay")){
-          return_rs_dt = return_rs_dt[, .(get = get,
+                                          count_per_day = count_per_day/7.0)]
+        } else if((agg_Unit=="aggWeek") & (day_selection=="workingday")){
+          return_rs_dt = return_rs_dt[, .(timestamp = timestamp,
                                           sum_of_duration = sum_of_duration/5.0,
-                                          freq = freq/5.0)]
-        } else if((agg_Unit=="aggWeek") & (day_selection=="weekEnd")){
-          return_rs_dt = return_rs_dt[, .(get = get,
+                                          count_per_day = count_per_day/5.0)]
+        } else if((agg_Unit=="aggWeek") & (day_selection=="non_workingday")){
+          return_rs_dt = return_rs_dt[, .(timestamp = timestamp,
                                           sum_of_duration = sum_of_duration/5.0,
-                                          freq = freq/2.0)]
+                                          count_per_day = count_per_day/2.0)]
         }
         
-        return_rs_dt[get <= "2015-10-14"]$sum_of_duration <- NA
-        return_rs_dt[get <= "2015-10-14"]$freq <- NA
+#         return_rs_dt[timestamp <= "2015-10-14"]$sum_of_duration <- NA
+#         return_rs_dt[timestamp <= "2015-10-14"]$count_per_day <- NA
         
         if(lab_name == "HCC"){
-          return_rs_dt <- return_rs_dt[get < "2015-12-11" | get > "2015-12-30"]
+          return_rs_dt <- return_rs_dt[timestamp < "2015-12-11" | timestamp > "2015-12-30"]
         }
         
         assign(dt_name, return_rs_dt)
@@ -85,28 +87,28 @@ build.table.realsense <- function(dt_list){
 get.plot.realsense <- function(dt, expDate) {
   plot_dt = dt[[1]]
   
-  if(expDate[4] == "2016-11-16"){
+  if(expDate[length(expDate)] == "2014-11-17"){
     #exp1-1
-    plot_dt = set.expDate.1.1(plot_dt)
+    plot_dt = cut.expDate.1.1(plot_dt)
     plot_name = paste('exp1-1', names(dt), sep="_")
-  } else if(expDate[4] == "2015-01-22"){
+  } else if(expDate[length(expDate)] == "2015-01-22"){
     #exp1-2
-    plot_dt = set.expDate.1.2(plot_dt)
+    plot_dt = cut.expDate.1.2(plot_dt)
     plot_name = paste('exp1-2', names(dt), sep="_")
   } else{
-    #exp3
-    plot_dt = set.expDate.2(plot_dt)
+    #exp2
+    plot_dt = cut.expDate.2(plot_dt)
     plot_name = paste('exp2', names(dt), sep="_")
   }
   
-  rownum_expDate <- set.expDate.rownum(plot_dt, expDate)
+#   rownum_expDate <- set.expDate.rownum(plot_dt, expDate)
   
-  windowingWeek <- 4
+  windowingWeek = 4
   
 #   ylim_RS_duration <- 600
-#   ylim_RS_freq <- 300
+#   ylim_RS_count_per_day <- 300
   
-  RS_duration <- ggplot(plot_dt, aes(x=get))+
+  RS_duration <- ggplot(plot_dt, aes(x=timestamp))+
     geom_point(aes(y=sum_of_duration), colour="grey50") +
     #       geom_text(aes(y=sum_of_duration, label=round(sum_of_duration, 0)), position=position_dodge(width=0.9), vjust=-0.25, colour="grey50") + 
     scale_y_continuous(limits=c(0, 600), oob=rescale_none) +
@@ -114,36 +116,36 @@ get.plot.realsense <- function(dt, expDate) {
     theme_bw()+
     ylab("total duration(seconds)")
   
-  RS_freq <- ggplot(plot_dt, aes(x=get))+
-    geom_point(aes(y=freq), colour="grey50") +
-    #       geom_text(aes(y=freq, label=round(freq, 0)), position=position_dodge(width=0.9), vjust=-0.25, colour="grey50") + 
+  RS_count_per_day <- ggplot(plot_dt, aes(x=timestamp))+
+    geom_point(aes(y=count_per_day), colour="grey50") +
+    #       geom_text(aes(y=count_per_day, label=round(count_per_day, 0)), position=position_dodge(width=0.9), vjust=-0.25, colour="grey50") + 
     scale_y_continuous(limits=c(0, 300), oob=rescale_none) +
-    ggtitle(paste("RS", plot_name,"freq"))+
+    ggtitle(paste("RS", plot_name,"count_per_day"))+
     theme_bw()+
     ylab("(counts / day)")
   
   RS_duration      = add.window.line(RS_duration, plot_dt, plot_name, "sum_of_duration", windowingWeek, expDate)
-  RS_freq          = add.window.line(RS_freq, plot_dt, plot_name, "freq", windowingWeek, expDate)
+  RS_count_per_day          = add.window.line(RS_count_per_day, plot_dt, plot_name, "count_per_day", windowingWeek, expDate)
   
-  if(expDate[4] == "2016-11-16"){
-    #exp1-1
+  if(expDate[length(expDate)] == "2014-11-17"){
+  #exp1-1
     RS_duration      = add.event.vline.exp1.1(RS_duration)
-    RS_freq          = add.event.vline.exp1.1(RS_freq)
-  } else if(expDate[4] == "2015-01-22"){
+    RS_count_per_day          = add.event.vline.exp1.1(RS_count_per_day)
+  } else if(expDate[length(expDate)] == "2015-01-22"){
     #exp1-2
     RS_duration      = add.event.vline.exp1.2(RS_duration)
-    RS_freq          = add.event.vline.exp1.2(RS_freq)
+    RS_count_per_day          = add.event.vline.exp1.2(RS_count_per_day)
   } else{
-    #exp3
+    #exp2
     RS_duration      = add.event.vline.exp2(RS_duration)
-    RS_freq          = add.event.vline.exp2(RS_freq)
+    RS_count_per_day          = add.event.vline.exp2(RS_count_per_day)
   }
   
-  RS_duration      = set.colorful.theme(RS_duration, "black")
-  RS_freq          = set.colorful.theme(RS_freq, "black")    
+  RS_duration      = set.colorful.theme(RS_duration)
+  RS_count_per_day          = set.colorful.theme(RS_count_per_day)    
   
-  save.plot(paste0("../plots/",plot_name, "_realsense_duration.png"),RS_duration)
-  save.plot(paste0("../plots/",plot_name, "_realsense_freq.png"),RS_freq)
+  save.plot(paste0("../plots/realsense/",plot_name, "_duration.png"),RS_duration)
+  save.plot(paste0("../plots/realsense/",plot_name, "_count_per_day.png"),RS_count_per_day)
   
 }
 
@@ -170,12 +172,12 @@ for(lab in 1:length(table_realsense)){
     }
     
     print(names(table_realsense[lab]))
-    print("freq")
+    print("count_per_day")
     
     for(i in 1:length(all_expDate)){
       dt = table_realsense[[lab]][get >= all_expDate[[i]][1] & get <= all_expDate[[i]][2]]
       #       print(paste(all_expDate[[i]][1],"~",all_expDate[[i]][2],":",mean(dt$lightON)))
-      print(mean(dt$freq))
+      print(mean(dt$count_per_day))
     }
     
   }
