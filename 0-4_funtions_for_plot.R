@@ -176,14 +176,16 @@ windowingByExpDate <- function(data, data_name, target, windowingWeek, expDate){
     }
     
     cut_data <- data[(timestamp >= start_date) & (timestamp <= end_date)]
+
+    if(!is.na(data[[target]][k])){
+      windowing$mean[k] <- mean(cut_data[[target]], na.rm = T)
+      #standard deviation of one row is NA
+      windowing$sd[k] <- ifelse(is.na(sd(cut_data[[target]], na.rm = T)),0,sd(cut_data[[target]], na.rm = T))
+    } else{
+      windowing$mean[k] <- NA
+        windowing$sd[k] <- NA
+    }
     
-    #     print(paste("start:",start_date,"->",cut_data$timestamp[1]))
-    #     print(paste("end:",end_date,"->",cut_data$timestamp[nrow(cut_data)]))
-    #     print(nrow(cut_data))
-    
-    windowing$mean[k] <- mean(cut_data[[target]])
-    #standard deviation of one row is NA
-    windowing$sd[k] <- ifelse(is.na(sd(cut_data[[target]])),0,sd(cut_data[[target]]))
   }
   
   windowing$timestamp <- data$timestamp
