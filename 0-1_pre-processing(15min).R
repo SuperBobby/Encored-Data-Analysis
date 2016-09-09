@@ -44,7 +44,6 @@ marg_dt = data.table(marg_defalut_table_15min, index=rep(1:96, (nrow(marg_defalu
 hcc_dt = data.table(hcc_defalut_table_15min, index=rep(1:96, (nrow(marg_defalut_table_15min)/96)))
 ux_dt = data.table(ux_defalut_table_15min, index=rep(1:96, (nrow(marg_defalut_table_15min)/96)))
 
-
 ##
 ## Missing data 
 ## 컴퓨터기준으로 15분 사용량이 marg:0.1, hcc:0.05, ux:0.02 미만 시점을 NA처리 
@@ -217,6 +216,12 @@ fill.na <- function(dt){
 marg_dt = fill.na(marg_dt)
 hcc_dt = fill.na(hcc_dt)
 ux_dt = fill.na(ux_dt)
+
+## Add total_woHVAC(total without hvac) column
+marg_dt = marg_dt[, ':='(total_woHVAC = total - hvac)]
+hcc_dt = hcc_dt[, ':='(total_woHVAC = total - hvac)]
+ux_dt = ux_dt[, ':='(total_woHVAC = total - hvac)]
+
 
 summary(marg_dt)
 summary(hcc_dt)

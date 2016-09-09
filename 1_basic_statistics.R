@@ -39,7 +39,7 @@ get.four.stats <- function(usage, thre_peak, thre_base){
 LABS = c("MARG", "HCC", "UX", "All_Labs")                    # lab
 AGG_UNITS = c("aggWeek", "aggDay")                           # agg_unit
 TYPES_OF_DAY = c("allDay", "workingday", "non_workingday")   # day_type
-FEEDERS = c("total", "computer", "light", "hvac")            # feeder
+FEEDERS = c("total", "total_woHVAC", "computer", "light", "hvac")            # feeder
 
 dt_list = setNames(dt_list, LABS)
 

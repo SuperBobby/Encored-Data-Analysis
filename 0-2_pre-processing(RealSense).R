@@ -139,24 +139,24 @@ ux_RS_dt = build.quarter.table(ux_RS)
 # ux_count_per_day = ux_RS[duration>1, .(count_per_day = nrow(.SD)), by=aggDay]
 
 ## Build 'valid' table 
-VALID_SUM_OF_DURATION = 600
-MAX_COUNT_PER_DAY = 300
-
-marg_sum_of_duration_day[sum_of_duration > VALID_SUM_OF_DURATION]
-hcc_sum_of_duration_day[sum_of_duration > VALID_SUM_OF_DURATION]
-ux_sum_of_duration_day[sum_of_duration > VALID_SUM_OF_DURATION]
-
-marg_sum_of_duration_day[sum_of_duration > VALID_SUM_OF_DURATION, ':='(sum_of_duration = VALID_SUM_OF_DURATION)]
-hcc_sum_of_duration_day[sum_of_duration > VALID_SUM_OF_DURATION, ':='(sum_of_duration = VALID_SUM_OF_DURATION)]
-ux_sum_of_duration_day[sum_of_duration > VALID_SUM_OF_DURATION, ':='(sum_of_duration = VALID_SUM_OF_DURATION)]
-
-marg_count_per_day[count_per_day > 100]
-hcc_count_per_day[count_per_day > 100]
-ux_count_per_day[count_per_day > 100]
-
-marg_count_per_day[count_per_day > MAX_COUNT_PER_DAY, ':='(count_per_day = MAX_COUNT_PER_DAY)]
-hcc_count_per_day[count_per_day > MAX_COUNT_PER_DAY, ':='(count_per_day = MAX_COUNT_PER_DAY)]
-ux_count_per_day[count_per_day > MAX_COUNT_PER_DAY, ':='(count_per_day = MAX_COUNT_PER_DAY)]
+# VALID_SUM_OF_DURATION = 600
+# MAX_COUNT_PER_DAY = 300
+# 
+# marg_sum_of_duration_day[sum_of_duration > VALID_SUM_OF_DURATION]
+# hcc_sum_of_duration_day[sum_of_duration > VALID_SUM_OF_DURATION]
+# ux_sum_of_duration_day[sum_of_duration > VALID_SUM_OF_DURATION]
+# 
+# marg_sum_of_duration_day[sum_of_duration > VALID_SUM_OF_DURATION, ':='(sum_of_duration = VALID_SUM_OF_DURATION)]
+# hcc_sum_of_duration_day[sum_of_duration > VALID_SUM_OF_DURATION, ':='(sum_of_duration = VALID_SUM_OF_DURATION)]
+# ux_sum_of_duration_day[sum_of_duration > VALID_SUM_OF_DURATION, ':='(sum_of_duration = VALID_SUM_OF_DURATION)]
+# 
+# marg_count_per_day[count_per_day > 100]
+# hcc_count_per_day[count_per_day > 100]
+# ux_count_per_day[count_per_day > 100]
+# 
+# marg_count_per_day[count_per_day > MAX_COUNT_PER_DAY, ':='(count_per_day = MAX_COUNT_PER_DAY)]
+# hcc_count_per_day[count_per_day > MAX_COUNT_PER_DAY, ':='(count_per_day = MAX_COUNT_PER_DAY)]
+# ux_count_per_day[count_per_day > MAX_COUNT_PER_DAY, ':='(count_per_day = MAX_COUNT_PER_DAY)]
 
 
 # 
@@ -235,6 +235,7 @@ AllLabs_dt$computer = AllLabs_dt$computer + hcc_dt$computer + ux_dt$computer
 AllLabs_dt$light = AllLabs_dt$light + hcc_dt$light + ux_dt$light
 AllLabs_dt$etc = AllLabs_dt$etc + hcc_dt$etc + ux_dt$etc
 AllLabs_dt$total = AllLabs_dt$total + hcc_dt$total + ux_dt$total
+AllLabs_dt$total_woHVAC = AllLabs_dt$total_woHVAC + hcc_dt$total_woHVAC + ux_dt$total_woHVAC
 AllLabs_dt$RS_duration = AllLabs_dt$RS_duration + hcc_dt$RS_duration + ux_dt$RS_duration
 AllLabs_dt$RS_count = AllLabs_dt$RS_count + hcc_dt$RS_count + ux_dt$RS_count
 
