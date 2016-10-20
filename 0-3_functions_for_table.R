@@ -99,3 +99,20 @@ split.table.by.expDate <- function(input_table, expDate){
 
 
 
+get.day.type.subset = function(input_dt, day_type){
+  if(day_type == "allDay"){
+    return_dt = input_dt
+    
+  } else if(day_type == "workingday") {
+    return_dt = input_dt[workingday == T]
+    
+  } else if(day_type == "non_workingday") {
+    return_dt = input_dt[workingday == F]
+    
+  } else {
+    return_dt = NULL
+  }
+  
+  return(return_dt)
+}
+

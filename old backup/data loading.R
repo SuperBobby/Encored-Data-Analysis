@@ -1,24 +1,24 @@
-source("Encored-Data-Analysis/getSNUdata.R")
+source("getSNUdata.R")
 
-###########################################
-## Default data tables (15min & hours)
-###########################################
-start = "2014-09-01"
-end = "2016-07-11"
-marg_defalut_table_15min <- getSNUData.feeder("marg", "quarters", start, end, verbose = T)
- hcc_defalut_table_15min <- getSNUData.feeder("hcc",  "quarters", start, end, verbose = T)
-  ux_defalut_table_15min <- getSNUData.feeder("ux",   "quarters", start, end, verbose = T)
-
-marg_defalut_table_hours <- getSNUData.feeder("marg", "hours", start, end, verbose = T)
- hcc_defalut_table_hours <- getSNUData.feeder("hcc",  "hours", start, end, verbose = T)
-  ux_defalut_table_hours <- getSNUData.feeder("ux",   "hours", start, end, verbose = T)
+# ###########################################
+# ## Default data tables (15min & hours)
+# ###########################################
+# start = "2014-09-01"
+# end = "2016-10-20"
+# marg_defalut_table_15min <- getSNUData.feeder("marg", "quarters", start, end, verbose = T)
+#  hcc_defalut_table_15min <- getSNUData.feeder("hcc",  "quarters", start, end, verbose = T)
+#   ux_defalut_table_15min <- getSNUData.feeder("ux",   "quarters", start, end, verbose = T)
+# 
+# marg_defalut_table_hours <- getSNUData.feeder("marg", "hours", start, end, verbose = T)
+#  hcc_defalut_table_hours <- getSNUData.feeder("hcc",  "hours", start, end, verbose = T)
+#   ux_defalut_table_hours <- getSNUData.feeder("ux",   "hours", start, end, verbose = T)
 
 ##################################################
 ## Update the default data tables (15min & hours)
 ##################################################
-source("Encored-Data-Analysis/getSNUdata.R")
+source("getSNUdata.R")
 update_start = "2014-09-01"
-update_end = "2016-07-18"
+update_end = "2016-10-20"
 
 marg_defalut_table_15min <- reviseSNUData(marg_defalut_table_15min, "marg", update_start, update_end, verbose = T)
  hcc_defalut_table_15min <- reviseSNUData( hcc_defalut_table_15min, "hcc",  update_start, update_end, verbose = T)
@@ -31,37 +31,37 @@ marg_defalut_table_hours <- reviseSNUData(marg_defalut_table_hours, "marg", upda
 ###########################################
 ## save $ load the data tables
 ###########################################
-save(marg_defalut_table_15min, file ="rawData/marg_15min.RData")
-save( hcc_defalut_table_15min, file ="rawData/hcc_15min.RData")
-save(  ux_defalut_table_15min, file ="rawData/ux_15min.RData")
+save(marg_defalut_table_15min, file ="../data/raw/marg_15min.RData")
+save( hcc_defalut_table_15min, file ="../data/raw/hcc_15min.RData")
+save(  ux_defalut_table_15min, file ="../data/raw/ux_15min.RData")
 
-save(marg_defalut_table_hours, file ="rawData/marg_hours.RData")
-save( hcc_defalut_table_hours, file ="rawData/hcc_hours.RData")
-save(  ux_defalut_table_hours, file ="rawData/ux_hours.RData")
+save(marg_defalut_table_hours, file ="../data/raw/marg_hours.RData")
+save( hcc_defalut_table_hours, file ="../data/raw/hcc_hours.RData")
+save(  ux_defalut_table_hours, file ="../data/raw/ux_hours.RData")
 
-write.csv(marg_defalut_table_15min, file ="rawData/marg_15min.csv")
-write.csv( hcc_defalut_table_15min, file ="rawData/hcc_15min.csv")
-write.csv(  ux_defalut_table_15min, file ="rawData/ux_15min.csv")
+write.csv(marg_defalut_table_15min, file ="../data/raw/marg_15min.csv")
+write.csv( hcc_defalut_table_15min, file ="../data/raw/hcc_15min.csv")
+write.csv(  ux_defalut_table_15min, file ="../data/raw/ux_15min.csv")
 
-write.csv(marg_defalut_table_hours, file ="rawData/marg_hours.csv")
-write.csv( hcc_defalut_table_hours, file ="rawData/hcc_hours.csv")
-write.csv(  ux_defalut_table_hours, file ="rawData/ux_hours.csv")
+write.csv(marg_defalut_table_hours, file ="../data/raw/marg_hours.csv")
+write.csv( hcc_defalut_table_hours, file ="../data/raw/hcc_hours.csv")
+write.csv(  ux_defalut_table_hours, file ="../data/raw/ux_hours.csv")
 
-load("rawData/marg_15min.RData")
-load("rawData/hcc_15min.RData")
-load("rawData/ux_15min.RData")
+load("../data/raw/marg_15min.RData")
+load("../data/raw/hcc_15min.RData")
+load("../data/raw/ux_15min.RData")
 
-load("rawData/marg_hours.RData")
-load("rawData/hcc_hours.RData")
-load("rawData/ux_hours.RData")
+load("../data/raw/marg_hours.RData")
+load("../data/raw/hcc_hours.RData")
+load("../data/raw/ux_hours.RData")
 
-# write.csv(marg_defalut_table_15min, "rawData/marg_15min.csv")
-# write.csv(hcc_defalut_table_15min, "rawData/hcc_15min.csv")
-# write.csv(ux_defalut_table_15min, "rawData/ux_15min.csv")
+# write.csv(marg_defalut_table_15min, "../data/raw/marg_15min.csv")
+# write.csv(hcc_defalut_table_15min, "../data/raw/hcc_15min.csv")
+# write.csv(ux_defalut_table_15min, "../data/raw/ux_15min.csv")
 
-# write.csv(marg_defalut_table_hours, "rawData/marg_hour.csv")
-# write.csv(hcc_defalut_table_hours, "rawData/hcc_hour.csv")
-# write.csv(ux_defalut_table_hours, "rawData/ux_hour.csv")
+# write.csv(marg_defalut_table_hours, "../data/raw/marg_hour.csv")
+# write.csv(hcc_defalut_table_hours, "../data/raw/hcc_hour.csv")
+# write.csv(ux_defalut_table_hours, "../data/raw/ux_hour.csv")
 
 ###########################################
 ## preprocessing

@@ -1,4 +1,4 @@
-source("Encored-Data-Analysis/getSNUdata.R")
+source("getSNUdata.R")
 library(data.table)
 library(splines)
 library(ggplot2)
@@ -7,12 +7,13 @@ library(timeDate)
 library(stringr)
 
 ## last Season
-last_season_start = "2016-4-18"
-last_season_end = "2016-7-11"
+last_season_start = "2016-7-25"
+last_season_end = "2016-10-17"
 
 # spline target date
-target_date = "2015-7-14"
-                
+target_date = "2015-10-14"
+
+
 ## realtime ref
 last_12weeks_marg_hours <- reviseSNUData(marg_defalut_table_hours, "marg", last_season_start, last_season_end, verbose = T)
 last_12weeks_hcc_hours <- reviseSNUData(hcc_defalut_table_hours, "hcc", last_season_start, last_season_end, verbose = T)

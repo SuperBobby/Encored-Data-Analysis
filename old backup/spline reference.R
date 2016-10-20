@@ -202,36 +202,39 @@ trace.spline.ref <- function(lab, data, date_from, weekday_, week_long, week_spa
         return(result_df)
 }
 
-###########################################
-## get reference
-target_date = "2015-3-2"
-
-get.spline.ref(hcc_defalut_table_15min, target_date, weekday_=T)
-get.spline.ref(hcc_defalut_table_15min, target_date, weekday_=F)
-
-get.spline.ref(ux_defalut_table_15min, target_date, weekday_=T)
-get.spline.ref(ux_defalut_table_15min, target_date, weekday_=F)
 
 
-###########################################
-## reference trace
-from = "2014-11-3"
-long = 60
-trace.spline.ref("MARG", marg_defalut_table_15min, from, 
-                 weekday_ = T, week_long = long, set_df = 3, with_temp = T, with_cloud = F)
-trace.spline.ref("MARG", marg_defalut_table_15min, from, 
-                 weekday_ = F, week_long = long, set_df = 3, with_temp = T, with_cloud = F)
-
-trace.spline.ref("HCC", hcc_defalut_table_15min, from, 
-                 weekday_ = T, week_long = long, set_df = 3, with_temp = F, with_cloud = F)
-trace.spline.ref("HCC", hcc_defalut_table_15min, from, 
-                 weekday_ = F, week_long = long, set_df = 3, with_temp = F, with_cloud = F)
-
-trace.spline.ref("UX", ux_defalut_table_15min, from, 
-                 weekday_ = T, week_long = long, set_df = 5, with_temp = F, with_cloud = F)
-trace.spline.ref("UX", ux_defalut_table_15min, from, 
-                 weekday_ = F, week_long = long, set_df = 3, with_temp = F, with_cloud = F)
-
+# 
+# ###########################################
+# ## get reference
+# target_date = "2015-3-2"
+# 
+# get.spline.ref(hcc_defalut_table_15min, target_date, weekday_=T)
+# get.spline.ref(hcc_defalut_table_15min, target_date, weekday_=F)
+# 
+# get.spline.ref(ux_defalut_table_15min, target_date, weekday_=T)
+# get.spline.ref(ux_defalut_table_15min, target_date, weekday_=F)
+# 
+# 
+# ###########################################
+# ## reference trace
+# from = "2014-11-3"
+# long = 60
+# trace.spline.ref("MARG", marg_defalut_table_15min, from, 
+#                  weekday_ = T, week_long = long, set_df = 3, with_temp = T, with_cloud = F)
+# trace.spline.ref("MARG", marg_defalut_table_15min, from, 
+#                  weekday_ = F, week_long = long, set_df = 3, with_temp = T, with_cloud = F)
+# 
+# trace.spline.ref("HCC", hcc_defalut_table_15min, from, 
+#                  weekday_ = T, week_long = long, set_df = 3, with_temp = F, with_cloud = F)
+# trace.spline.ref("HCC", hcc_defalut_table_15min, from, 
+#                  weekday_ = F, week_long = long, set_df = 3, with_temp = F, with_cloud = F)
+# 
+# trace.spline.ref("UX", ux_defalut_table_15min, from, 
+#                  weekday_ = T, week_long = long, set_df = 5, with_temp = F, with_cloud = F)
+# trace.spline.ref("UX", ux_defalut_table_15min, from, 
+#                  weekday_ = F, week_long = long, set_df = 3, with_temp = F, with_cloud = F)
+# 
 
 
 
