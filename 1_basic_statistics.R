@@ -39,7 +39,9 @@ get.four.stats <- function(usage, thre_peak, thre_base){
 LABS = c("MARG", "HCC", "UX", "All_Labs")                    # lab
 AGG_UNITS = c("aggWeek", "aggDay")                           # agg_unit
 TYPES_OF_DAY = c("allDay", "workingday", "non_workingday")   # day_type
-FEEDERS = c("total", "total_woHVAC", "computer", "light", "hvac")            # feeder
+# FEEDERS = c("total", "total_woHVAC", "computer", "light", "hvac")            # feeder
+FEEDERS = c("total", "total_woHVAC", "total_woETC", "computer", "light", "hvac")            # feeder
+
 
 dt_list = setNames(dt_list, LABS)
 
@@ -191,3 +193,13 @@ for(lab in target_labs){
 }
 
 # source('10_representation_table.R')
+
+
+for(i in 1:length(STATS_list)){
+#   print(names(STATS_list[i]))
+#   print(summary(STATS_list[[i]]$peak))
+#   print(summary(STATS_list[[i]]$base))
+#   print(summary(STATS_list[[i]]$avg))
+    
+  basic.plot(STATS_list[[i]], names(STATS_list[i]))
+}

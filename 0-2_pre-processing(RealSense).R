@@ -236,6 +236,7 @@ AllLabs_dt$light = AllLabs_dt$light + hcc_dt$light + ux_dt$light
 AllLabs_dt$etc = AllLabs_dt$etc + hcc_dt$etc + ux_dt$etc
 AllLabs_dt$total = AllLabs_dt$total + hcc_dt$total + ux_dt$total
 AllLabs_dt$total_woHVAC = AllLabs_dt$total_woHVAC + hcc_dt$total_woHVAC + ux_dt$total_woHVAC
+AllLabs_dt$total_woETC = AllLabs_dt$total_woETC + hcc_dt$total_woETC + ux_dt$total_woETC
 AllLabs_dt$RS_duration = AllLabs_dt$RS_duration + hcc_dt$RS_duration + ux_dt$RS_duration
 AllLabs_dt$RS_count = AllLabs_dt$RS_count + hcc_dt$RS_count + ux_dt$RS_count
 

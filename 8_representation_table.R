@@ -37,3 +37,5 @@ for(category in names(summary_list)){
 
 
 View(t(representation_table))
+
+write.csv(representation_table, "representation_table.csv")

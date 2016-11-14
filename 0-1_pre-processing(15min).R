@@ -14,7 +14,6 @@ library(lubridate)
 library(plyr)
 library(scales)
 library(reshape2)
-library(data.table)
 library(bit64)
 library(gtable)
 library(gridExtra)
@@ -218,9 +217,17 @@ hcc_dt = fill.na(hcc_dt)
 ux_dt = fill.na(ux_dt)
 
 ## Add total_woHVAC(total without hvac) column
-marg_dt = marg_dt[, ':='(total_woHVAC = total - hvac)]
-hcc_dt = hcc_dt[, ':='(total_woHVAC = total - hvac)]
-ux_dt = ux_dt[, ':='(total_woHVAC = total - hvac)]
+# marg_dt = marg_dt[, ':='(total_woHVAC = total - hvac)]
+# hcc_dt = hcc_dt[, ':='(total_woHVAC = total - hvac)]
+# ux_dt = ux_dt[, ':='(total_woHVAC = total - hvac)]
+
+marg_dt = marg_dt[, ':='(total_woHVAC = total - hvac,
+                         total_woETC = total - etc)]
+hcc_dt = hcc_dt[, ':='(total_woHVAC = total - hvac,
+                       total_woETC = total - etc)]
+ux_dt = ux_dt[, ':='(total_woHVAC = total - hvac,
+                     total_woETC = total - etc)]
+
 
 
 summary(marg_dt)

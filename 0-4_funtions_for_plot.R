@@ -190,6 +190,8 @@ windowingByExpDate <- function(data, data_name, target, windowingWeek, expDate){
   
   windowing$timestamp <- data$timestamp
   
+  View(windowing)
+  
   return (windowing)
 }
 
@@ -338,3 +340,23 @@ save.plot <- function(file, plot, width_ = 8, height_ = 6, dpi_ = 300) {
 }
 
 
+basic.plot <- function(data, data_name){
+  p <- ggplot(data, aes(x=timestamp)) +
+    ggtitle(data_name) +
+    ylab("Energy use (kWh/day)")+
+    geom_line(aes(y=peak, linetype = "peak"), size=1) + 
+    geom_line(aes(y=avg, linetype = "avg"), size=1) + 
+    geom_line(aes(y=base, linetype = "base"), size=1) + 
+    scale_x_date("Timestamp", labels = date_format("%Y-%m"), breaks = date_breaks("month")) +
+    scale_linetype_discrete(breaks=c("peak", "avg", "base")) + 
+    theme(axis.text.x = element_text(size=15, angle = 45, hjust = 1))
+  
+  p = set.default.theme(p)
+#   png(filename = paste0("../plots/validationCheck/", data_name, ".png"))
+#   plot(p)
+#   dev.off()  
+
+  ggsave(filename = paste0("../validationCheck/", data_name, ".png"), plot = p)
+# #   save.plot(paste0("../plots/validationCheck/", data_name, ".png"), plot)
+  
+}
