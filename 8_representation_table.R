@@ -38,4 +38,4 @@ for(category in names(summary_list)){
 
 View(t(representation_table))
 
-write.csv(representation_table, "representation_table.csv")
+write.csv(representation_table, "../data/representation_table.csv")
