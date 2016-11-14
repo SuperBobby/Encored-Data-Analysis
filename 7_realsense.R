@@ -11,11 +11,17 @@ day_selections = c("allDay", "workingday", "non_workingday")
 feeders = c("total", "computer", "light", "hvac")
 # feeders = c("hvac")
 
+MARG_VALID_RS_START_DATE = '2015-10-09'
+HCC_VALID_RS_START_DATE = '2015-10-14'
+UX_VALID_RS_START_DATE = '2015-11-01'
+
+VALID_SUM_OF_DURATION = 600
+MAX_COUNT_PER_DAY = 300
 
 build.table.realsense <- function(dt_list){
   
   return_rs_dts = list()
-
+  
   for(lab in 1:length(dt_list)){
     # lab_dt & name selection 
     lab_dt = dt_list[[lab]]
@@ -36,45 +42,38 @@ build.table.realsense <- function(dt_list){
         
         if(day_selection == "allDay"){
           
-          return_rs_dt = lab_dt[, .(sum_of_duration = sum(sum_of_duration, na.rm = T),
-                                    count_per_day = sum(count_per_day, na.rm = T))
+          return_rs_dt = lab_dt[, .(sum_of_duration = sum(RS_duration, na.rm = T)/nrow(.SD)*96,
+                                    count_per_day = sum(RS_count, na.rm = T)/nrow(.SD)*96)
                                 , by=get(agg_Unit)]   
           
         } else if(day_selection == "workingday") {
           
-          return_rs_dt = lab_dt[workingday == T, .(sum_of_duration = sum(sum_of_duration, na.rm = T), 
-                                                count_per_day = sum(count_per_day, na.rm = T))
+          return_rs_dt = lab_dt[workingday == T, .(sum_of_duration = sum(RS_duration, na.rm = T)/nrow(.SD)*96, 
+                                                   count_per_day = sum(RS_count, na.rm = T)/nrow(.SD)*96)
                                 , by=get(agg_Unit)]
           
         } else if(day_selection == "non_workingday") {
           
-          return_rs_dt = lab_dt[workingday == F, .(sum_of_duration = sum(sum_of_duration, na.rm = T), 
-                                                count_per_day = sum(count_per_day, na.rm = T))
+          return_rs_dt = lab_dt[workingday == F, .(sum_of_duration = sum(RS_duration, na.rm = T)/nrow(.SD)*96, 
+                                                   count_per_day = sum(RS_count, na.rm = T)/nrow(.SD)*96)
                                 , by=get(agg_Unit)]
         }
         
         names(return_rs_dt) = c("timestamp", "sum_of_duration", "count_per_day")
         
-        if((agg_Unit=="aggWeek") & (day_selection=="allDay")){
-          return_rs_dt = return_rs_dt[, .(timestamp = timestamp,
-                                          sum_of_duration = sum_of_duration/7.0,
-                                          count_per_day = count_per_day/7.0)]
-        } else if((agg_Unit=="aggWeek") & (day_selection=="workingday")){
-          return_rs_dt = return_rs_dt[, .(timestamp = timestamp,
-                                          sum_of_duration = sum_of_duration/5.0,
-                                          count_per_day = count_per_day/5.0)]
-        } else if((agg_Unit=="aggWeek") & (day_selection=="non_workingday")){
-          return_rs_dt = return_rs_dt[, .(timestamp = timestamp,
-                                          sum_of_duration = sum_of_duration/5.0,
-                                          count_per_day = count_per_day/2.0)]
+        if(lab_name == "MARG"){
+          return_rs_dt <- return_rs_dt[timestamp <= MARG_VALID_RS_START_DATE, ':='(sum_of_duration = NA,
+                                                                                   count_per_day = NA)]
+        } else if(lab_name == "HCC"){
+          return_rs_dt <- return_rs_dt[(timestamp >= "2015-12-11" & timestamp <= "2015-12-30") | timestamp <= HCC_VALID_RS_START_DATE, ':='(sum_of_duration = NA,
+                                                                                                                                            count_per_day = NA)]
+        } else{
+          return_rs_dt <- return_rs_dt[timestamp <= UX_VALID_RS_START_DATE, ':='(sum_of_duration = NA,
+                                                                                 count_per_day = NA)]
         }
         
-#         return_rs_dt[timestamp <= "2015-10-14"]$sum_of_duration <- NA
-#         return_rs_dt[timestamp <= "2015-10-14"]$count_per_day <- NA
-        
-        if(lab_name == "HCC"){
-          return_rs_dt <- return_rs_dt[timestamp < "2015-12-11" | timestamp > "2015-12-30"]
-        }
+        return_rs_dt[sum_of_duration > VALID_SUM_OF_DURATION, ':='(sum_of_duration = VALID_SUM_OF_DURATION)]
+        return_rs_dt[count_per_day > MAX_COUNT_PER_DAY, ':='(count_per_day = MAX_COUNT_PER_DAY)]
         
         assign(dt_name, return_rs_dt)
         return_rs_dts = append(return_rs_dts, setNames(list(return_rs_dt),dt_name))
@@ -101,12 +100,12 @@ get.plot.realsense <- function(dt, expDate) {
     plot_name = paste('exp2', names(dt), sep="_")
   }
   
-#   rownum_expDate <- set.expDate.rownum(plot_dt, expDate)
+  #   rownum_expDate <- set.expDate.rownum(plot_dt, expDate)
   
   windowingWeek = 4
   
-#   ylim_RS_duration <- 600
-#   ylim_RS_count_per_day <- 300
+  #   ylim_RS_duration <- 600
+  #   ylim_RS_count_per_day <- 300
   
   RS_duration <- ggplot(plot_dt, aes(x=timestamp))+
     geom_point(aes(y=sum_of_duration), colour="grey50") +
@@ -128,7 +127,7 @@ get.plot.realsense <- function(dt, expDate) {
   RS_count_per_day          = add.window.line(RS_count_per_day, plot_dt, plot_name, "count_per_day", windowingWeek, expDate)
   
   if(expDate[length(expDate)] == "2014-11-17"){
-  #exp1-1
+    #exp1-1
     RS_duration      = add.event.vline.exp1.1(RS_duration)
     RS_count_per_day          = add.event.vline.exp1.1(RS_count_per_day)
   } else if(expDate[length(expDate)] == "2015-01-22"){
@@ -182,5 +181,4 @@ for(lab in 1:length(table_realsense)){
     
   }
 }
-
 
