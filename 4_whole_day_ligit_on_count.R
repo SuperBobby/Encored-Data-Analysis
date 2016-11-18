@@ -20,13 +20,15 @@ LIGHT_ON_MIN_USAGE = 0.01
 
 LABEL = "whole_day_ligit_on_count"
 
+PLOT_PATH = "../plots/"
+
 ## Loop parameters 
 # 1. lab
 # 2. aggregation unit 
 # 3. types of day (working day?)
 # 4. target feeder
 
-LABS = c("MARG", "HCC", "UX", "All_Labs")                    # lab
+LABS = c("MARG", "HCC", "UX")                                # lab
 AGG_UNITS = c("aggWeek")                                     # agg_unit
 TYPES_OF_DAY = c("allDay", "workingday", "non_workingday")   # day_type
 
@@ -81,7 +83,7 @@ for(lab in LABS){
 ### Plot: whole_day_ligit_on_count     
 ### -------------------------------- ### 
 
-plot.24hr.lightOn.counting <- function(dt, expDate, whole_day_ligit_on_count_color = "violetred4"){
+plot.24hr.lightOn.counting <- function(dt, expDate, PLOT_PATH, whole_day_ligit_on_count_color = "violetred4"){
   
   plot_dt = dt[[1]]
   
@@ -123,22 +125,23 @@ plot.24hr.lightOn.counting <- function(dt, expDate, whole_day_ligit_on_count_col
   
   p = set.colorful.theme(p)
 
-  save.plot(paste0("../plots/whole_day_light_on_count/", plot_name, ".png"), p)
+  save.plot(paste0(PLOT_PATH, plot_name, ".png"), p)
   
+  print(paste("plot:", plot_name))
   return(p)
 }
 
 ##plot
+# for(lab in 1:length(WHOLE_DAY_LIGHT_ON_COUNT_list)){
+#   plot_24hr_lightOn_counting <- plot.24hr.lightOn.counting(WHOLE_DAY_LIGHT_ON_COUNT_list[lab], get.expDate.1.1(), PLOT_PATH)  
+# }
+
 for(lab in 1:length(WHOLE_DAY_LIGHT_ON_COUNT_list)){
-  plot_24hr_lightOn_counting <- plot.24hr.lightOn.counting(WHOLE_DAY_LIGHT_ON_COUNT_list[lab], get.expDate.1.1())  
+  plot_24hr_lightOn_counting <- plot.24hr.lightOn.counting(WHOLE_DAY_LIGHT_ON_COUNT_list[lab], get.expDate.1.2(), PLOT_PATH)  
 }
 
 for(lab in 1:length(WHOLE_DAY_LIGHT_ON_COUNT_list)){
-  plot_24hr_lightOn_counting <- plot.24hr.lightOn.counting(WHOLE_DAY_LIGHT_ON_COUNT_list[lab], get.expDate.1.2())  
-}
-
-for(lab in 1:length(WHOLE_DAY_LIGHT_ON_COUNT_list)){
-  plot_24hr_lightOn_counting <- plot.24hr.lightOn.counting(WHOLE_DAY_LIGHT_ON_COUNT_list[lab], get.expDate.2())  
+  plot_24hr_lightOn_counting <- plot.24hr.lightOn.counting(WHOLE_DAY_LIGHT_ON_COUNT_list[lab], get.expDate.2(), PLOT_PATH)  
 }
 
 

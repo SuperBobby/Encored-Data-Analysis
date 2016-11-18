@@ -28,7 +28,8 @@ load("../data/raw/ux_15min.RData")
 
 ## Update & save 15min data  
 update_start = "2014-09-01"
-update_end = "2016-08-30"
+update_end = "2016-08-29"
+# update_end = "2016-09-01"
 
 marg_defalut_table_15min <- reviseSNUData(marg_defalut_table_15min, "marg", update_start, update_end, verbose = T)
 hcc_defalut_table_15min <- reviseSNUData( hcc_defalut_table_15min, "hcc",  update_start, update_end, verbose = T)
@@ -102,27 +103,29 @@ ux_dt[etc > 0.15, ':='(etc = NA)]
 
 
 # check computer & light usage distributions
-par(mfrow=c(5,3))
-hist(marg_dt$computer, 100)
-hist(hcc_dt$computer, 100)
-hist(ux_dt$computer, 100)
-
-hist(marg_dt$light, 100)
-hist(hcc_dt$light, 100)
-hist(ux_dt$light, 100)
-
-hist(marg_dt[hvac > 0.1]$hvac, 100)
-hist(hcc_dt[hvac > 0.01]$hvac, 100)
-hist(ux_dt[hvac > 0.01]$hvac, 100)
-
-hist(marg_dt$etc, 100)
-hist(hcc_dt$etc, 100)
-hist(ux_dt$etc, 100)
-
-hist(marg_dt$total, 100)
-hist(hcc_dt$total, 100)
-hist(ux_dt$total, 100)
-par(mfrow=c(1,1))
+{
+  par(mfrow=c(5,3))
+  hist(marg_dt$computer, 100)
+  hist(hcc_dt$computer, 100)
+  hist(ux_dt$computer, 100)
+  
+  hist(marg_dt$light, 100)
+  hist(hcc_dt$light, 100)
+  hist(ux_dt$light, 100)
+  
+  hist(marg_dt[hvac > 0.1]$hvac, 100)
+  hist(hcc_dt[hvac > 0.01]$hvac, 100)
+  hist(ux_dt[hvac > 0.01]$hvac, 100)
+  
+  hist(marg_dt$etc, 100)
+  hist(hcc_dt$etc, 100)
+  hist(ux_dt$etc, 100)
+  
+  hist(marg_dt$total, 100)
+  hist(hcc_dt$total, 100)
+  hist(ux_dt$total, 100)
+  par(mfrow=c(1,1))
+}
 
 
 ##

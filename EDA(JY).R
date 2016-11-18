@@ -1,7 +1,66 @@
+### HVAC something
+## 2015-11-18 JY
+library(data.table)
+
+get.max.consecutive.on <- function(input, verbose=F){
+  rle_return = rle(input)
+  
+  true_sequence = rle_return$lengths[rle_return$values]
+  
+  if(length(true_sequence) != 0) {
+    result = max(true_sequence, na.rm = T)  
+  } else {
+    result = integer(0)
+  }
+  
+  if(verbose == T) print((result))
+  
+  return(result)
+}
+
+tmp = marg_dt
+
+tmp_hvac_cons = tmp[, .(hvac_on_duration = sum(hvac > 0.1),
+                        max_consecutive_on_hvac = get.max.consecutive.on(hvac > 0.1)), by=aggDay]
+
+tmp_hvac_cons[, (max_cons_ratio = max_consecutive_on_hvac/hvac_on_duration), by=aggDay]
+
+plot(tmp_hvac_cons$aggDay, tmp_hvac_cons$hvac_on_duration)
+plot(tmp_hvac_cons[, (max_cons_ratio = max_consecutive_on_hvac/hvac_on_duration), by=aggDay])
+
+
+
+
+summary(tmp$hvac > 0.1)
+
+tmp[, .(hvac_on_duration = sum(hvac > 0.1)), by=aggDay]
+
+
+
+get.max.consecutive.on(tmp$hvac > 0.1, T)
+
+
+plot(hvac_tmp)
+
+tmp_x = c(F, F)
+
+tmp_x = rle(tmp_x)
+
+length(tmp_x$lengths[tmp_x$values])
+
+max(tmp_x$lengths[tmp_x$values], na.rm = T)
+
+get.max.consecutive.on(tmp_x)
+#
+
+
+
+
+
 ### ------------------------------------- ###
 ## plot.point.with.3stats
 ## 
-## find the matrix(or index) for computer usage pattern 
+## find the matrix(or index) for COMPUTER usage pattern 
 ## 2016. 8. 30. JY
 ### ------------------------------------- ###
 

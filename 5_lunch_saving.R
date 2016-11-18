@@ -22,13 +22,15 @@ LUNCH_TIME_SAVING_COUNT_list = list()
 
 LABEL = "lunch_time_saving_count"
 
+PLOT_PATH = "../plots/"
+
 ## Loop parameters 
 # 1. lab
 # 2. aggregation unit 
 # 3. types of day (working day?)
 # 4. target feeder
 
-LABS = c("MARG", "HCC", "UX", "All_Labs")                    # lab
+LABS = c("MARG", "HCC", "UX")                                # lab
 AGG_UNITS = c("aggWeek")                                     # agg_unit
 TYPES_OF_DAY = c("allDay", "workingday", "non_workingday")   # day_type
 FEEDERS = c("computer", "light")                             # feeder
@@ -120,7 +122,7 @@ for(lab in LABS){
 ### -------------------------------- ### 
 
 
-plot.lunch.saving <- function(dt, expDate){
+plot.lunch.saving <- function(dt, expDate, PLOT_PATH){
   
   plot_dt = dt[[1]]
   
@@ -161,21 +163,22 @@ plot.lunch.saving <- function(dt, expDate){
   
   p1 = set.default.theme(p1)
   
-  save.plot(paste0("../plots/lunch_saving/", plot_name, ".png"), p1)
+  save.plot(paste0(PLOT_PATH, plot_name, ".png"), p1)
   
+  print(paste("plot:", plot_name))
   return(p1)
 }
 
 
 #plot
+# for(lab in 1:length(LUNCH_TIME_SAVING_COUNT_list)){
+#   plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_COUNT_list[lab], get.expDate.1.1(), PLOT_PATH)  
+# }
 for(lab in 1:length(LUNCH_TIME_SAVING_COUNT_list)){
-  plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_COUNT_list[lab], get.expDate.1.1())  
+  plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_COUNT_list[lab], get.expDate.1.2(), PLOT_PATH)  
 }
 for(lab in 1:length(LUNCH_TIME_SAVING_COUNT_list)){
-  plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_COUNT_list[lab], get.expDate.1.2())  
-}
-for(lab in 1:length(LUNCH_TIME_SAVING_COUNT_list)){
-  plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_COUNT_list[lab], get.expDate.2())  
+  plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_COUNT_list[lab], get.expDate.2(), PLOT_PATH)  
 }
 
 
