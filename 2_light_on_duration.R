@@ -145,16 +145,18 @@ plot.light.On.duration <- function(dt, expDate, PLOT_PATH, lightON_duration_colo
 
 
 #plot
-# for(lab in 1:length(LIGHT_ON_DURATION_list)){
-#   plot_lightOn_duration <- plot.light.On.duration(LIGHT_ON_DURATION_list[lab], get.expDate.1.1(), PLOT_PATH)  
-# }
-
-for(lab in 1:length(LIGHT_ON_DURATION_list)){
-  plot_lightOn_duration <- plot.light.On.duration(LIGHT_ON_DURATION_list[lab], get.expDate.1.2(), PLOT_PATH)  
-}
-
-for(lab in 1:length(LIGHT_ON_DURATION_list)){
-  plot_lightOn_duration <- plot.light.On.duration(LIGHT_ON_DURATION_list[lab], get.expDate.2(), PLOT_PATH)  
+if(PLOTTING){
+  # for(lab in 1:length(LIGHT_ON_DURATION_list)){
+  #   plot_lightOn_duration <- plot.light.On.duration(LIGHT_ON_DURATION_list[lab], get.expDate.1.1(), PLOT_PATH)  
+  # }
+  
+  for(lab in 1:length(LIGHT_ON_DURATION_list)){
+    plot_lightOn_duration <- plot.light.On.duration(LIGHT_ON_DURATION_list[lab], get.expDate.1.2(), PLOT_PATH)  
+  }
+  
+  for(lab in 1:length(LIGHT_ON_DURATION_list)){
+    plot_lightOn_duration <- plot.light.On.duration(LIGHT_ON_DURATION_list[lab], get.expDate.2(), PLOT_PATH)  
+  }
 }
 
 

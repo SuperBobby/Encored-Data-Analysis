@@ -42,8 +42,8 @@ LABS = c("MARG", "HCC", "UX")                                  # lab
 AGG_UNITS = c("aggDay")                                        # agg_unit
 # AGG_UNITS = c("aggWeek", "aggDay")                           # agg_unit
 TYPES_OF_DAY = c("allDay", "workingday", "non_workingday")     # day_type
-# FEEDERS = c("total", "total_woHVAC", "computer", "light", "hvac")                         # feeder
-FEEDERS = c("total", "total_woHVAC", "total_woETC", "computer", "light", "hvac")            # feeder
+FEEDERS = c("total", "total_woHVAC", "computer", "light", "hvac")                         # feeder
+# FEEDERS = c("total", "total_woHVAC", "total_woETC", "computer", "light", "hvac")            # feeder
 
 
 dt_list = setNames(dt_list, LABS)
@@ -137,18 +137,20 @@ plot.stats <- function(dt, expDate, PLOT_PATH) {
 
 
 ### plot
-# for(lab in 1:length(STATS_list)){
-#   plot_stats <- plot.stats(STATS_list[lab], get.expDate.1.1(), PLOT_PATH)
-# }
-
-for(lab in 1:length(STATS_list)){
-  plot_stats <- plot.stats(STATS_list[lab], get.expDate.1.2(), PLOT_PATH)
+if(PLOTTING){
+  # for(lab in 1:length(STATS_list)){
+  #   plot_stats <- plot.stats(STATS_list[lab], get.expDate.1.1(), PLOT_PATH)
+  # }
+  
+  for(lab in 1:length(STATS_list)){
+    plot_stats <- plot.stats(STATS_list[lab], get.expDate.1.2(), PLOT_PATH)
+  }
+  
+  for(lab in 1:length(STATS_list)){
+    plot_stats <- plot.stats(STATS_list[lab], get.expDate.2(), PLOT_PATH)
+  }
+  
 }
-
-for(lab in 1:length(STATS_list)){
-  plot_stats <- plot.stats(STATS_list[lab], get.expDate.2(), PLOT_PATH)
-}
-
 
 ### ------------------------------------------------------------ ###
 ### Update summary_list

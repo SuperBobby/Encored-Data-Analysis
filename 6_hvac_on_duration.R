@@ -143,20 +143,19 @@ plot.hvac.On.duration <- function(dt, expDate, PLOT_PATH, hvacON_duration_color 
 
 
 #plot
-# for(lab in 1:length(HVAC_ON_DURATION_list)){
-#   plot_hvacOn_duration <- plot.hvac.On.duration(HVAC_ON_DURATION_list[lab], get.expDate.1.1(), PLOT_PATH)  
-# }
-
-for(lab in 1:length(HVAC_ON_DURATION_list)){
-  plot_hvacOn_duration <- plot.hvac.On.duration(HVAC_ON_DURATION_list[lab], get.expDate.1.2(), PLOT_PATH)  
+if(PLOTTING){
+  # for(lab in 1:length(HVAC_ON_DURATION_list)){
+  #   plot_hvacOn_duration <- plot.hvac.On.duration(HVAC_ON_DURATION_list[lab], get.expDate.1.1(), PLOT_PATH)  
+  # }
+  
+  for(lab in 1:length(HVAC_ON_DURATION_list)){
+    plot_hvacOn_duration <- plot.hvac.On.duration(HVAC_ON_DURATION_list[lab], get.expDate.1.2(), PLOT_PATH)  
+  }
+  
+  for(lab in 1:length(HVAC_ON_DURATION_list)){
+    plot_hvacOn_duration <- plot.hvac.On.duration(HVAC_ON_DURATION_list[lab], get.expDate.2(), PLOT_PATH)  
+  }
 }
-
-for(lab in 1:length(HVAC_ON_DURATION_list)){
-  plot_hvacOn_duration <- plot.hvac.On.duration(HVAC_ON_DURATION_list[lab], get.expDate.2(), PLOT_PATH)  
-}
-
-
-
 
 ### ------------------------------------------------------------ ###
 ### Update summary_list

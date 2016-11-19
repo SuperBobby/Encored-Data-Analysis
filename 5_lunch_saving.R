@@ -171,18 +171,17 @@ plot.lunch.saving <- function(dt, expDate, PLOT_PATH){
 
 
 #plot
-# for(lab in 1:length(LUNCH_TIME_SAVING_COUNT_list)){
-#   plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_COUNT_list[lab], get.expDate.1.1(), PLOT_PATH)  
-# }
-for(lab in 1:length(LUNCH_TIME_SAVING_COUNT_list)){
-  plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_COUNT_list[lab], get.expDate.1.2(), PLOT_PATH)  
+if(PLOTTING){
+  # for(lab in 1:length(LUNCH_TIME_SAVING_COUNT_list)){
+  #   plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_COUNT_list[lab], get.expDate.1.1(), PLOT_PATH)  
+  # }
+  for(lab in 1:length(LUNCH_TIME_SAVING_COUNT_list)){
+    plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_COUNT_list[lab], get.expDate.1.2(), PLOT_PATH)  
+  }
+  for(lab in 1:length(LUNCH_TIME_SAVING_COUNT_list)){
+    plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_COUNT_list[lab], get.expDate.2(), PLOT_PATH)  
+  }
 }
-for(lab in 1:length(LUNCH_TIME_SAVING_COUNT_list)){
-  plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_COUNT_list[lab], get.expDate.2(), PLOT_PATH)  
-}
-
-
-
 
 ### ------------------------------------------------------------ ###
 ### Update summary_list

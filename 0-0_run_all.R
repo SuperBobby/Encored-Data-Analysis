@@ -1,3 +1,5 @@
+PLOTTING = F
+
 source("0-1_pre-processing(15min).R")
 source("0-2_pre-processing(RealSense).R")
 source("0-3_functions_for_table.R")
