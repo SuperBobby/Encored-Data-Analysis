@@ -170,7 +170,6 @@ if(PLOTTING){
 ### ------------------------------------------------------------ ### 
 
 target_summary_list = LIGHT_ON_DURATION_list
-all_expDate = get.expDate.all()
 
 target_labs         = LABS                    # lab 
 target_types_of_day = TYPES_OF_DAY            # day_type

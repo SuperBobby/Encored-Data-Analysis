@@ -155,7 +155,6 @@ if(PLOTTING){
 ### ------------------------------------------------------------ ### 
 
 target_summary_list = WHOLE_DAY_LIGHT_ON_COUNT_list
-all_expDate = get.expDate.all()
 
 target_labs         = LABS                    # lab 
 target_types_of_day = TYPES_OF_DAY            # day_type

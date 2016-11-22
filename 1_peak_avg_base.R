@@ -163,7 +163,6 @@ if(PLOTTING){
 summary_list = list()
 
 target_summary_list = STATS_list
-all_expDate = get.expDate.all()
 
 target_labs         = LABS                    # lab 
 target_types_of_day = TYPES_OF_DAY            # day_type
