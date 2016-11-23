@@ -190,8 +190,6 @@ windowingByExpDate <- function(data, data_name, target, windowingWeek, expDate){
   
   windowing$timestamp <- data$timestamp
   
-  View(windowing)
-  
   return (windowing)
 }
 
@@ -349,7 +347,17 @@ basic.plot <- function(data, data_name){
     geom_line(aes(y=base, linetype = "base"), size=1) + 
     scale_x_date("Timestamp", labels = date_format("%Y-%m"), breaks = date_breaks("month")) +
     scale_linetype_discrete(breaks=c("peak", "avg", "base")) + 
-    theme(axis.text.x = element_text(size=15, angle = 45, hjust = 1))
+    theme(axis.text.x = element_text(size=15, angle = 45, hjust = 1)) +
+    geom_vline(aes(xintercept = as.numeric(as.Date("2014-11-10"))),color="gray40", linetype = "longdash") +
+    geom_vline(aes(xintercept = as.numeric(as.Date("2014-11-17"))),color="gray40", linetype = "longdash") +
+    geom_vline(aes(xintercept = as.numeric(as.Date("2015-01-15"))),color="gray40", linetype = "longdash") +
+    geom_vline(aes(xintercept = as.numeric(as.Date("2015-01-22"))),color="gray40", linetype = "longdash") +
+    geom_vline(aes(xintercept = as.numeric(as.Date("2015-10-08"))),color="gray40", linetype = "longdash") +
+    geom_vline(aes(xintercept = as.numeric(as.Date("2015-12-01"))),color="gray40", linetype = "longdash") +
+    geom_vline(aes(xintercept = as.numeric(as.Date("2016-01-11"))),color="gray40", linetype = "longdash") +
+    geom_vline(aes(xintercept = as.numeric(as.Date("2016-02-01"))),color="gray40", linetype = "longdash") +
+    geom_vline(aes(xintercept = as.numeric(as.Date("2016-05-16"))),color="gray40", linetype = "longdash") +
+    geom_vline(aes(xintercept = as.numeric(as.Date("2016-06-13"))),color="gray40", linetype = "longdash")
   
   p = set.default.theme(p)
 #   png(filename = paste0("../plots/validationCheck/", data_name, ".png"))
