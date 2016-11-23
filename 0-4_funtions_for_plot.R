@@ -189,7 +189,9 @@ windowingByExpDate <- function(data, data_name, target, windowingWeek, expDate){
   }
   
   windowing$timestamp <- data$timestamp
-  
+
+  # View(windowing)
+
   return (windowing)
 }
 

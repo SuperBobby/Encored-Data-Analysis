@@ -1,8 +1,8 @@
 ### ------------------------------------------------------------ ###
-### basic_statistics(peak, base, average, median) of each feeder
+### basic_statistics(peak, base, average) of each feeder
 ### 
 ### JY, EJ @ ADSL, SNU 
-###                                   last update : 2016. 8. 30.
+###                                   last update : 2016. 11. 19.
 ### ------------------------------------------------------------ ###
 
 # * peak : 90th percentile of usage in the aggregate unit 
@@ -20,13 +20,14 @@ STATS_list = list()
 PEAK_PERCENTILE = 0.9
 BASE_PERCENTILE = 0.1
 
-## four stat : peak, base, avg, med 
+PLOT_PATH = "../plots/"
+
+## four stat : peak, base, avg 
 get.four.stats <- function(usage, thre_peak, thre_base){
   peak = quantile(usage, thre_peak, na.rm = T)
-  base = quantile(usage, thre_base, na.rm = T)
   avg  = mean(usage, na.rm = T)
-  # med  = median(usage, na.rm = T)
-  
+  base = quantile(usage, thre_base, na.rm = T)
+
   return(list(peak=peak, base=base, avg=avg))
 }
 
@@ -36,11 +37,13 @@ get.four.stats <- function(usage, thre_peak, thre_base){
 # 3. types of day (working day?)
 # 4. target feeder
 
-LABS = c("MARG", "HCC", "UX", "All_Labs")                    # lab
-AGG_UNITS = c("aggWeek", "aggDay")                           # agg_unit
-TYPES_OF_DAY = c("allDay", "workingday", "non_workingday")   # day_type
-# FEEDERS = c("total", "total_woHVAC", "computer", "light", "hvac")            # feeder
-FEEDERS = c("total", "total_woHVAC", "total_woETC", "computer", "light", "hvac")            # feeder
+LABS = c("MARG", "HCC", "UX")                                  # lab
+# LABS = c("MARG", "HCC", "UX", "All_Labs")                    # lab
+AGG_UNITS = c("aggDay")                                        # agg_unit
+# AGG_UNITS = c("aggWeek", "aggDay")                           # agg_unit
+TYPES_OF_DAY = c("allDay", "workingday", "non_workingday")     # day_type
+FEEDERS = c("total", "total_woHVAC", "computer", "light", "hvac")                         # feeder
+# FEEDERS = c("total", "total_woHVAC", "total_woETC", "computer", "light", "hvac")            # feeder
 
 
 dt_list = setNames(dt_list, LABS)
@@ -85,7 +88,7 @@ for(lab in LABS){
 ### Plot: stats    
 ### -------------------------------- ### 
 
-plot.stats <- function(dt, expDate) {
+plot.stats <- function(dt, expDate, PLOT_PATH) {
   plot_dt = dt[[1]]
   
   if(expDate[length(expDate)] == "2014-11-17"){
@@ -126,7 +129,7 @@ plot.stats <- function(dt, expDate) {
   
   stats = set.default.theme(stats)
   
-  save.plot(paste0("../plots/stats/", plot_name, ".png"), stats)
+  save.plot(paste0(PLOT_PATH, plot_name, "_peak_avg_base.png"), stats)
   
   print(paste("plot:", plot_name))
   return(stats)
@@ -134,18 +137,20 @@ plot.stats <- function(dt, expDate) {
 
 
 ### plot
-for(lab in 1:length(STATS_list)){
-  plot_stats <- plot.stats(STATS_list[lab], get.expDate.1.1())
+if(PLOTTING){
+  # for(lab in 1:length(STATS_list)){
+  #   plot_stats <- plot.stats(STATS_list[lab], get.expDate.1.1(), PLOT_PATH)
+  # }
+  
+  for(lab in 1:length(STATS_list)){
+    plot_stats <- plot.stats(STATS_list[lab], get.expDate.1.2(), PLOT_PATH)
+  }
+  
+  for(lab in 1:length(STATS_list)){
+    plot_stats <- plot.stats(STATS_list[lab], get.expDate.2(), PLOT_PATH)
+  }
+  
 }
-
-for(lab in 1:length(STATS_list)){
-  plot_stats <- plot.stats(STATS_list[lab], get.expDate.1.2())
-}
-
-for(lab in 1:length(STATS_list)){
-  plot_stats <- plot.stats(STATS_list[lab], get.expDate.2())
-}
-
 
 ### ------------------------------------------------------------ ###
 ### Update summary_list
@@ -158,12 +163,11 @@ for(lab in 1:length(STATS_list)){
 summary_list = list()
 
 target_summary_list = STATS_list
-all_expDate = get.expDate.all()
 
 target_labs         = LABS                    # lab 
 target_types_of_day = TYPES_OF_DAY            # day_type
 target_feeders      = FEEDERS                 # feeder  
-target_stats        = c('peak','base','avg')  # stats ----> {feeder}_{stats} = label
+target_stats        = c('peak','avg','base')  # stats ----> {feeder}_{stats} = label
 
 agg_unit = "aggDay"
 
@@ -190,16 +194,4 @@ for(lab in target_labs){
       }
     }
   }
-}
-
-# source('10_representation_table.R')
-
-
-for(i in 1:length(STATS_list)){
-#   print(names(STATS_list[i]))
-#   print(summary(STATS_list[[i]]$peak))
-#   print(summary(STATS_list[[i]]$base))
-#   print(summary(STATS_list[[i]]$avg))
-    
-  basic.plot(STATS_list[[i]], names(STATS_list[i]))
 }

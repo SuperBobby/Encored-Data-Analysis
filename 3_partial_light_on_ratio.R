@@ -23,13 +23,15 @@ PARTIAL_ON_RATIO = 0.8
 
 LABEL = "partial_light_on_ratio"
 
+PLOT_PATH = "../plots/"
+
 ## Loop parameters 
 # 1. lab
 # 2. aggregation unit 
 # 3. types of day (working day?)
 # 4. target feeder
 
-LABS = c("MARG", "HCC", "UX", "All_Labs")                    # lab
+LABS = c("MARG", "HCC", "UX")                                # lab
 AGG_UNITS = c("aggWeek", "aggDay")                           # agg_unit
 TYPES_OF_DAY = c("allDay", "workingday", "non_workingday")   # day_type
 
@@ -106,7 +108,7 @@ for(lab in LABS){
 ### Plot: partial_light_on_ratio     
 ### -------------------------------- ### 
 
-plot.partial.lightOn <- function(dt, expDate, partial_lightON_color = "orange2"){
+plot.partial.lightOn <- function(dt, expDate, PLOT_PATH, partial_lightON_color = "orange2"){
   
   plot_dt = dt[[1]]
   
@@ -146,25 +148,28 @@ plot.partial.lightOn <- function(dt, expDate, partial_lightON_color = "orange2")
   
   partial_lightON = set.colorful.theme(partial_lightON)
   
-  save.plot(paste0("../plots/partial_light_on_ratio/", plot_name, ".png"), partial_lightON)
+  save.plot(paste0(PLOT_PATH, plot_name, ".png"), partial_lightON)
   
+  print(paste("plot:", plot_name))
   return(partial_lightON)
 }
 
 
 #plot
-for(lab in 1:length(PARTIAL_LIGHT_ON_RATIO_list)){
-  plot_partial_lightOn <- plot.partial.lightOn(PARTIAL_LIGHT_ON_RATIO_list[lab], get.expDate.1.1())  
+#plot
+if(PLOTTING){
+  # for(lab in 1:length(PARTIAL_LIGHT_ON_RATIO_list)){
+  #   plot_partial_lightOn <- plot.partial.lightOn(PARTIAL_LIGHT_ON_RATIO_list[lab], get.expDate.1.1(), PLOT_PATH)  
+  # }
+  
+  for(lab in 1:length(PARTIAL_LIGHT_ON_RATIO_list)){
+    plot_partial_lightOn <- plot.partial.lightOn(PARTIAL_LIGHT_ON_RATIO_list[lab], get.expDate.1.2(), PLOT_PATH)  
+  }
+  
+  for(lab in 1:length(PARTIAL_LIGHT_ON_RATIO_list)){
+    plot_partial_lightOn <- plot.partial.lightOn(PARTIAL_LIGHT_ON_RATIO_list[lab], get.expDate.2(), PLOT_PATH)  
+  }
 }
-
-for(lab in 1:length(PARTIAL_LIGHT_ON_RATIO_list)){
-  plot_partial_lightOn <- plot.partial.lightOn(PARTIAL_LIGHT_ON_RATIO_list[lab], get.expDate.1.2())  
-}
-
-for(lab in 1:length(PARTIAL_LIGHT_ON_RATIO_list)){
-  plot_partial_lightOn <- plot.partial.lightOn(PARTIAL_LIGHT_ON_RATIO_list[lab], get.expDate.2())  
-}
-
 
 
 ### ------------------------------------------------------------ ###
@@ -175,7 +180,6 @@ for(lab in 1:length(PARTIAL_LIGHT_ON_RATIO_list)){
 ### ------------------------------------------------------------ ### 
 
 target_summary_list = PARTIAL_LIGHT_ON_RATIO_list
-all_expDate = get.expDate.all()
 
 target_labs         = LABS                    # lab 
 target_types_of_day = TYPES_OF_DAY            # day_type

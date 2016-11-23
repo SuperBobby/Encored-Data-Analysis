@@ -28,7 +28,8 @@ load("../data/raw/ux_15min.RData")
 
 ## Update & save 15min data  
 update_start = "2014-09-01"
-update_end = "2016-08-30"
+update_end = "2016-08-29"
+# update_end = "2016-09-01"
 
 marg_defalut_table_15min <- reviseSNUData(marg_defalut_table_15min, "marg", update_start, update_end, verbose = T)
 hcc_defalut_table_15min <- reviseSNUData( hcc_defalut_table_15min, "hcc",  update_start, update_end, verbose = T)
@@ -75,35 +76,56 @@ hcc_dt = na.missing.data(hcc_dt, 0.05)
 ux_dt = na.missing.data(ux_dt, 0.02)
 
 ##
-## Computer
-## Abnormal computer usage (HVAC usage at computer feeder)
-## hcc : computer usage over 0.6 --> NA
-##  ux : computer usage over 0.4 --> NA
-hcc_dt[computer > 0.6, ':='(computer = NA)]
+## Abnormal computer usage - Computer
+##  (HVAC usage at computer feeder)
+## hcc : computer usage > 0.45 --> NA
+##  ux : computer usage > 0.4 --> NA
+hcc_dt[computer > 0.45, ':='(computer = NA)]
 ux_dt[computer > 0.4, ':='(computer = NA)]
 
 ##
-## Light 
-## Abnormal light usage
+## Abnormal computer usage - Light 
 ## all labs: over 0.5 --> NA 
 marg_dt[light > 0.5, ':='(light = NA)]
 hcc_dt[light > 0.5, ':='(light = NA)]
 ux_dt[light > 0.5, ':='(light = NA)]
 
+##
+## Abnormal computer usage - Etc 
+marg_dt[etc > 0.3, ':='(etc = NA)]
+hcc_dt[etc > 0.1, ':='(etc = NA)]
+ux_dt[etc > 0.15, ':='(etc = NA)]
+
+##
+## Abnormal computer usage - HVAC
+## marg only ... 
+# marg_dt[hvac > 1.5, ':='(hvac = NA)]
+
+
 # check computer & light usage distributions
-par(mfrow=c(3,3))
-hist(marg_dt$computer, 100)
-hist(hcc_dt$computer, 100)
-hist(ux_dt$computer, 100)
-
-hist(marg_dt$light, 100)
-hist(hcc_dt$light, 100)
-hist(ux_dt$light, 100)
-
-hist(marg_dt$total, 100)
-hist(hcc_dt$total, 100)
-hist(ux_dt$total, 100)
-par(mfrow=c(1,1))
+{
+  par(mfrow=c(5,3))
+  hist(marg_dt$computer, 100)
+  hist(hcc_dt$computer, 100)
+  hist(ux_dt$computer, 100)
+  
+  hist(marg_dt$light, 100)
+  hist(hcc_dt$light, 100)
+  hist(ux_dt$light, 100)
+  
+  hist(marg_dt[hvac > 0.1]$hvac, 100)
+  hist(hcc_dt[hvac > 0.01]$hvac, 100)
+  hist(ux_dt[hvac > 0.01]$hvac, 100)
+  
+  hist(marg_dt$etc, 100)
+  hist(hcc_dt$etc, 100)
+  hist(ux_dt$etc, 100)
+  
+  hist(marg_dt$total, 100)
+  hist(hcc_dt$total, 100)
+  hist(ux_dt$total, 100)
+  par(mfrow=c(1,1))
+}
 
 
 ##

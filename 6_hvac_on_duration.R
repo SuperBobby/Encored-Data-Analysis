@@ -1,25 +1,25 @@
 ### ------------------------------------------------------------ ###
-### light_on_duration per day
+### hvac_on_duration per day
 ### 
 ### JY, EJ @ ADSL, SNU 
 ###                                   last update : 2016. 11. 19.
 ### ------------------------------------------------------------ ###
 
-# * Light-on_duration: sum of 'light-on' duration per day
-#   ('light-on': over 0.01 consumption(for 15min))
+# * HVAC-on_duration: sum of 'HVAC-on' duration per day
+#   ('HVAC-on': over 0.1 consumption(for 15min))
 # * unit: hours / day
 # * Down is good
 
 ### -------------------------------------------------------------------- ###
-### Build list of tables : LIGHT_ON_DURATION_list
+### Build list of tables : HVAC_ON_DURATION_list
 ### 
-### table_name = {lab}_{agg_unit}_{day_type}_'light_on_duration'
+### table_name = {lab}_{agg_unit}_{day_type}_'hvac_on_duration'
 ### -------------------------------------------------------------------- ### 
 
-LIGHT_ON_DURATION_list = list()
-LIGHT_ON_MIN_USAGE = 0.01
+HVAC_ON_DURATION_list = list()
+HVAC_ON_MIN_USAGE = 0.1
 
-LABEL = 'light_on_duration'
+LABEL = 'hvac_on_duration'
 
 PLOT_PATH = "../plots/"
 
@@ -30,7 +30,7 @@ PLOT_PATH = "../plots/"
 # 4. target feeder
 
 LABS = c("MARG", "HCC", "UX")                                # lab
-AGG_UNITS = c("aggWeek", "aggDay")                           # agg_unit
+AGG_UNITS = c("aggDay")                                      # agg_unit
 TYPES_OF_DAY = c("allDay", "workingday", "non_workingday")   # day_type
 
 dt_list = setNames(dt_list, LABS)
@@ -51,51 +51,49 @@ for(lab in LABS){
       
       if(day_type == "allDay"){
         
-        light_on_duration_dt = lab_dt[, .(sum(light > LIGHT_ON_MIN_USAGE)), 
+        hvac_on_duration_dt = lab_dt[, .(sum(hvac > HVAC_ON_MIN_USAGE)), 
                                       by=get(agg_unit)]
         
       } else if(day_type == "workingday") {
         
-        light_on_duration_dt = lab_dt[workingday == T, .(sum(light > LIGHT_ON_MIN_USAGE)), 
+        hvac_on_duration_dt = lab_dt[workingday == T, .(sum(hvac > HVAC_ON_MIN_USAGE)), 
                                       by=get(agg_unit)]
         
       } else if(day_type == "non_workingday") {
         
-        light_on_duration_dt = lab_dt[workingday == F, .(sum(light > LIGHT_ON_MIN_USAGE)), 
+        hvac_on_duration_dt = lab_dt[workingday == F, .(sum(hvac > HVAC_ON_MIN_USAGE)), 
                                       by=get(agg_unit)]
       }
       
       # change column name
-      names(light_on_duration_dt) = c("timestamp", LABEL)
+      names(hvac_on_duration_dt) = c("timestamp", LABEL)
       
       # change unit: '(count of 15min) / (day or week)' to 'hours/day'
       if(agg_unit == 'aggDay'){
         
-        light_on_duration_dt$light_on_duration = light_on_duration_dt$light_on_duration * 15 / 60
-          
+        hvac_on_duration_dt$hvac_on_duration = hvac_on_duration_dt$hvac_on_duration * 15 / 60
+        
       } else {
         
-        light_on_duration_dt$light_on_duration = light_on_duration_dt$light_on_duration * 15 / 60 / 7
+        hvac_on_duration_dt$hvac_on_duration = hvac_on_duration_dt$hvac_on_duration * 15 / 60 / 7
       }
       
       # append data.table to list 
-      LIGHT_ON_DURATION_list = append(LIGHT_ON_DURATION_list, setNames(list(light_on_duration_dt),dt_name))
+      HVAC_ON_DURATION_list = append(HVAC_ON_DURATION_list, setNames(list(hvac_on_duration_dt),dt_name))
     }
   }
 }
 
 
 
-
 ### -------------------------------- ###
-### Plot: light_on duration     
+### Plot: hvac_on duration     
 ### -------------------------------- ### 
 
-
-plot.light.On.duration <- function(dt, expDate, PLOT_PATH, lightON_duration_color = "darkolivegreen"){
+plot.hvac.On.duration <- function(dt, expDate, PLOT_PATH, hvacON_duration_color = "darkolivegreen"){
   
   plot_dt = dt[[1]]
-
+  
   if(expDate[length(expDate)] == "2014-11-17"){
     #exp1-1
     plot_dt = cut.expDate.1.1(plot_dt)
@@ -113,63 +111,60 @@ plot.light.On.duration <- function(dt, expDate, PLOT_PATH, lightON_duration_colo
   }
   
   windowingWeek = 4
- 
-  light_on_duration <- ggplot(plot_dt, aes(x=timestamp)) +
+  
+  hvac_on_duration <- ggplot(plot_dt, aes(x=timestamp)) +
     ggtitle(plot_name)+
     scale_y_continuous(limits=c(0,24), oob=rescale_none) +
-    ylab("Light-ON duration (hours)")+
-    scale_color_discrete(breaks = c("light_on_duration"), labels = c("light on duration (hours/day)"))
+    ylab("HVAC-ON duration (hours)")+
+    scale_color_discrete(breaks = c("hvac_on_duration"), labels = c("hvac on duration (hours/day)"))
   
-  light_on_duration = add.colorful.window.line(light_on_duration, plot_dt, plot_name, 'light_on_duration', 
-                                               windowingWeek, lightON_duration_color, expDate)
+  hvac_on_duration = add.colorful.window.line(hvac_on_duration, plot_dt, plot_name, 'hvac_on_duration', 
+                                               windowingWeek, hvacON_duration_color, expDate)
   
   if(expDate[length(expDate)] == "2014-11-17"){
     #exp1-1
-    light_on_duration = add.event.vline.exp1.1(light_on_duration)
+    hvac_on_duration = add.event.vline.exp1.1(hvac_on_duration)
   } else if(expDate[length(expDate)] == "2015-01-22"){
     #exp1-2
-    light_on_duration = add.event.vline.exp1.2(light_on_duration)
+    hvac_on_duration = add.event.vline.exp1.2(hvac_on_duration)
   } else{
     #exp2
-    light_on_duration = add.event.vline.exp2(light_on_duration)
+    hvac_on_duration = add.event.vline.exp2(hvac_on_duration)
   }
-
-  light_on_duration = set.colorful.theme(light_on_duration)
   
-  save.plot(paste0(PLOT_PATH, plot_name, ".png"), light_on_duration)
+  hvac_on_duration = set.colorful.theme(hvac_on_duration)
+  
+  save.plot(paste0(PLOT_PATH, plot_name, ".png"), hvac_on_duration)
   
   print(paste("plot:", plot_name))
-  return(light_on_duration)
+  return(hvac_on_duration)
 }
 
 
 
 #plot
 if(PLOTTING){
-  # for(lab in 1:length(LIGHT_ON_DURATION_list)){
-  #   plot_lightOn_duration <- plot.light.On.duration(LIGHT_ON_DURATION_list[lab], get.expDate.1.1(), PLOT_PATH)  
+  # for(lab in 1:length(HVAC_ON_DURATION_list)){
+  #   plot_hvacOn_duration <- plot.hvac.On.duration(HVAC_ON_DURATION_list[lab], get.expDate.1.1(), PLOT_PATH)  
   # }
   
-  for(lab in 1:length(LIGHT_ON_DURATION_list)){
-    plot_lightOn_duration <- plot.light.On.duration(LIGHT_ON_DURATION_list[lab], get.expDate.1.2(), PLOT_PATH)  
+  for(lab in 1:length(HVAC_ON_DURATION_list)){
+    plot_hvacOn_duration <- plot.hvac.On.duration(HVAC_ON_DURATION_list[lab], get.expDate.1.2(), PLOT_PATH)  
   }
   
-  for(lab in 1:length(LIGHT_ON_DURATION_list)){
-    plot_lightOn_duration <- plot.light.On.duration(LIGHT_ON_DURATION_list[lab], get.expDate.2(), PLOT_PATH)  
+  for(lab in 1:length(HVAC_ON_DURATION_list)){
+    plot_hvacOn_duration <- plot.hvac.On.duration(HVAC_ON_DURATION_list[lab], get.expDate.2(), PLOT_PATH)  
   }
 }
-
-
-
 
 ### ------------------------------------------------------------ ###
 ### Update summary_list
 ###
 ### category = {lab} + {day_type} + {label} 
-###                                 {label} = 'light_on_duration' 
+###                                 {label} = 'hvac_on_duration' 
 ### ------------------------------------------------------------ ### 
 
-target_summary_list = LIGHT_ON_DURATION_list
+target_summary_list = HVAC_ON_DURATION_list
 
 target_labs         = LABS                    # lab 
 target_types_of_day = TYPES_OF_DAY            # day_type
@@ -182,7 +177,7 @@ for(lab in target_labs){
     
     dt_name = paste(lab, agg_unit, day_type, LABEL, sep="_")
     target_dt = target_summary_list[[dt_name]][,c('timestamp', LABEL),with=F]
-
+    
     category_name = paste(lab, day_type, LABEL, sep='_')
     
     print(category_name)
@@ -193,3 +188,5 @@ for(lab in target_labs){
     summary_list = append(summary_list, setNames(list(split_list), category_name))
   }
 }
+
+# source('10_representation_table.R')
