@@ -50,13 +50,44 @@ get.expDate.all <- function() {
                   c(as.Date("2016-02-01"), as.Date("2016-05-15")), # 2-4
                   c(as.Date("2016-05-16"), as.Date("2016-06-12")), # 2-5
                   c(as.Date("2016-06-13"), as.Date("2016-08-28"))) # post 2
-  
+
   exp_Names = c('pre 1', '1-1', 'post 1-1', '1-2', 'post 1-2', 'pre 2', '2-1', '2-2', '2-3', '2-4', '2-5', 'post 2')
   exp_Date = setNames(exp_Date, exp_Names)
-  
+
   return(exp_Date)
 }
 
+# 
+# get.expDate.all <- function() {
+#   exp_Date = list(c(as.Date("2014-10-01"), as.Date("2014-10-31")), # 14y-10
+#                   c(as.Date("2014-11-01"), as.Date("2014-11-30")), # 14y-11
+#                   c(as.Date("2014-12-01"), as.Date("2014-12-31")), # 14y-12
+#                   c(as.Date("2015-01-01"), as.Date("2015-01-31")), # 15y-01
+#                   c(as.Date("2015-02-01"), as.Date("2015-02-28")), # 15y-02
+#                   c(as.Date("2015-03-01"), as.Date("2015-03-31")), # 15y-03  
+#                   c(as.Date("2015-04-01"), as.Date("2015-04-30")), # 15y-04
+#                   c(as.Date("2015-05-01"), as.Date("2015-05-31")), # 15y-05
+#                   c(as.Date("2015-06-01"), as.Date("2015-06-30")), # 15y-06
+#                   c(as.Date("2015-07-01"), as.Date("2015-07-31")), # 15y-07
+#                   c(as.Date("2015-08-01"), as.Date("2015-08-30")), # 15y-08
+#                   c(as.Date("2015-09-01"), as.Date("2015-08-30")), # 15y-09
+#                   c(as.Date("2015-10-01"), as.Date("2015-10-31")), # 15y-10
+#                   c(as.Date("2015-11-01"), as.Date("2015-11-30")), # 15y-11
+#                   c(as.Date("2015-12-01"), as.Date("2015-12-31")), # 15y-12
+#                   c(as.Date("2016-01-01"), as.Date("2016-01-31")), # 16y-01
+#                   c(as.Date("2016-02-01"), as.Date("2016-02-28")), # 16y-02
+#                   c(as.Date("2016-03-01"), as.Date("2016-03-31")), # 16y-03  
+#                   c(as.Date("2016-04-01"), as.Date("2016-04-30")), # 16y-04
+#                   c(as.Date("2016-05-01"), as.Date("2016-05-31")), # 16y-05
+#                   c(as.Date("2016-06-01"), as.Date("2016-06-30")), # 16y-06
+#                   c(as.Date("2016-07-01"), as.Date("2016-07-31")), # 16y-07
+#                   c(as.Date("2018-08-01"), as.Date("2016-08-28"))) # 16y-08 
+#   
+#   exp_Names = c('pre 1', '1-1', 'post 1-1', '1-2', 'post 1-2', 'pre 2', '2-1', '2-2', '2-3', '2-4', '2-5', 'post 2')
+#   exp_Date = setNames(exp_Date, exp_Names)
+#   
+#   return(exp_Date)
+# }
 
 
 # Cut the data.table depending on experiment date 
