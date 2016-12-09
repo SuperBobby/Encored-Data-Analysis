@@ -7,10 +7,10 @@ N_of_feeder = length(milli_dt) - 1
 PRE_POST_WIDTH = 30 # secs
 HIGHLIGHT_WIDTH = 5 # secs 
 
-PRE_POST_HEIGHT_THRE = 20 # Watts
+PRE_POST_HEIGHT_THRE = 30 # Watts
 
-ON_OFF_GAP_THRE   = 40 # Watts
-PRE_POST_GAP_THRE = 30 # Watts
+ON_OFF_GAP_THRE   = 80 # Watts
+PRE_POST_GAP_THRE = 50 # Watts
 
 STARTING_INDEX = PRE_POST_WIDTH + HIGHLIGHT_WIDTH + 1
 FINISHING_INDEX = nrow(one_com_feeder_dt) - PRE_POST_WIDTH - HIGHLIGHT_WIDTH
@@ -20,7 +20,7 @@ get.com.status = function(pre, highlight, post){
   pre_height = quantile(pre, 0.9) - quantile(pre, 0.1)
   pre_med   = median(pre)
   
-  on_off_gap = sum(diff(highlight))
+  on_off_gap = range(highlight)[2] - range(highlight)[1]
   
   post_height = quantile(post, 0.9) - quantile(post, 0.1)
   post_med   = median(post)
@@ -29,12 +29,12 @@ get.com.status = function(pre, highlight, post){
   
   ## Thresholding 
   if(abs(on_off_gap)   >= ON_OFF_GAP_THRE & 
-     # abs(pre_post_gap) >= PRE_POST_GAP_THRE  & 
+     abs(pre_post_gap) >= PRE_POST_GAP_THRE  &
      pre_height  <= PRE_POST_HEIGHT_THRE & 
      post_height <= PRE_POST_HEIGHT_THRE) {
     
-    if(on_off_gap > 0){ return_status = 1} 
-    else if(on_off_gap < 0) { return_status = -1 }
+    if(PRE_POST_GAP_THRE > 0){ return_status = 1} 
+    else if(PRE_POST_GAP_THRE < 0) { return_status = -1 }
     else { return_status = 2 }
     
     print(paste(round(on_off_gap), round(pre_post_gap), 
@@ -43,7 +43,13 @@ get.com.status = function(pre, highlight, post){
   } else {
     return_status = 0
   }
-  return(return_status)
+  return(c(on_off_gap=on_off_gap, 
+           pre_post_gap=pre_post_gap, 
+           pre_height=pre_height, 
+           pre_med=pre_med, 
+           post_height=post_height, 
+           post_med=post_med, 
+           return_status=return_status))
 }
 
 
@@ -51,10 +57,15 @@ get.com.status = function(pre, highlight, post){
 ## LoooooooooooooooooooooooP~!
 ##
 
+
 lab_labels = c('marg', 'hcc', 'ux')
 
 for(lab in lab_labels){
-  
+ 
+  ## initialize status_dt
+  status_dt = data.frame(matrix(data=NA, nrow=1, ncol=8))
+  names(status_dt) <-c("lab", "on_off_gap", "pre_post_gap", "pre_height", "pre_med", "post_height", "post_med", "return_status")
+   
   ## load input file 
   input_file_name = paste0("../data/sec_tidy/", lab, "_2015-09-01(com).csv")  
   com_dt = fread(input_file_name)
@@ -72,10 +83,16 @@ for(lab in lab_labels){
       highlight = com_usage[(index-HIGHLIGHT_WIDTH):(index+HIGHLIGHT_WIDTH)]
       post      = com_usage[(index+HIGHLIGHT_WIDTH+1):(index+PRE_POST_WIDTH+HIGHLIGHT_WIDTH)]
       
-      one_com_feeder_dt[index]$status = get.com.status(pre, highlight, post)
+      status_vector = get.com.status(pre, highlight, post)
+      status_dt = rbind(status_dt, c(lab, status_vector))
+      
+      one_com_feeder_dt[index]$status = status_vector[7]
       
       # show the current status change at console  
-      if(index %% 60 == 0| one_com_feeder_dt$status != 0) print(one_com_feeder_dt[index])
+      if(index %% 60 == 0| one_com_feeder_dt[index]$status != 0) {
+        print(status_vector)
+        print(one_com_feeder_dt[index])
+      }
     }
     
     ##
@@ -105,6 +122,8 @@ for(lab in lab_labels){
       ggsave(filename = paste0("../plots/milli/", lab, target_feeder,'-', i, ".png"), plot = p, width = 50, height = 10, units='cm')
     }
   }
+  
+  write.csv(status_dt, paste0('../data/status_dt(', lab,').csv'), row.names = F)
   
 }
 
