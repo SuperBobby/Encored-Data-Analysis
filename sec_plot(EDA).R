@@ -2,8 +2,6 @@ library(data.table)
 library(ggplot2)
 library(zoo)
 
-com_dt = fread("../data/sec_tidy/hcc_2015-09-01(com).csv")
-
 N_of_feeder = length(milli_dt) - 1
 
 PRE_POST_WIDTH = 30 # secs
@@ -12,11 +10,10 @@ HIGHLIGHT_WIDTH = 5 # secs
 PRE_POST_HEIGHT_THRE = 20 # Watts
 
 ON_OFF_GAP_THRE   = 40 # Watts
-PRE_POST_GAP_THRE = 40 # Watts
+PRE_POST_GAP_THRE = 30 # Watts
 
 STARTING_INDEX = PRE_POST_WIDTH + HIGHLIGHT_WIDTH + 1
 FINISHING_INDEX = nrow(one_com_feeder_dt) - PRE_POST_WIDTH - HIGHLIGHT_WIDTH
-
 
 get.com.status = function(pre, highlight, post){
   
@@ -49,54 +46,69 @@ get.com.status = function(pre, highlight, post){
 }
 
 
-for(target_feeder in 1:N_of_feeder){
-  one_com_feeder_dt = com_dt[, c(1,target_feeder+1),with=F]
-  one_com_feeder_dt = cbind(one_com_feeder_dt, status = 0)
+## ------------------------------------------- ##
+## LoooooooooooooooooooooooP~!
+##
+
+lab_labels = c('marg', 'hcc', 'ux')
+
+for(lab in lab_labels){
   
-  for(index in STARTING_INDEX:(FINISHING_INDEX)){
+  ## load input file 
+  input_file_name = paste0("../data/sec_tidy/", lab, "_2015-09-01(com).csv")  
+  com_dt = fread(input_file_name)
+  
+  ## loop for each computer feeder
+  for(target_feeder in 1:N_of_feeder){
+    one_com_feeder_dt = com_dt[, c(1,target_feeder+1),with=F]
+    one_com_feeder_dt = cbind(one_com_feeder_dt, status = 0)
     
-    com_usage = unlist(one_com_feeder_dt[,2, with=F]) / 1000
-    com_usage = na.locf(com_usage)
+    for(index in STARTING_INDEX:(FINISHING_INDEX)){
+      com_usage = unlist(one_com_feeder_dt[,2, with=F]) / 1000
+      com_usage = na.locf(com_usage)
+      
+      pre       = com_usage[(index-PRE_POST_WIDTH-HIGHLIGHT_WIDTH):(index-HIGHLIGHT_WIDTH-1)]
+      highlight = com_usage[(index-HIGHLIGHT_WIDTH):(index+HIGHLIGHT_WIDTH)]
+      post      = com_usage[(index+HIGHLIGHT_WIDTH+1):(index+PRE_POST_WIDTH+HIGHLIGHT_WIDTH)]
+      
+      one_com_feeder_dt[index]$status = get.com.status(pre, highlight, post)
+      
+      # show the current status change at console  
+      print(one_com_feeder_dt[index])
+    }
     
-    pre       = com_usage[(index-PRE_POST_WIDTH-HIGHLIGHT_WIDTH):(index-HIGHLIGHT_WIDTH-1)]
-    highlight = com_usage[(index-HIGHLIGHT_WIDTH):(index+HIGHLIGHT_WIDTH)]
-    post      = com_usage[(index+HIGHLIGHT_WIDTH+1):(index+PRE_POST_WIDTH+HIGHLIGHT_WIDTH)]
+    ##
+    ## plotting 
+    dt_for_plot = one_com_feeder_dt
     
-    one_com_feeder_dt[index]$status = get.com.status(pre, highlight, post)
+    unit = 200
+    loop_max = nrow(dt_for_plot) / unit
     
-    # show the current status change at console  
-    print(one_com_feeder_dt[index])
+    com_feeder_name = paste0(lab, '_com1')
+    
+    max_value = range(com_usage)[2] * 0.8 
+    min_value = range(com_usage)[1]
+    
+    for(i in 1:loop_max){
+      sub_dt = dt_for_plot[(unit*(i-1)+1):(unit*(i))]
+      plot_name = paste(lab, sub_dt$dts[1])
+      print(plot_name)
+      
+      p <- ggplot(sub_dt) +
+        geom_point(aes(x=dts, y=get(com_feeder_name)/1000, color=factor(status)), size=1) +
+        theme(axis.text.x = element_text(size=5, angle = 90, hjust = 1)) +
+        ylim(min_value, max_value) +
+        ggtitle(plot_name)
+      
+      # print(p)
+      ggsave(filename = paste0("../plots/milli/", lab, target_feeder,'-', i, ".png"), plot = p, width = 50, height = 10, units='cm')
+    }
   }
-  
-  
-  ## plotting 
-  dt = one_com_feeder_dt
-  
-  unit = 200
-  loop_max = nrow(dt) / unit
-  
-  com_feeder_name = 'hcc_com1'
-  
-  max_value = range(com_usage)[2] * 0.8 
-  min_value = range(com_usage)[1]
-  
-  for(i in 1:loop_max){
-    sub_dt = dt[(unit*(i-1)+1):(unit*(i))]
-    plot_name = sub_dt$dts[1]
-    print(plot_name)
-    
-    p <- ggplot(sub_dt) +
-      geom_point(aes(x=dts, y=get(com_feeder_name)/1000, color=factor(status)), size=1) +
-      theme(axis.text.x = element_text(size=5, angle = 90, hjust = 1)) +
-      ylim(min_value, max_value) +
-      ggtitle(plot_name)
-    
-    # print(p)
-    ggsave(filename = paste0("../plots/milli/hcc",target_feeder,'-', i, ".png"), plot = p, width = 50, height = 10, units='cm')
-  }
-  
   
 }
+
+
+
 
 
 
