@@ -27,8 +27,6 @@ get.com.status = function(pre, highlight, post){
   
   pre_post_gap = post_med - pre_med
   
-  print(paste(round(on_off_gap), round(pre_post_gap), "(", pre_height, pre_med, "|", post_height, post_med, ")"))
-  
   ## Thresholding 
   if(abs(on_off_gap)   >= ON_OFF_GAP_THRE & 
      # abs(pre_post_gap) >= PRE_POST_GAP_THRE  & 
@@ -38,6 +36,9 @@ get.com.status = function(pre, highlight, post){
     if(on_off_gap > 0){ return_status = 1} 
     else if(on_off_gap < 0) { return_status = -1 }
     else { return_status = 2 }
+    
+    print(paste(round(on_off_gap), round(pre_post_gap), 
+                "(", round(pre_height), round(pre_med), "|", round(post_height), round(post_med), ")"))
     
   } else {
     return_status = 0
@@ -74,7 +75,7 @@ for(lab in lab_labels){
       one_com_feeder_dt[index]$status = get.com.status(pre, highlight, post)
       
       # show the current status change at console  
-      print(one_com_feeder_dt[index])
+      if(index %% 60 == 0| one_com_feeder_dt$status != 0) print(one_com_feeder_dt[index])
     }
     
     ##
