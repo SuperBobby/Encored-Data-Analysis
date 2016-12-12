@@ -22,12 +22,12 @@ SEC_DT_PATH = "data/sec/"
 PLOT_PATH = "plots/"
 DT_SAVE_PATH = 'data/'
 
-LOADING_NROW = -1
+LOADING_NROW = 2400
 
 get.moving.avg <- function(x,n=5){filter(x,rep(1/n,n), sides=2)}
 
 get.com.status = function(sub_com_usage, CHANGE_THRE){
-  indexed_value = median(sub_com_usage[1:INDEX_LENGTH])
+  indexed_value = median(sub_com_usage[1:(INDEX_LENGTH+1)])
   comparing_values = sub_com_usage[(INDEX_LENGTH+1):length(sub_com_usage)]
   
   #         indexed_value = sub_com_usage[1]
@@ -70,7 +70,7 @@ LOOP_START = numeric(0)
 LOOP_END = numeric(0)
 
 # lab_labels = c('marg', 'hcc', 'ux')
-lab_labels = c('marg', 'hcc', 'ux')
+lab_labels = c('hcc')
 
 for(lab in lab_labels){
   
@@ -102,12 +102,12 @@ for(lab in lab_labels){
     #                 STARTING_INDEX = (MOVING_AVG_WIDTH - 1) / 2 + 1
     #                 FINISHING_INDEX = (nrow(one_com_feeder_dt)-STARTING_INDEX) - COMPARING_LENGTH - 1
     
-    STARTING_INDEX = INDEX_LENGTH
-    FINISHING_INDEX = nrow(one_com_feeder_dt) - COMPARING_LENGTH - 1 - INDEX_LENGTH
+    STARTING_INDEX = INDEX_LENGTH+1
+    FINISHING_INDEX = nrow(one_com_feeder_dt) - COMPARING_LENGTH - 1
     
     for(index in STARTING_INDEX:(FINISHING_INDEX)){
       
-      sub_com_usage = com_usage[(index-INDEX_LENGTH+1):(index+COMPARING_LENGTH)]
+      sub_com_usage = com_usage[(index-INDEX_LENGTH):(index+COMPARING_LENGTH)]
       
       status = get.com.status(sub_com_usage, CHANGE_THRE)
       status_dt = rbind(status_dt, c(lab, target_feeder, one_com_feeder_dt[index]$dts,
