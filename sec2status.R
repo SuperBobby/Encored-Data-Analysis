@@ -168,7 +168,7 @@ for(lab in LAB_LABLES){
         for(i in 1:loop_max){
           sub_dt = dt_for_plot[(unit*(i-1)+1):(unit*(i))]
           plot_name = paste(lab, sub_dt$dts[1])
-          print(paste('plot:', i, plot_name))
+          print(paste('plot:', target_feeder, '-', i, plot_name))
           
           p <- ggplot(sub_dt) +
             geom_point(aes(x=dts, y=get(com_feeder_name)/1000, color=factor(status)), size=1) +
