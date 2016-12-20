@@ -2,8 +2,8 @@ library(data.table)
 library(ggplot2)
 library(zoo)
 
-REF_LENGTH = 30
-COMPARING_LENGTH = 120
+REF_LENGTH = 10
+COMPARING_LENGTH = 30
 PRE_POST_GAP_THRE = 40 # Watts
 
 FUMBLING_LENGTH = 5
@@ -20,15 +20,17 @@ TIDY_DATA_DIR = "../data/sec_tidy/"
 STATUS_DT_SAVE_PATH = "../data/status/"
 PLOT_PATH = "../plots/milli/"
 
-PLOTTING = F
+PLOTTING = T
 
 LOADING_NROW = -1
 
 # LAB_LABLES = c('marg', 'hcc', 'ux')
 LAB_LABLES = c('marg')
 
-START_DATE = as.Date("2015-09-01")
+# START_DATE = as.Date("2015-09-01")
 # END_DATE = as.Date("2015-09-02")
+
+START_DATE = as.Date("2016-12-06")
 END_DATE = as.Date("2016-12-06")
 
 ## -----------------------------
@@ -166,7 +168,7 @@ for(lab in LAB_LABLES){
         for(i in 1:loop_max){
           sub_dt = dt_for_plot[(unit*(i-1)+1):(unit*(i))]
           plot_name = paste(lab, sub_dt$dts[1])
-          print(paste('plot:', plot_name))
+          print(paste('plot:', i, plot_name))
           
           p <- ggplot(sub_dt) +
             geom_point(aes(x=dts, y=get(com_feeder_name)/1000, color=factor(status)), size=1) +
