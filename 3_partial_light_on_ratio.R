@@ -59,7 +59,7 @@ get.partial.light.on.ratio <- function(light, LIGHT_ON_MIN_USAGE, light_peak, PA
   if(sum(light_on) == 0){
     return(0)
   } else {
-    partial_light_on_ratio = sum(partial_light_on) / sum(light_on)
+    partial_light_on_ratio = (sum(partial_light_on) / sum(light_on)) * 100
   }
   return(partial_light_on_ratio)
 }

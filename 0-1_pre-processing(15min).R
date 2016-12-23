@@ -28,7 +28,7 @@ load("../data/raw/ux_15min.RData")
 
 ## Update & save 15min data  
 update_start = "2014-09-01"
-update_end = "2016-08-28"
+update_end = "2016-09-01"
 
 marg_defalut_table_15min <- reviseSNUData(marg_defalut_table_15min, "marg", update_start, update_end, verbose = T)
 hcc_defalut_table_15min <- reviseSNUData( hcc_defalut_table_15min, "hcc",  update_start, update_end, verbose = T)

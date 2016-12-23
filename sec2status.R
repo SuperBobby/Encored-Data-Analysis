@@ -2,11 +2,11 @@ library(data.table)
 library(ggplot2)
 library(zoo)
 
-REF_LENGTH = 10
-COMPARING_LENGTH = 30
+REF_LENGTH = 20
+COMPARING_LENGTH = 60
 PRE_POST_GAP_THRE = 40 # Watts
 
-FUMBLING_LENGTH = 5
+FUMBLING_LENGTH = 10
 
 DEFAULT_STATUS = 'stay'
 RISING_STATUS  = 'up'
@@ -20,7 +20,7 @@ TIDY_DATA_DIR = "../data/sec_tidy/"
 STATUS_DT_SAVE_PATH = "../data/status/"
 PLOT_PATH = "../plots/milli/"
 
-PLOTTING = T
+PLOTTING = F
 
 LOADING_NROW = -1
 
@@ -157,7 +157,8 @@ for(lab in LAB_LABLES){
       if(PLOTTING){
         dt_for_plot = one_com_feeder_dt
         
-        unit = COMPARING_LENGTH * 4 + 1
+        # unit = COMPARING_LENGTH * 4 + 1
+        unit = 600
         loop_max = nrow(dt_for_plot) / unit
         
         com_feeder_name = paste0(lab, '_com', target_feeder)

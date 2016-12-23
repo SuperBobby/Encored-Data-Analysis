@@ -136,8 +136,10 @@ for(lab in lab_labels){
   
 }
 
-print(LOOP_END - LOOP_START)
+print((LOOP_END - LOOP_START)/60/60)
 
+# print((LOOP_END - LOOP_START)/60/60)
+# [1] 2.213390 3.202949 4.400864 2.228496 3.176093 2.194107
 
 
 
