@@ -30,7 +30,7 @@ PLOT_PATH = "../plots/"
 
 LABS = c("MARG", "HCC", "UX")                                # lab
 AGG_UNITS = c("aggWeek")                                     # agg_unit
-TYPES_OF_DAY = c("allDay", "workingday", "non_workingday")   # day_type
+TYPES_OF_DAY = c("allDay", "workingday", "nonworkingday")   # day_type
 
 dt_list = setNames(dt_list, LABS)
 
@@ -64,7 +64,7 @@ for(lab in LABS){
         
         whole_day_ligit_on_count_dt = lab_dt[workingday == T, .(whole_day_ligit_on_count = get.whole.day.ligit.on.count(.SD)), by=aggWeek]
         
-      } else if(day_type == "non_workingday") {
+      } else if(day_type == "nonworkingday") {
         
         whole_day_ligit_on_count_dt = lab_dt[workingday == F, .(whole_day_ligit_on_count = get.whole.day.ligit.on.count(.SD)), by=aggWeek]
       }

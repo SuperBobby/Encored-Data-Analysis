@@ -29,7 +29,7 @@ PLOT_PATH = "../plots/"
 
 LABS = c("MARG", "HCC", "UX")                                # lab
 AGG_UNITS = c("aggDay")                                      # agg_unit
-TYPES_OF_DAY = c("allDay", "workingday", "non_workingday")   # day_type
+TYPES_OF_DAY = c("allDay", "workingday", "nonworkingday")   # day_type
 
 dt_list = setNames(dt_list, LABS)
 
@@ -65,7 +65,7 @@ for(lab in LABS){
         com_base_ratio_dt = lab_dt[workingday == T, .(get.com.base.ratio(computer)), by=get(agg_unit)]
         
         
-      } else if(day_type == "non_workingday") {
+      } else if(day_type == "nonworkingday") {
         
         com_base_ratio_dt = lab_dt[workingday == F, .(get.com.base.ratio(computer)), by=get(agg_unit)]
       }

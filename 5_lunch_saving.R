@@ -32,7 +32,7 @@ PLOT_PATH = "../plots/"
 
 LABS = c("MARG", "HCC", "UX")                                # lab
 AGG_UNITS = c("aggWeek")                                     # agg_unit
-TYPES_OF_DAY = c("allDay", "workingday", "non_workingday")   # day_type
+TYPES_OF_DAY = c("allDay", "workingday", "nonworkingday")   # day_type
 FEEDERS = c("computer", "light")                             # feeder
 
 dt_list = setNames(dt_list, LABS)
@@ -86,13 +86,6 @@ for(lab in LABS){
         dt_name = paste(lab, agg_unit, day_type, feeder, LABEL, sep="_")
         print(paste("Build table:", dt_name))
         
-        # # subset by day_type ------------------> Why it doesn't work? should be figured out!
-        # if(day_type == "workingday"){ 
-        #   lab_dt = lab_dt[workingday == T] 
-        # } else if(day_type == "non_workingday"){ 
-        #   lab_dt = lab_dt[workingday == F] 
-        # } 
-
         if(day_type == "allDay"){
           
           lunch_time_saving_count_dt = lab_dt[, .(get.lunch.time.saving.count(.SD, feeder)), by=agg_unit]
@@ -101,7 +94,7 @@ for(lab in LABS){
           
           lunch_time_saving_count_dt = lab_dt[workingday == T, .(get.lunch.time.saving.count(.SD, feeder)), by=agg_unit]
           
-        } else if(day_type == "non_workingday") {
+        } else if(day_type == "nonworkingday") {
           
           lunch_time_saving_count_dt = lab_dt[workingday == F, .(get.lunch.time.saving.count(.SD, feeder)), by=agg_unit]
         }

@@ -9,10 +9,6 @@
 get.expDate.1.1 <- function() {
   exp_Date<-c(as.Date("2014-11-10"),
               as.Date("2014-11-17"))
-#               as.Date("2016-11-16"),
-#               as.Date("2016-11-16"),
-#               as.Date("2016-11-16"),
-#               as.Date("2016-11-16"))
   return(exp_Date)
 }
 
@@ -31,7 +27,7 @@ get.expDate.2 <- function() {
               as.Date("2015-12-01"),
               as.Date("2016-01-11"),
               as.Date("2016-02-01"),
-              as.Date("2016-05-16"),
+              # as.Date("2016-05-16"),
               as.Date("2016-06-13"))
   return(exp_Date)
 }

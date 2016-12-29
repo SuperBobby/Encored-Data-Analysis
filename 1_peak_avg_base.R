@@ -41,7 +41,7 @@ LABS = c("MARG", "HCC", "UX")                                  # lab
 # LABS = c("MARG", "HCC", "UX", "All_Labs")                    # lab
 AGG_UNITS = c("aggDay")                                        # agg_unit
 # AGG_UNITS = c("aggWeek", "aggDay")                           # agg_unit
-TYPES_OF_DAY = c("allDay", "workingday", "non_workingday")     # day_type
+TYPES_OF_DAY = c("allDay", "workingday", "nonworkingday")     # day_type
 FEEDERS = c("total", "total_woHVAC", "computer", "light", "hvac")                         # feeder
 # FEEDERS = c("total", "total_woHVAC", "total_woETC", "computer", "light", "hvac")            # feeder
 
@@ -73,7 +73,7 @@ for(lab in LABS){
           stats_dt = lab_dt[workingday == T, as.list(get.four.stats(get(feeder), PEAK_PERCENTILE, BASE_PERCENTILE)), 
                             by=.(timestamp=get(agg_unit))]
           
-        } else if(day_type == "non_workingday") {
+        } else if(day_type == "nonworkingday") {
           stats_dt = lab_dt[workingday == F, as.list(get.four.stats(get(feeder), PEAK_PERCENTILE, BASE_PERCENTILE)), 
                             by=.(timestamp=get(agg_unit))]
         }

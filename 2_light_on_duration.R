@@ -31,7 +31,7 @@ PLOT_PATH = "../plots/"
 
 LABS = c("MARG", "HCC", "UX")                                # lab
 AGG_UNITS = c("aggWeek", "aggDay")                           # agg_unit
-TYPES_OF_DAY = c("allDay", "workingday", "non_workingday")   # day_type
+TYPES_OF_DAY = c("allDay", "workingday", "nonworkingday")   # day_type
 
 dt_list = setNames(dt_list, LABS)
 
@@ -59,7 +59,7 @@ for(lab in LABS){
         light_on_duration_dt = lab_dt[workingday == T, .(sum(light > LIGHT_ON_MIN_USAGE)), 
                                       by=get(agg_unit)]
         
-      } else if(day_type == "non_workingday") {
+      } else if(day_type == "nonworkingday") {
         
         light_on_duration_dt = lab_dt[workingday == F, .(sum(light > LIGHT_ON_MIN_USAGE)), 
                                       by=get(agg_unit)]

@@ -33,7 +33,7 @@ PLOT_PATH = "../plots/"
 
 LABS = c("MARG", "HCC", "UX")                                # lab
 AGG_UNITS = c("aggWeek", "aggDay")                           # agg_unit
-TYPES_OF_DAY = c("allDay", "workingday", "non_workingday")   # day_type
+TYPES_OF_DAY = c("allDay", "workingday", "nonworkingday")   # day_type
 
 dt_list = setNames(dt_list, LABS)
 
@@ -91,7 +91,7 @@ for(lab in LABS){
                                            by=get(agg_unit)]
         
         
-      } else if(day_type == "non_workingday") {
+      } else if(day_type == "nonworkingday") {
         
         partial_light_on_ratio_dt = lab_dt[workingday == F, .(get.partial.light.on.ratio(light, LIGHT_ON_MIN_USAGE, light_peak, PARTIAL_ON_RATIO)), 
                                            by=get(agg_unit)]
