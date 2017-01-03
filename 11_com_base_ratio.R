@@ -1,24 +1,23 @@
 ### ------------------------------------------------------------ ###
-### whole_day_ligit_on_count per week 
+### com_base_ratio per day
 ### 
 ### JY, EJ @ ADSL, SNU 
 ###                                   last update : 2016. 9. 3.
 ### ------------------------------------------------------------ ###
 
-# * Def: number of days which is ‘light-on duration == 24hrs’ per week 
-# * Unit: # of days / week 
+# * Def: computer base / computer average in A working day 
+# * Unit: % 
 # * Down is good
 
 ### -------------------------------------------------------------------- ###
-### Build list of tables : WHOLE_DAY_LIGHT_ON_COUNT_list
+### Build list of tables : COM_BASE_RATIO_list
 ### 
-### table_name = {lab}_{agg_unit}_{day_type}_'whole_day_ligit_on_count' 
+### table_name = {lab}_{agg_unit}_{day_type}_'com_base_ratio' 
 ### -------------------------------------------------------------------- ### 
 
-WHOLE_DAY_LIGHT_ON_COUNT_list = list()
-LIGHT_ON_MIN_USAGE = 0.01
+COM_BASE_RATIO_list = list()
 
-LABEL = "whole_day_ligit_on_count"
+LABEL = "com_base_ratio"
 
 PLOT_PATH = "../plots/"
 
@@ -29,22 +28,23 @@ PLOT_PATH = "../plots/"
 # 4. target feeder
 
 LABS = c("MARG", "HCC", "UX")                                # lab
-AGG_UNITS = c("aggWeek")                                     # agg_unit
+AGG_UNITS = c("aggDay")                                      # agg_unit
 TYPES_OF_DAY = c("allDay", "workingday", "nonworkingday")   # day_type
 
 dt_list = setNames(dt_list, LABS)
 
-
-get.whole.day.ligit.on.count <- function(sub_dt){
-  whole_day_ligit_on_dt = sub_dt[, .(whole_day_ligit_on = (sum(light > LIGHT_ON_MIN_USAGE)==96)), by=aggDay]
+get.com.base.ratio <- function(usage){
+  avg  = mean(usage, na.rm = T)
+  base = quantile(usage, 0.1, na.rm = T)
   
-  return(sum(whole_day_ligit_on_dt$whole_day_ligit_on))
+  return((base/avg)*100)
 }
 
 
 # 1. lab
 for(lab in LABS){ 
   lab_dt = dt_list[[lab]]
+  light_peak = quantile(lab_dt$light, .9)
   
   # 2. Aggregation unit
   for(agg_unit in AGG_UNITS){
@@ -58,32 +58,30 @@ for(lab in LABS){
       
       if(day_type == "allDay"){
         
-        whole_day_ligit_on_count_dt = lab_dt[, .(whole_day_ligit_on_count = get.whole.day.ligit.on.count(.SD)), by=aggWeek]
+        com_base_ratio_dt = lab_dt[, .(get.com.base.ratio(computer)), by=get(agg_unit)]
         
       } else if(day_type == "workingday") {
         
-        whole_day_ligit_on_count_dt = lab_dt[workingday == T, .(whole_day_ligit_on_count = get.whole.day.ligit.on.count(.SD)), by=aggWeek]
+        com_base_ratio_dt = lab_dt[workingday == T, .(get.com.base.ratio(computer)), by=get(agg_unit)]
+        
         
       } else if(day_type == "nonworkingday") {
         
-        whole_day_ligit_on_count_dt = lab_dt[workingday == F, .(whole_day_ligit_on_count = get.whole.day.ligit.on.count(.SD)), by=aggWeek]
+        com_base_ratio_dt = lab_dt[workingday == F, .(get.com.base.ratio(computer)), by=get(agg_unit)]
       }
+      names(com_base_ratio_dt) = c("timestamp", LABEL)
       
-      # change column name
-      names(whole_day_ligit_on_count_dt) = c("timestamp", LABEL)
-      
-      # append data.table to list 
-      WHOLE_DAY_LIGHT_ON_COUNT_list = append(WHOLE_DAY_LIGHT_ON_COUNT_list, setNames(list(whole_day_ligit_on_count_dt),dt_name))
+      COM_BASE_RATIO_list = append(COM_BASE_RATIO_list, setNames(list(com_base_ratio_dt),dt_name))
     }
   }
 }
 
 
 ### -------------------------------- ###
-### Plot: whole_day_ligit_on_count     
+### Plot: com_base_ratio     
 ### -------------------------------- ### 
 
-plot.24hr.lightOn.counting <- function(dt, expDate, PLOT_PATH, whole_day_ligit_on_count_color = "violetred4"){
+plot.com.base.ratio <- function(dt, expDate, PLOT_PATH, com_base_ratio_color = 'green'){
   
   plot_dt = dt[[1]]
   
@@ -100,49 +98,48 @@ plot.24hr.lightOn.counting <- function(dt, expDate, PLOT_PATH, whole_day_ligit_o
     plot_dt = cut.expDate.2(plot_dt)
     plot_name = paste('exp2', names(dt), sep="_")
   }
-
-  windowingWeek <- 4
-
-#   print(plot_name)
   
-  p <- ggplot(plot_dt, aes(x=timestamp)) +
-    geom_point(aes(y=whole_day_ligit_on_count), colour='gray70') +
+  windowingWeek = 4
+  
+  #   print(plot_name)
+  com_base_ratio <- ggplot(plot_dt, aes(x=timestamp)) +
     ggtitle(plot_name)+
-    ylab("24hrs light-ON day (count/week)")
+    ylab("Computer Base Ratio (%)")
   
-  p = add.colorful.window.line(p, plot_dt, plot_name, 'whole_day_ligit_on_count', windowingWeek, whole_day_ligit_on_count_color, expDate)
+  com_base_ratio = add.colorful.window.line(com_base_ratio, plot_dt, plot_name, 'com_base_ratio', windowingWeek, com_base_ratio_color, expDate)
   
   if(expDate[length(expDate)] == "2014-11-17"){
     #exp1-1
-    p = add.event.vline.exp1.1(p)
+    com_base_ratio = add.event.vline.exp1.1(com_base_ratio)
   } else if(expDate[length(expDate)] == "2015-01-22"){
     #exp1-2
-    p = add.event.vline.exp1.2(p)
+    com_base_ratio = add.event.vline.exp1.2(com_base_ratio)
   } else{
     #exp2
-    p = add.event.vline.exp2(p)
+    com_base_ratio = add.event.vline.exp2(com_base_ratio)
   }
   
-  p = set.colorful.theme(p)
-
-  save.plot(paste0(PLOT_PATH, plot_name, ".png"), p)
+  com_base_ratio = set.colorful.theme(com_base_ratio)
+  
+  save.plot(paste0(PLOT_PATH, plot_name, ".png"), com_base_ratio)
   
   print(paste("plot:", plot_name))
-  return(p)
+  return(com_base_ratio)
 }
 
-##plot
+
+#plot
 if(PLOTTING){
-  # for(lab in 1:length(WHOLE_DAY_LIGHT_ON_COUNT_list)){
-  #   plot_24hr_lightOn_counting <- plot.24hr.lightOn.counting(WHOLE_DAY_LIGHT_ON_COUNT_list[lab], get.expDate.1.1(), PLOT_PATH)  
+  # for(lab in 1:length(COM_BASE_RATIO_list)){
+  #   plot_com_base <- plot.com.base.ratio(COM_BASE_RATIO_list[lab], get.expDate.1.1(), PLOT_PATH)  
   # }
   
-  for(lab in 1:length(WHOLE_DAY_LIGHT_ON_COUNT_list)){
-    plot_24hr_lightOn_counting <- plot.24hr.lightOn.counting(WHOLE_DAY_LIGHT_ON_COUNT_list[lab], get.expDate.1.2(), PLOT_PATH)  
+  for(lab in 1:length(COM_BASE_RATIO_list)){
+    plot_com_base <- plot.com.base.ratio(COM_BASE_RATIO_list[lab], get.expDate.1.2(), PLOT_PATH)  
   }
   
-  for(lab in 1:length(WHOLE_DAY_LIGHT_ON_COUNT_list)){
-    plot_24hr_lightOn_counting <- plot.24hr.lightOn.counting(WHOLE_DAY_LIGHT_ON_COUNT_list[lab], get.expDate.2(), PLOT_PATH)  
+  for(lab in 1:length(COM_BASE_RATIO_list)){
+    plot_com_base <- plot.com.base.ratio(COM_BASE_RATIO_list[lab], get.expDate.2(), PLOT_PATH)  
   }
 }
 
@@ -151,15 +148,15 @@ if(PLOTTING){
 ### Update summary_list
 ###
 ### category = {lab} + {day_type} + {label} 
-###                                 {label} = 'whole_day_ligit_on_count' 
+###                                 {label} = 'com_base_ratio' 
 ### ------------------------------------------------------------ ### 
 
-target_summary_list = WHOLE_DAY_LIGHT_ON_COUNT_list
+target_summary_list = COM_BASE_RATIO_list
 
 target_labs         = LABS                    # lab 
 target_types_of_day = TYPES_OF_DAY            # day_type
 
-agg_unit = "aggWeek"
+agg_unit = "aggDay"
 
 for(lab in target_labs){
   

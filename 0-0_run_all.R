@@ -1,4 +1,5 @@
-PLOTTING = F
+
+PLOTTING = T
 
 source("0-1_pre-processing(15min).R")
 source("0-2_pre-processing(RealSense).R")
@@ -13,5 +14,7 @@ source('3_partial_light_on_ratio.R')
 source("4_whole_day_ligit_on_count.R")
 source("5_lunch_saving.R")
 source("6_hvac_on_duration.R")
+source("11_com_base_ratio.R")
+source("12_max_consecutive_hvac.R")
 
-source("10_representation_table.R")
+source("100_representation_table.R")

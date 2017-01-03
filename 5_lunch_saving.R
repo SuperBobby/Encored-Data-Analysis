@@ -1,5 +1,5 @@
 ### ------------------------------------------------------------ ###
-### lunch_time_saving_count per week (computer & light feeder) 
+### lunch_time_saving_ratio per week (computer & light feeder) 
 ### 
 ### JY, EJ @ ADSL, SNU 
 ###                                   last update : 2016. 8. 30.
@@ -13,14 +13,14 @@
 # * Unit: # of action / week
 
 ### --------------------------------------------------------------------- ###
-### Build list of tables : LUNCH_TIME_SAVING_COUNT_list
+### Build list of tables : LUNCH_TIME_SAVING_RATIO_list
 ### 
-### table_name = {lab}_{agg_unit}_{day_type}_{feeder} (with lunch_time_saving_count column)
+### table_name = {lab}_{agg_unit}_{day_type}_{feeder} (with lunch_time_saving_ratio column)
 ### --------------------------------------------------------------------- ### 
 
-LUNCH_TIME_SAVING_COUNT_list = list()
+LUNCH_TIME_SAVING_RATIO_list = list()
 
-LABEL = "lunch_time_saving_count"
+LABEL = "lunch_time_saving_ratio"
 
 PLOT_PATH = "../plots/"
 
@@ -32,13 +32,14 @@ PLOT_PATH = "../plots/"
 
 LABS = c("MARG", "HCC", "UX")                                # lab
 AGG_UNITS = c("aggWeek")                                     # agg_unit
-TYPES_OF_DAY = c("allDay", "workingday", "non_workingday")   # day_type
+TYPES_OF_DAY = c("allDay")   # day_type
 FEEDERS = c("computer", "light")                             # feeder
 
 dt_list = setNames(dt_list, LABS)
 
 
-get.lunch.time.saving.count <- function(sub_dt, feeder){
+
+get.lunch.time.saving.ratio <- function(sub_dt, feeder){
   
   # * before lunch usage: 11:00 ~ 12:00 — index 17:20
   # * during lunch usage: 11:30 ~ 13:30 — index 19:26
@@ -47,25 +48,44 @@ get.lunch.time.saving.count <- function(sub_dt, feeder){
   during_lunch_index = 19:26
   after_lunch_index  = 25:28
   
-  lunch_saving_threshold_ratio = 0.8
-  target_on_usage = 0.01
+  lunch_saving_threshold_ratio = 0.9
+  
+  week_usage = unlist(sub_dt[, feeder, with=F])
+  target_on_usage = quantile(week_usage, 0.1)
+  
+  # print(class(target_on_usage))
   
   before_dt = sub_dt[index %in% before_lunch_index, .(before_lunch_max = max(get(feeder))), by=aggDay]
   during_dt = sub_dt[index %in% during_lunch_index, .(during_lunch_min = min(get(feeder))), by=aggDay]
-   after_dt = sub_dt[index %in%  after_lunch_index, .( after_lunch_max = max(get(feeder))), by=aggDay]
+  after_dt = sub_dt[index %in%  after_lunch_index, .( after_lunch_max = max(get(feeder))), by=aggDay]
   
   lunch_dt = merge(before_dt, during_dt, by='aggDay')
   lunch_dt = merge(lunch_dt, after_dt, by='aggDay')
   
   
+  lunch_dt[, ':='(before_on = 0)][round(before_lunch_max,2) > target_on_usage, ':='(before_on = 1)]
   lunch_dt[, ':='(lunch_saving = 0)]
-  lunch_dt[    (during_lunch_min < (before_lunch_max * lunch_saving_threshold_ratio)) 
-             & (during_lunch_min < ( after_lunch_max * lunch_saving_threshold_ratio)) 
-             & (before_lunch_max > target_on_usage), ':='(lunch_saving = 1), by=aggDay]
+  lunch_dt[(during_lunch_min < (before_lunch_max * lunch_saving_threshold_ratio)) 
+           & (during_lunch_min < (after_lunch_max * lunch_saving_threshold_ratio)), 
+           ':='(lunch_saving = 1), by=aggDay]
   
-  lunch_time_saving_count = sum(lunch_dt$lunch_saving)
+  # print(target_on_usage)
+  # print(lunch_dt)
   
-  return(lunch_time_saving_count)
+  before_lunch_on_ratio = sum(lunch_dt$before_on)
+  lunch_saving_ratio = sum(lunch_dt[before_on == 1]$lunch_saving)
+  
+  if(before_lunch_on_ratio != 0){
+    lunch_time_saving_ratio = lunch_saving_ratio / before_lunch_on_ratio  
+  } else {
+    lunch_time_saving_ratio = NA
+  }
+  
+  # print(before_lunch_on_ratio)
+  # print(lunch_saving_ratio)
+  # print(lunch_time_saving_ratio)
+  
+  return(lunch_time_saving_ratio)
 }
 
 
@@ -79,48 +99,39 @@ for(lab in LABS){
     # 3. Types of day
     for(day_type in TYPES_OF_DAY){
       
-      # 4. Target feeder ----> {feeder}_lunch_time_saving_count = label
+      # 4. Target feeder ----> {feeder}_lunch_time_saving_ratio = label
       for(feeder in FEEDERS){
         
         # table name
         dt_name = paste(lab, agg_unit, day_type, feeder, LABEL, sep="_")
         print(paste("Build table:", dt_name))
         
-        # # subset by day_type ------------------> Why it doesn't work? should be figured out!
-        # if(day_type == "workingday"){ 
-        #   lab_dt = lab_dt[workingday == T] 
-        # } else if(day_type == "non_workingday"){ 
-        #   lab_dt = lab_dt[workingday == F] 
-        # } 
-
         if(day_type == "allDay"){
           
-          lunch_time_saving_count_dt = lab_dt[, .(get.lunch.time.saving.count(.SD, feeder)), by=agg_unit]
+          lunch_time_saving_ratio_dt = lab_dt[, .(get.lunch.time.saving.ratio(.SD, feeder)), by=agg_unit]
           
         } else if(day_type == "workingday") {
           
-          lunch_time_saving_count_dt = lab_dt[workingday == T, .(get.lunch.time.saving.count(.SD, feeder)), by=agg_unit]
+          lunch_time_saving_ratio_dt = lab_dt[workingday == T, .(get.lunch.time.saving.ratio(.SD, feeder)), by=agg_unit]
           
-        } else if(day_type == "non_workingday") {
+        } else if(day_type == "nonworkingday") {
           
-          lunch_time_saving_count_dt = lab_dt[workingday == F, .(get.lunch.time.saving.count(.SD, feeder)), by=agg_unit]
+          lunch_time_saving_ratio_dt = lab_dt[workingday == F, .(get.lunch.time.saving.ratio(.SD, feeder)), by=agg_unit]
         }
         
         # change column name
-        names(lunch_time_saving_count_dt) = c("timestamp", paste(feeder, LABEL, sep='_'))
+        names(lunch_time_saving_ratio_dt) = c("timestamp", paste(feeder, LABEL, sep='_'))
         
-        LUNCH_TIME_SAVING_COUNT_list = append(LUNCH_TIME_SAVING_COUNT_list, setNames(list(lunch_time_saving_count_dt),dt_name))
+        LUNCH_TIME_SAVING_RATIO_list = append(LUNCH_TIME_SAVING_RATIO_list, setNames(list(lunch_time_saving_ratio_dt),dt_name))
       }
     }
   }
 }
 
 
-
 ### -------------------------------- ###
-### Plot: lunch_time_saving_count     
+### Plot: lunch_time_saving_ratio     
 ### -------------------------------- ### 
-
 
 plot.lunch.saving <- function(dt, expDate, PLOT_PATH){
   
@@ -172,14 +183,14 @@ plot.lunch.saving <- function(dt, expDate, PLOT_PATH){
 
 #plot
 if(PLOTTING){
-  # for(lab in 1:length(LUNCH_TIME_SAVING_COUNT_list)){
-  #   plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_COUNT_list[lab], get.expDate.1.1(), PLOT_PATH)  
+  # for(lab in 1:length(LUNCH_TIME_SAVING_RATIO_list)){
+  #   plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_RATIO_list[lab], get.expDate.1.1(), PLOT_PATH)  
   # }
-  for(lab in 1:length(LUNCH_TIME_SAVING_COUNT_list)){
-    plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_COUNT_list[lab], get.expDate.1.2(), PLOT_PATH)  
+  for(lab in 1:length(LUNCH_TIME_SAVING_RATIO_list)){
+    plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_RATIO_list[lab], get.expDate.1.2(), PLOT_PATH)  
   }
-  for(lab in 1:length(LUNCH_TIME_SAVING_COUNT_list)){
-    plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_COUNT_list[lab], get.expDate.2(), PLOT_PATH)  
+  for(lab in 1:length(LUNCH_TIME_SAVING_RATIO_list)){
+    plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_RATIO_list[lab], get.expDate.2(), PLOT_PATH)  
   }
 }
 
@@ -187,10 +198,10 @@ if(PLOTTING){
 ### Update summary_list
 ###
 ### category = {lab} + {day_type} + {label} 
-###                                 {label} = {feeder}_lunch_time_saving_count
+###                                 {label} = {feeder}_lunch_time_saving_ratio
 ### ------------------------------------------------------------ ### 
 
-target_summary_list = LUNCH_TIME_SAVING_COUNT_list
+target_summary_list = LUNCH_TIME_SAVING_RATIO_list
 
 target_labs         = LABS                    # lab 
 target_types_of_day = TYPES_OF_DAY            # day_type

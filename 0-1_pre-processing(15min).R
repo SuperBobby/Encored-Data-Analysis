@@ -28,8 +28,8 @@ load("../data/raw/ux_15min.RData")
 
 ## Update & save 15min data  
 update_start = "2014-09-01"
-# update_end = "2016-08-29"
-update_end = "2016-09-01"
+update_end = "2016-12-01"
+
 
 marg_defalut_table_15min <- reviseSNUData(marg_defalut_table_15min, "marg", update_start, update_end, verbose = T)
 hcc_defalut_table_15min <- reviseSNUData( hcc_defalut_table_15min, "hcc",  update_start, update_end, verbose = T)
@@ -104,7 +104,7 @@ ux_dt[etc > 0.15, ':='(etc = NA)]
 
 # check computer & light usage distributions
 {
-  par(mfrow=c(5,3))
+  par(mfrow=c(1,3))
   hist(marg_dt$computer, 100)
   hist(hcc_dt$computer, 100)
   hist(ux_dt$computer, 100)
@@ -175,9 +175,9 @@ ux_dt[, ':='(aggWeek=as.Date(cut(aggDay, breaks = "week", start.on.monday = T)))
 ## 
 ## Cut-out 2014.09(Sep) & the last day data
 ##
-marg_dt = marg_dt[aggDay >= "2014-10-01" & aggDay <= as.Date(update_end)-2]
-hcc_dt = hcc_dt[aggDay >= "2014-10-01" & aggDay <= as.Date(update_end)-2]
-ux_dt = ux_dt[aggDay >= "2014-10-01" & aggDay <= as.Date(update_end)-2]
+marg_dt = marg_dt[aggDay >= "2014-09-01" & aggDay <= as.Date(update_end)-2]
+hcc_dt = hcc_dt[aggDay >= "2014-09-01" & aggDay <= as.Date(update_end)-2]
+ux_dt = ux_dt[aggDay >= "2014-09-01" & aggDay <= as.Date(update_end)-2]
 
 ##
 ## Update columns depending on addDay & index update

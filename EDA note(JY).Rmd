@@ -7,6 +7,28 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute
 
 Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
 ```{r}
+### Computer base ratio on working-day
+
+library(data.table)
+
+tmp_marg = STATS_list$MARG_aggDay_workingday_computer
+base_ratio_marg = tmp_marg[, .(timestamp = timestamp, base_ratio = base / avg)]
+plot(base_ratio_marg, main='marg')
+
+tmp_hcc = STATS_list$HCC_aggDay_workingday_computer
+base_ratio_hcc = tmp_hcc[, .(timestamp = timestamp, base_ratio = base / avg)]
+plot(base_ratio_hcc, main='hcc')
+
+tmp_ux = STATS_list$UX_aggDay_workingday_computer
+base_ratio_ux = tmp_ux[, .(timestamp = timestamp, base_ratio = base / avg)]
+plot(base_ratio_ux, main='ux')
+
+
+
+```
+
+```{r}
+
 ### HVAC something
 ## 2015-11-18 JY
 library(data.table)
@@ -35,7 +57,7 @@ tmp_hvac_cons = tmp[, .(hvac_on_duration = sum(hvac > 0.1),
 tmp_hvac_cons[, (max_cons_ratio = max_consecutive_on_hvac/hvac_on_duration), by=aggDay]
 
 plot(tmp_hvac_cons$aggDay, tmp_hvac_cons$hvac_on_duration)
-plot(tmp_hvac_cons[, (max_cons_ratio = max_consecutive_on_hvac), by=aggDay])
+plot(tmp_hvac_cons[, .(max_cons = max_consecutive_on_hvac), by=aggDay])
 
 # 
 # summary(tmp$hvac > 0.1)
@@ -59,15 +81,10 @@ plot(tmp_hvac_cons[, (max_cons_ratio = max_consecutive_on_hvac), by=aggDay])
 # 
 # get.max.consecutive.on(tmp_x)
 #
+
 ```
 
 ```{r}
-
-
-
-
-
-
 ### ------------------------------------- ###
 ## plot.point.with.3stats
 ## 
@@ -233,10 +250,6 @@ readkey <- function()
 }
 
 
-
-
-
-
 tmp = marg_dt[aggDay == '2015-01-07']
 
 peak = quantile(tmp$computer, 0.9)
@@ -255,10 +268,6 @@ for(i in seq(0, 10, 0.01)){
   text(x = i, y = peak, labels=peak)
   
 }
-
-
-
-
 
 tmp1 <- MARG_aggDay_allDay_computer
 tmp2 <- HCC_aggDay_allDay_computer
@@ -318,7 +327,6 @@ tmp <- UX_aggDay_allDay_computer[(get > '2014-11-30') & (get < '2015-09-01') & (
 tmp[,':='(base_ratio = base / avg)]
 plot(as.Date(tmp$get), tmp$base_ratio)
 mean(tmp$base_ratio)
-
 ```
 
 ```{r}
@@ -392,7 +400,6 @@ quantile(com_usage, .99, na.rm = T) / 1000
 2. y-axis scale : not fixed!
   3. magnitude 170 out of 180 secs 
 4. make plot wider (180 * 180 + 1)
-
 ```
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
