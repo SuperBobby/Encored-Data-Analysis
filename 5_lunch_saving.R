@@ -51,7 +51,7 @@ get.lunch.time.saving.ratio <- function(sub_dt, feeder){
   lunch_saving_threshold_ratio = 0.9
   
   week_usage = unlist(sub_dt[, feeder, with=F])
-  target_on_usage = quantile(week_usage, 0.1)
+  target_on_usage = quantile(week_usage, BASE_PERCENTILE)
   
   # print(class(target_on_usage))
   
