@@ -5,139 +5,13 @@
 ###                                   last update : 2016. 8. 30.
 ### ------------------------------------------------------------ ###
 
-# windowingByExpDate <- function(data, data_name, yName, windowingWeek, rownum_expDate){
-#   if(grepl("aggWeek", data_name)){
-#     if(grepl("workingday", data_name) | grepl("non_workingday", data_name)){
-#       n <- windowingWeek/2/2
-#     } else{
-#       n <- windowingWeek/2
-#     }
-#   } else{
-#     if(grepl("allDay", data_name)){
-#       n <- windowingWeek/2*7
-#     } else if(grepl("workingday", data_name)){
-#       n <- windowingWeek/2*5
-#     } else{
-#       n <- windowingWeek/2*2
-#     }
-#   }
-#   
-#   y<-data[[yName]]
-#   windowing <- data.table(matrix(rep(0,length(y)*3),ncol=3))
-#   setnames(windowing,c("timestamp","mean","sd"))
-#   
-#   for (k in 1:length(y)) {
-#     start<-1
-#     end<-1
-#     
-#     #Collecting UX RealSense data starts on "2015-11-02"
-#     if((yName=='sum_of_duration' | yName=='freq') & (data.frame(data)[k,1] < as.Date("2015-11-02"))) {
-#       windowing$mean[k] <- NA
-#       windowing$sd[k] <- NA 
-#       next
-#     }
-#     
-#     if(k < rownum_expDate[2]){
-#       start<-k-n
-#       end<-k+n
-#       
-#       if(k-n <= 0) {
-#         start <- 1
-#       }
-#       if(k+n >= rownum_expDate[2]) {
-#         end <- rownum_expDate[2] - 1
-#       }
-#       
-#       windowing$mean[k] <- ifelse(is.nan(mean(y[start:end],na.rm=T)),NA,mean(y[start:end],na.rm=T))
-#       windowing$sd[k] <- ifelse(is.nan(sd(y[start:end],na.rm=T)),NA,sd(y[start:end],na.rm=T))
-#       
-#     } else if(k < rownum_expDate[3]){
-#       start<-k-n
-#       end<-k+n
-#       
-#       if(k-n <= rownum_expDate[2]) {
-#         start <- rownum_expDate[2]
-#       }
-#       if(k+n >= rownum_expDate[3]) {
-#         end <- rownum_expDate[3] - 1
-#       }
-#       
-#       windowing$mean[k] <- ifelse(is.nan(mean(y[start:end],na.rm=T)),NA,mean(y[start:end],na.rm=T))
-#       windowing$sd[k] <- ifelse(is.nan(sd(y[start:end],na.rm=T)),NA,sd(y[start:end],na.rm=T))
-#     } else if(k < rownum_expDate[4]){
-#       start<-k-n
-#       end<-k+n
-#       
-#       if(k-n <= rownum_expDate[3]) {
-#         start <- rownum_expDate[3]
-#       }
-#       if(k+n >= rownum_expDate[4]) {
-#         end <- rownum_expDate[4] - 1
-#       }
-#       
-#       windowing$mean[k] <- ifelse(is.nan(mean(y[start:end],na.rm=T)),NA,mean(y[start:end],na.rm=T))
-#       windowing$sd[k] <- ifelse(is.nan(sd(y[start:end],na.rm=T)),NA,sd(y[start:end],na.rm=T)) 
-#     } else if(k < rownum_expDate[5]){
-#       start<-k-n
-#       end<-k+n
-#       
-#       if(k-n <= rownum_expDate[4]) {
-#         start <- rownum_expDate[4]
-#       }
-#       if(k+n >= rownum_expDate[5]) {
-#         end <- rownum_expDate[5] - 1
-#       }
-#       
-#       windowing$mean[k] <- ifelse(is.nan(mean(y[start:end],na.rm=T)),NA,mean(y[start:end],na.rm=T))
-#       windowing$sd[k] <- ifelse(is.nan(sd(y[start:end],na.rm=T)),NA,sd(y[start:end],na.rm=T))
-#     } else if(k < rownum_expDate[6]){
-#       start<-k-n
-#       end<-k+n
-#       
-#       if(k-n <= rownum_expDate[5]) {
-#         start <- rownum_expDate[5]
-#       }
-#       if(k+n >= rownum_expDate[6]) {
-#         end <- rownum_expDate[6] - 1
-#       }
-#       
-#       windowing$mean[k] <- ifelse(is.nan(mean(y[start:end],na.rm=T)),NA,mean(y[start:end],na.rm=T))
-#       windowing$sd[k] <- ifelse(is.nan(sd(y[start:end],na.rm=T)),NA,sd(y[start:end],na.rm=T))
-#     } else if(k < rownum_expDate[7]){
-#       start<-k-n
-#       end<-k+n
-#       
-#       if(k-n <= rownum_expDate[6]) {
-#         start <- rownum_expDate[6]
-#       }
-#       if(k+n >= rownum_expDate[7]) {
-#         end <- rownum_expDate[7] - 1
-#       }
-#       
-#       windowing$mean[k] <- ifelse(is.nan(mean(y[start:end],na.rm=T)),NA,mean(y[start:end],na.rm=T))
-#       windowing$sd[k] <- ifelse(is.nan(sd(y[start:end],na.rm=T)),NA,sd(y[start:end],na.rm=T))
-#     } else {
-#       start<-k-n
-#       end<-k+n
-#       
-#       if(k-n <= rownum_expDate[7]) {
-#         start <- rownum_expDate[7]
-#       }
-#       if(k+n >= length(y)) {
-#         end <- length(y)
-#       }
-#       
-#       windowing$mean[k] <- ifelse(is.nan(mean(y[start:end],na.rm=T)),NA,mean(y[start:end],na.rm=T))
-#       windowing$sd[k] <- ifelse(is.nan(sd(y[start:end],na.rm=T)),NA,sd(y[start:end],na.rm=T)) 
-#     }
-# #     print(paste(data.frame(data)[k,1],":",start,end, windowing$mean[k]))
-#   }
-#   windowing$sd <- ifelse(is.na(windowing$sd),0,windowing$sd)
-# #   windowing$timestamp <- data.frame(data)[,1]
-#   windowing$timestamp <- data$timestamp
-#   
-#   return (windowing)
-# }
+
+# 플롯 수정 제안 사항 (2017.1.4)
+# 
+# * 플롯 구분짓는 색상 지정 
+# (total, feeder-light/com/hvac, partial lighting, 24hrs lighting, lunchtime saving-light/com)
+# * X, Y 축 선
+# * Y축 min -- 0 
 
 windowingByExpDate <- function(data, data_name, target, windowingWeek, expDate){
   #windowing before and after n days
@@ -221,20 +95,6 @@ add.colorful.window.line <- function(plot_body, data, data_name, target, windowi
   
   return (result)
 }
-
-# get.expDate.rownum <- function(plot_dt, expDate) {
-#   rownum_expDate <- 1
-#   
-#   for (d in expDate) {
-#     rownum_expDate <- append(rownum_expDate, ifelse((nrow(plot_dt[d > data.frame(plot_dt)[,1],])+1)>nrow(plot_dt),nrow(plot_dt),(nrow(plot_dt[d > data.frame(plot_dt)[,1],])+1)))
-#   }
-#   
-#   return(rownum_expDate)
-# }
-# 
-# insert_minor <- function(major_labs, n_minor) {labs <- 
-#                                                  c( sapply( major_labs, function(x) c(x, rep("", 4) ) ) )
-#                                                labs[1:(length(labs)-n_minor)]}
 
 
 # add.event.vline.exp1.1
