@@ -59,12 +59,9 @@ windowingByExpDate <- function(data, data_name, target, windowingWeek, expDate){
       windowing$mean[k] <- NA
         windowing$sd[k] <- NA
     }
-    
   }
   
   windowing$timestamp <- data$timestamp
-
-  # View(windowing)
 
   return (windowing)
 }
