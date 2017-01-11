@@ -126,7 +126,7 @@ for(lab in LAB_LABLES){
       index = STARTING_INDEX
       while(index <= FINISHING_INDEX){
         
-        ## Fumbling 
+        ## Fumbling for skipping 
         pre     = median(com_usage[(index-FUMBLING_LENGTH):(index)], na.rm = T)
         post    = median(com_usage[(index):(index+FUMBLING_LENGTH)], na.rm = T)
         btw_var = var(com_usage[(index-FUMBLING_LENGTH):(index+FUMBLING_LENGTH)], na.rm = T)
@@ -182,13 +182,13 @@ for(lab in LAB_LABLES){
         }
       }
 
-      ## saving status_dt
+      ## add new row to status_dt
       names(one_com_feeder_dt) <- c('dts', 'usage', 'status')
       one_com_feeder_dt$usage = one_com_feeder_dt$usage / 1000
       status_dt = rbind(status_dt, cbind(lab, target_feeder, one_com_feeder_dt), fill=T)
     }
     
-    # View(status_dt)
+    ## saving status_dt
     status_dt = na.omit(status_dt)
     write.csv(status_dt, paste0(STATUS_DT_SAVE_PATH, lab, '_', TARGET_DATE, '_status_dt', '.csv'), row.names = F)
     
