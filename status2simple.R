@@ -64,7 +64,7 @@ for(lab in LAB_LABLES){
   
   ## initialize simple_status_dt
   simple_status_dt = data.frame(matrix(data=NA, nrow=1, ncol=5))
-  names(simple_status_dt) <-c("lab", "dts", "up", "stay", "down")
+  names(simple_status_dt) <-c("lab", "timestamp", "up", "stay", "down")
   
   ## for measuring time cost (each lab)  
   LOOP_START = c(LOOP_START, Sys.time())
@@ -111,36 +111,81 @@ print((LOOP_END - LOOP_START)[-1])
 
 
 
+plot.status <- function(lab, dt, expDate, PLOT_PATH) {
+  plot_dt = dt
+  
+  if(expDate[length(expDate)] == "2014-11-17"){
+    #exp1-1
+    plot_dt = cut.expDate.1.1(plot_dt)
+    plot_name = paste('exp1-1', lab, sep="_")
+  } else if(expDate[length(expDate)] == "2015-01-22"){
+    #exp1-2
+    plot_dt = cut.expDate.1.2(plot_dt)
+    plot_name = paste('exp1-2', lab, sep="_")
+  } else{
+    #exp3
+    plot_dt = cut.expDate.2(plot_dt)
+    plot_name = paste('exp2', lab, sep="_")
+  }
+  
+  windowingWeek = 4
+  
+  status <- ggplot(plot_dt, aes(x=timestamp)) +
+    ggtitle(plot_name) +
+    ylab("Count (per day)")+
+    scale_linetype_discrete(breaks=c("up", "down"))
+  # scale_linetype_discrete(breaks=c("up", "stay", "down"))
+  
+  status = add.window.line(status, plot_dt, plot_name, "up", windowingWeek, expDate)
+  status = add.window.line(status, plot_dt, plot_name, "down", windowingWeek, expDate)
+  # status = add.window.line(status, plot_dt, plot_name, "stay", windowingWeek, expDate)
+  
+  if(expDate[length(expDate)] == "2014-11-17"){
+    #exp1-1
+    status = add.event.vline.exp1.1(status)
+  } else if(expDate[length(expDate)] == "2015-01-22"){
+    #exp1-2
+    status = add.event.vline.exp1.2(status)
+  } else{
+    #exp2
+    status = add.event.vline.exp2(status)
+  }
+  
+  status = set.default.theme(status)
+  
+  save.plot(paste0(PLOT_PATH, plot_name, "_up_stay_down.png"), status)
+  
+  print(paste("plot:", plot_name))
+  return(status)
+}
+
+dt = fread("../data/status/marg_simple_status_dt.csv")
+dt$timestamp = as.Date(dt$timestamp)
+dt$stay = as.numeric(dt$stay)
+dt$up = as.numeric(dt$up)
+dt$down = as.numeric(dt$down)
+# names(dt)[2] = 'timestamp'
+plot.status('MARG', dt, get.expDate.2(), PLOT_PATH)
 
 
 
 
+dt = fread("../data/status/hcc_simple_status_dt.csv")
+dt$timestamp = as.Date(dt$timestamp)
+dt$stay = as.numeric(dt$stay)
+dt$up = as.numeric(dt$up)
+dt$down = as.numeric(dt$down)
+names(dt)[2] = 'timestamp'
+plot.status('HCC', dt, get.expDate.2(), PLOT_PATH)
 
-# 
-# ## plotting
-# if(PLOTTING){
-#   dt_for_plot = one_com_feeder_dt
-#   
-#   unit = COMPARING_LENGTH * 4 + 1
-#   loop_max = nrow(dt_for_plot) / unit
-#   
-#   com_feeder_name = paste0(lab, '_com', target_feeder)
-#   
-#   max_value = range(com_usage)[2]
-#   min_value = range(com_usage)[1] * 0.9
-#   
-#   for(i in 1:loop_max){
-#     sub_dt = dt_for_plot[(unit*(i-1)+1):(unit*(i))]
-#     plot_name = paste(lab, sub_dt$dts[1])
-#     print(paste('plot:', i, plot_name))
-#     
-#     p <- ggplot(sub_dt) +
-#       geom_point(aes(x=dts, y=usage, color=factor(status)), size=1) +
-#       theme(axis.text.x = element_text(size=5, angle = 90, hjust = 1)) +
-#       ylim(min_value, max_value) +
-#       ggtitle(plot_name) + 
-#       theme(legend.position = "bottom")
-#     
-#     ggsave(filename = paste0(PLOT_PATH, lab, target_feeder,'-', i, ".png"), plot = p, width = 50, height = 10, units='cm')
-#   }
-# }
+
+
+dt = fread("../data/status/ux_simple_status_dt.csv")
+dt$timestamp = as.Date(dt$timestamp)
+dt$stay = as.numeric(dt$stay)
+dt$up = as.numeric(dt$up)
+dt$down = as.numeric(dt$down)
+names(dt)[2] = 'timestamp'
+plot.status('UX', dt, get.expDate.2(), PLOT_PATH)
+
+
