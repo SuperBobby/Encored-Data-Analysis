@@ -2,28 +2,7 @@ library(data.table)
 library(ggplot2)
 library(zoo)
 
-DEFAULT_STATUS = 'stay'
-RISING_STATUS  = 'up'
-FALLING_STATUS = 'down'
-
-# TIDY_DATA_DIR = "data/sec/"
-# STATUS_DT_SAVE_PATH = 'data/status/'
-# PLOT_PATH = "plots/"
-
-TIDY_DATA_DIR = "../data/sec_tidy/"
-STATUS_DT_SAVE_PATH = "../data/status/"
-PLOT_PATH = "../plots/milli/"
-
-LAB_LABLES = c('marg', 'hcc', 'ux')
-
-START_DATE = as.Date("2015-09-01")
-# END_DATE = as.Date("2015-09-02")
-END_DATE = as.Date("2016-12-06")
-
-
 CONSECUTIVE_CHANGE_SEC_THER = 3
-
-PLOTTING = F
 
 load.status.data = function(TARGET_DATE, lab){
   TARGET_DATE = as.character(as.Date(TARGET_DATE))
@@ -40,7 +19,7 @@ load.status.data = function(TARGET_DATE, lab){
   return(dt)
 }
 
-get.simple.status.dt <- function(status_dt, CONSECUTIVE_CHANGE_SEC_THER){
+get.daily.status.dt <- function(status_dt, CONSECUTIVE_CHANGE_SEC_THER){
   rle_return = rle(status_dt$status)
 
   valid_status_values = rle_return$values[rle_return$lengths > CONSECUTIVE_CHANGE_SEC_THER]
@@ -62,9 +41,9 @@ LOOP_END = Sys.time()
 ## loop for each lab
 for(lab in LAB_LABLES){
   
-  ## initialize simple_status_dt
-  simple_status_dt = data.frame(matrix(data=NA, nrow=1, ncol=5))
-  names(simple_status_dt) <-c("lab", "timestamp", "up", "stay", "down")
+  ## initialize daily_status_dt
+  daily_status_dt = data.frame(matrix(data=NA, nrow=1, ncol=5))
+  names(daily_status_dt) <-c("lab", "timestamp", RISING_STATUS, DEFAULT_STATUS, FALLING_STATUS)
   
   ## for measuring time cost (each lab)  
   LOOP_START = c(LOOP_START, Sys.time())
@@ -86,14 +65,14 @@ for(lab in LAB_LABLES){
       next
     }
     
-    # adding new row to simple_status_dt
-    adding_row = c(lab, as.character(TARGET_DATE), get.simple.status.dt(status_dt, CONSECUTIVE_CHANGE_SEC_THER))
-    simple_status_dt = rbind(simple_status_dt, adding_row)
-    # print(simple_status_dt)
+    # adding new row to daily_status_dt
+    adding_row = c(lab, as.character(TARGET_DATE), get.daily.status.dt(status_dt, CONSECUTIVE_CHANGE_SEC_THER))
+    daily_status_dt = rbind(daily_status_dt, adding_row)
+    # print(daily_status_dt)
     
-    ## saving simple_status_dt
-    simple_status_dt = na.omit(simple_status_dt)
-    write.csv(simple_status_dt, paste0(STATUS_DT_SAVE_PATH, lab, '_simple_status_dt.csv'), row.names = F)
+    ## saving daily_status_dt
+    daily_status_dt = na.omit(daily_status_dt)
+    write.csv(daily_status_dt, paste0(STATUS_DT_SAVE_PATH, lab, '_daily_status_dt.csv'), row.names = F)
     
     ## Loop until the END_DATE 
     if(TARGET_DATE == END_DATE){
@@ -133,12 +112,12 @@ plot.status <- function(lab, dt, expDate, PLOT_PATH) {
   status <- ggplot(plot_dt, aes(x=timestamp)) +
     ggtitle(plot_name) +
     ylab("Count (per day)")+
-    scale_linetype_discrete(breaks=c("up", "down"))
-  # scale_linetype_discrete(breaks=c("up", "stay", "down"))
+    scale_linetype_discrete(breaks=c(RISING_STATUS, FALLING_STATUS))
+  # scale_linetype_discrete(breaks=c(RISING_STATUS, DEFAULT_STATUS, FALLING_STATUS))
   
-  status = add.window.line(status, plot_dt, plot_name, "up", windowingWeek, expDate)
-  status = add.window.line(status, plot_dt, plot_name, "down", windowingWeek, expDate)
-  # status = add.window.line(status, plot_dt, plot_name, "stay", windowingWeek, expDate)
+  status = add.window.line(status, plot_dt, plot_name, RISING_STATUS, windowingWeek, expDate)
+  status = add.window.line(status, plot_dt, plot_name, FALLING_STATUS, windowingWeek, expDate)
+  # status = add.window.line(status, plot_dt, plot_name, DEFAULT_STATUS, windowingWeek, expDate)
   
   if(expDate[length(expDate)] == "2014-11-17"){
     #exp1-1
@@ -153,39 +132,55 @@ plot.status <- function(lab, dt, expDate, PLOT_PATH) {
   
   status = set.default.theme(status)
   
-  save.plot(paste0(PLOT_PATH, plot_name, "_up_stay_down.png"), status)
+  save.plot(paste0(PLOT_PATH, plot_name, "_on_stay_off.png"), status)
   
   print(paste("plot:", plot_name))
   return(status)
 }
 
-dt = fread("../data/status/marg_simple_status_dt.csv")
+if(PLOTTING){
+  for(lab in tolower(LABS)){
+    print(paste("plot:", lab))
+    
+    daily_dt = fread(paste0("../data/status/", lab, "_daily_status_dt.csv"))
+    daily_dt$timestamp = as.Date(daily_dt$timestamp)
+    daily_dt$stay = as.numeric(daily_dt$stay)
+    daily_dt$on = as.numeric(daily_dt$on)
+    daily_dt$off = as.numeric(daily_dt$off)
+    plot.status(toupper(lab), daily_dt, get.expDate.2(), PLOT_PATH)
+    
+  }
+}
+
+# 
+# 
+dt = fread("../data/status/marg_daily_status_dt.csv")
 dt$timestamp = as.Date(dt$timestamp)
 dt$stay = as.numeric(dt$stay)
-dt$up = as.numeric(dt$up)
-dt$down = as.numeric(dt$down)
+dt$on = as.numeric(dt$on)
+dt$off = as.numeric(dt$off)
 # names(dt)[2] = 'timestamp'
 plot.status('MARG', dt, get.expDate.2(), PLOT_PATH)
-
-
-
-
-dt = fread("../data/status/hcc_simple_status_dt.csv")
-dt$timestamp = as.Date(dt$timestamp)
-dt$stay = as.numeric(dt$stay)
-dt$up = as.numeric(dt$up)
-dt$down = as.numeric(dt$down)
-names(dt)[2] = 'timestamp'
-plot.status('HCC', dt, get.expDate.2(), PLOT_PATH)
-
-
-
-dt = fread("../data/status/ux_simple_status_dt.csv")
-dt$timestamp = as.Date(dt$timestamp)
-dt$stay = as.numeric(dt$stay)
-dt$up = as.numeric(dt$up)
-dt$down = as.numeric(dt$down)
-names(dt)[2] = 'timestamp'
-plot.status('UX', dt, get.expDate.2(), PLOT_PATH)
+# 
+# 
+# 
+# 
+# dt = fread("../data/status/hcc_daily_status_dt.csv")
+# dt$timestamp = as.Date(dt$timestamp)
+# dt$stay = as.numeric(dt$stay)
+# dt$up = as.numeric(dt$up)
+# dt$down = as.numeric(dt$down)
+# names(dt)[2] = 'timestamp'
+# plot.status('HCC', dt, get.expDate.2(), PLOT_PATH)
+# 
+# 
+# 
+# dt = fread("../data/status/ux_daily_status_dt.csv")
+# dt$timestamp = as.Date(dt$timestamp)
+# dt$stay = as.numeric(dt$stay)
+# dt$up = as.numeric(dt$up)
+# dt$down = as.numeric(dt$down)
+# names(dt)[2] = 'timestamp'
+# plot.status('UX', dt, get.expDate.2(), PLOT_PATH)
 
 

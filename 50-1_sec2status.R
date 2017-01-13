@@ -9,8 +9,8 @@ PRE_POST_GAP_THRE = 40 # Watts
 FUMBLING_LENGTH = 10
 
 DEFAULT_STATUS = 'stay'
-RISING_STATUS  = 'up'
-FALLING_STATUS = 'down'
+RISING_STATUS  = 'on'
+FALLING_STATUS = 'off'
 
 # TIDY_DATA_DIR = "data/sec/"
 # STATUS_DT_SAVE_PATH = 'data/status/'
@@ -21,16 +21,11 @@ STATUS_DT_SAVE_PATH = "../data/status/"
 PLOT_PATH = "../plots/milli/"
 
 PLOTTING = F
-
 LOADING_NROW = -1
 
-# LAB_LABLES = c('marg', 'hcc', 'ux')
-LAB_LABLES = c('marg')
+LAB_LABLES = c('marg', 'hcc', 'ux')
 
-# START_DATE = as.Date("2015-09-01")
-# END_DATE = as.Date("2015-09-02")
-
-START_DATE = as.Date("2016-12-06")
+START_DATE = as.Date("2015-09-01")
 END_DATE = as.Date("2016-12-06")
 
 ## -----------------------------
