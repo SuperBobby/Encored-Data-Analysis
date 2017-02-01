@@ -159,8 +159,7 @@ if(PLOTTING){
 ###                                 {label} = {feeder}_{stats}
 ### ------------------------------------------------------------ ### 
 
-## initialize summary list 
-summary_list = list()
+
 
 target_summary_list = STATS_list
 
