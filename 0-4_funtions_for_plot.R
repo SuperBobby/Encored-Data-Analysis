@@ -72,7 +72,7 @@ add.window.line <- function(plot_body, data, data_name, target, windowingWeek, e
 
   result = plot_body +
     geom_line(data=window_df, aes_string(y = "mean", linetype = shQuote(target)), size=1) +
-    geom_ribbon(data=window_df,aes(ymin = mean - sd, ymax = mean + sd), alpha = 0.2)
+    geom_ribbon(data=window_df, aes(ymin = mean - sd, ymax = mean + sd), alpha = 0.2)
   
   return (result)
 }
