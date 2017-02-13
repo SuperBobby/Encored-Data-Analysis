@@ -2,15 +2,6 @@ library(data.table)
 library(ggplot2)
 library(zoo)
 
-REF_LENGTH = 60
-COMPARING_LENGTH = 60
-LIGHT_PRE_POST_GAP_THRE = 100 # Watts
-CONSECUTIVE_CHANGE_SEC_THER = 0
-
-DEFAULT_STATUS = 'stay'
-RISING_STATUS  = 'up'
-FALLING_STATUS = 'down'
-
 STATUS_DT_SAVE_PATH = "../data/status/"
 STATUS_AGG_PATH = "../data/status/aggregated/"
 
@@ -22,6 +13,7 @@ END_DATE = as.Date("2016-12-06")
 # START_DATE = as.Date("2015-09-01")
 # END_DATE = START_DATE + 5
 
+CONSECUTIVE_CHANGE_SEC_THER = 0
 
 ## -----------------------------
 ## Functions 

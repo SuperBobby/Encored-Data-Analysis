@@ -13,7 +13,7 @@ library(timeDate)
 # hist(hcc_agg_status_dt$light_usage, 100)
 # hist(ux_agg_status_dt$light_usage, 100)
 
-VALID_STAY_DURATION = 10 # secs
+VALID_STAY_DURATION = 60 # secs
 
 STATUS_AGG_PATH = "../data/status/aggregated/"
 
