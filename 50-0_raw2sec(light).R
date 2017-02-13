@@ -1,3 +1,9 @@
+## ------------------------------------------------------- ##
+## Encored second-interval raw data preprocessing
+## 1sec raw data --> 1sec light-feeder-only table for each lab
+##                                        2017-02-07 JY.Han 
+##
+
 library(data.table)
 library(bit64)
 
@@ -5,20 +11,20 @@ did_MARG = 1171
 did_HCC  = 1168
 did_UX   = 1169
 
-fid_MARG = c(7,8,14)
-fid_HCC = c(5,12)
-fid_UX = c(14)
+fid_MARG = 17
+fid_HCC = 13
+fid_UX = 23
 
 LAB_LABLES = c('marg', 'hcc', 'ux')
 
-# RAW_DATA_DIR = "data/raw/snu/"
-# TIDY_DATA_DIR = "data/sec/"
+RAW_DATA_DIR = "data/raw/snu/"
+TIDY_DATA_DIR = "data/sec/"
 
-RAW_DATA_DIR = "../data/raw/sec_raw/"
-TIDY_DATA_DIR = "../data/sec_tidy/"
+# RAW_DATA_DIR = "R/"
+# TIDY_DATA_DIR = "R/sec/"
 
 START_DATE = as.Date("2015-09-01")
-END_DATE = as.Date("2015-09-02")
+END_DATE = as.Date("2016-12-06")
 
 ## -----------------------------
 ## Functions 
@@ -75,8 +81,8 @@ repeat {
   
   print(TARGET_DATE)
   
-  ## initialize a list for computer-feeder-only tables of each lab
-  com_list = list()
+  ## initialize a list for light-feeder-only tables of each lab
+  light_list = list()
   
   ## load raw data 
   raw_dt = load.sec.raw.data(TARGET_DATE)
@@ -90,34 +96,31 @@ repeat {
   for(target_lab in LAB_LABLES){
     
     # print(target_lab)
+    col_names = c('dts', 'light')
     
     if(target_lab == 'marg') {
       did_lab = did_MARG
       fid_lab = fid_MARG
-      col_names = c('dts', paste0('marg_com', 1:3))
       
     } else if(target_lab == 'hcc') {
       did_lab = did_HCC
       fid_lab = fid_HCC
-      col_names = c('dts', paste0('hcc_com', 1:2))
       
     } else if(target_lab == 'ux') {
       did_lab = did_UX
       fid_lab = fid_UX
-      col_names = c('dts', 'ux_com1')
-      
     }
     
     ## subset of the target lab
     lab_dt = get.dt.lab.tidy(raw_dt, TARGET_DATE, did_lab)
     
-    ## computer-feeder-only tables of each lab   
-    com_feeder_cols = paste0('watt_', fid_lab)
-    lab_dt_com = lab_dt[, c('dts', com_feeder_cols), with=F]
+    ## light-feeder-only tables of each lab   
+    light_feeder_cols = paste0('watt_', fid_lab)
+    lab_dt_com = lab_dt[, c('dts', light_feeder_cols), with=F]
     
     names(lab_dt_com) = col_names
     
-    output_file_name = paste0(TIDY_DATA_DIR, target_lab, '_', TARGET_DATE, '(com).csv')
+    output_file_name = paste0(TIDY_DATA_DIR, target_lab, '_', TARGET_DATE, '(light).csv')
     write.csv(lab_dt_com, output_file_name, row.names = F)
     print(paste(output_file_name, 'saved'))
     
