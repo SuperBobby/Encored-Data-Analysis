@@ -24,10 +24,8 @@ TIDY_DATA_DIR = "../data/sec_tidy/"
 # TIDY_DATA_DIR = "R/sec/"
 
 START_DATE = as.Date("2015-09-01")
-END_DATE = START_DATE
+END_DATE = as.Date("2016-12-06")
   
-  # as.Date("2016-12-06")
-
 ## -----------------------------
 ## Functions 
 ##

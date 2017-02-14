@@ -2,8 +2,8 @@ library(data.table)
 library(ggplot2)
 library(zoo)
 
-REF_LENGTH = 60
-COMPARING_LENGTH = 60
+REF_LENGTH = 90
+COMPARING_LENGTH = 90
 COM_PRE_POST_GAP_THRE = 40 # Watts
 
 DEFAULT_STATUS = 'stay'
@@ -14,16 +14,16 @@ TIDY_DATA_DIR = "../data/sec_tidy/"
 STATUS_DT_SAVE_PATH = "../data/status/"
 PLOT_PATH = "../plots/milli/status_check/"
 
-STATUS_CHECK_PLOTTING = T
+STATUS_CHECK_PLOTTING = F
 
-LAB_LABLES = c('marg')
-# LAB_LABLES = c('marg', 'hcc', 'ux')
-
-# START_DATE = as.Date("2015-09-01")
-# END_DATE = as.Date("2016-12-06")
+# LAB_LABLES = c('marg')
+LAB_LABLES = c('marg', 'hcc', 'ux')
 
 START_DATE = as.Date("2015-09-01")
-END_DATE = START_DATE 
+END_DATE = as.Date("2016-12-06")
+
+# START_DATE = as.Date("2015-09-01")
+# END_DATE = START_DATE 
 
 ## -----------------------------
 ## Functions 
