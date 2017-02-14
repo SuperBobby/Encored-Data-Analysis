@@ -2,8 +2,8 @@ library(data.table)
 library(ggplot2)
 library(zoo)
 
-REF_LENGTH = 30
-COMPARING_LENGTH = 30
+REF_LENGTH = 60
+COMPARING_LENGTH = 60
 COM_PRE_POST_GAP_THRE = 40 # Watts
 
 DEFAULT_STATUS = 'stay'
@@ -178,12 +178,13 @@ for(lab in LAB_LABLES){
         com_status_dt = rbind(com_status_dt, one_com_feeder_dt)
         
       }
+      
+      ## saving com_status_dt
+      com_status_dt = na.omit(com_status_dt)
+      write.csv(com_status_dt, output_status_file, row.names = F)
+      print(paste0("status file saved: ", output_status_file))
+      
     }
-    
-    ## saving com_status_dt
-    com_status_dt = na.omit(com_status_dt)
-    write.csv(com_status_dt, output_status_file, row.names = F)
-    print(paste0("status file saved: ", output_status_file))
     
     ## STATUS_CHECK_PLOTTING
     if(STATUS_CHECK_PLOTTING){

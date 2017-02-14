@@ -154,13 +154,14 @@ for(lab in LAB_LABLES){
       
       ## rbind to build the aggregated_status_dt
       light_status_dt = cbind(light_dt, status=status)
+      
+      ## saving light_status_dt
+      light_status_dt = na.omit(light_status_dt)
+      write.csv(light_status_dt, output_status_file, row.names = F)
+      print(paste0("status file saved: ", output_status_file))
+      
     }
-    
-    ## saving light_status_dt
-    light_status_dt = na.omit(light_status_dt)
-    write.csv(light_status_dt, output_status_file, row.names = F)
-    print(paste0("status file saved: ", output_status_file))
-    
+
     ## STATUS_CHECK_PLOTTING
     if(STATUS_CHECK_PLOTTING){
       dt_for_plot = light_status_dt
