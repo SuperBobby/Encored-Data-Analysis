@@ -19,11 +19,11 @@ STATUS_CHECK_PLOTTING = F
 
 LAB_LABLES = c('marg', 'hcc', 'ux')
 
-START_DATE = as.Date("2015-09-01")
-END_DATE = as.Date("2016-12-06")
-
 # START_DATE = as.Date("2015-09-01")
-# END_DATE = START_DATE + 10
+# END_DATE = as.Date("2016-12-06")
+
+START_DATE = as.Date("2015-09-01")
+END_DATE = START_DATE + 1
 
 
 ## -----------------------------
@@ -48,7 +48,7 @@ load.light.sec.tidy.data = function(TARGET_DATE, lab){
     dt_duration = get.sec.dt.duration(dt)
     if(dt_duration == 24){
       print(paste(FILE_PATH, 'loaded'))
-      names(dt) <- c('dts', 'light_usage')
+      # names(dt) <- c('dts', 'light')
       return(dt)        
       
     } else {
@@ -130,8 +130,8 @@ for(lab in LAB_LABLES){
       }
       
       # change unit to W/h 
-      light_dt$light_usage = light_dt$light_usage/1000
-      light_usage = na.locf(light_dt$light_usage)
+      light_dt$light = light_dt$light/1000
+      light_usage = na.locf(light_dt$light)
       status = rep("stay", length(light_usage))
       
       ## build the index for light_usage subsetting 
@@ -167,10 +167,10 @@ for(lab in LAB_LABLES){
       unit = 6000
       loop_max = nrow(dt_for_plot) / unit
       
-      light_feeder_name = 'light_usage'
+      light_feeder_name = 'light'
       
-      max_value = max(light_status_dt$light_usage, na.rm = T)
-      min_value = min(light_status_dt$light_usage, na.rm = T) * 0.9
+      max_value = max(light_status_dt$light, na.rm = T)
+      min_value = min(light_status_dt$light, na.rm = T) * 0.9
       
       print(paste("ylim:", min_value, '-', max_value))
       

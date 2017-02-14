@@ -48,62 +48,62 @@ get.dinner.label <- function(dts){
   return(dinner_label)
 }
 
-get.light.operation <- function(light_usage_diff){
-  operation = rep("ON", length(light_usage_diff))
-  operation[light_usage_diff < 0] = "OFF"
+get.light.event <- function(light_usage_diff){
+  event = rep("ON", length(light_usage_diff))
+  event[light_usage_diff < 0] = "OFF"
   
-  return(operation)
+  return(event)
 }
 
-get.light.tidy.operation.dt <- function(agg_status_dt, valid_stay_duration){
+get.light.tidy.event.dt <- function(agg_status_dt, valid_stay_duration){
 
-  agg_operation_dt = agg_status_dt
+  agg_event_dt = agg_status_dt
 
   # subset valid status only: 'stay' with over 'valid_stay_duration secs'
-  agg_operation_dt = agg_operation_dt[status=='stay' & duration > valid_stay_duration]
+  agg_event_dt = agg_event_dt[status=='stay' & duration > valid_stay_duration]
 
   # --- new columns --- #
   ##  'aggDay' & 'aggWeek' for aggregation (considering an office hour 7AM to 7AM)
-  agg_operation_dt[, ':='(aggDay = get.officehour(dts))]
-  agg_operation_dt[, ':='(aggWeek=as.Date(cut(aggDay, breaks = "week", start.on.monday = T)))]
+  agg_event_dt[, ':='(aggDay = get.officehour(dts))]
+  agg_event_dt[, ':='(aggWeek=as.Date(cut(aggDay, breaks = "week", start.on.monday = T)))]
   
   ## 'light_usage_diff' to consider a change of light usage
-  agg_operation_dt[, ':='(light_usage_diff = c(0, diff(agg_operation_dt$light_usage)))]
-  agg_operation_dt = agg_operation_dt[light_usage_diff != 0]
+  agg_event_dt[, ':='(light_usage_diff = c(0, diff(agg_event_dt$light_usage)))]
+  agg_event_dt = agg_event_dt[light_usage_diff != 0]
   
-  ## 'operation' for ON, OFF labeling 
-  agg_operation_dt[, ':='(operation = get.light.operation(light_usage_diff))]
+  ## 'event' for ON, OFF labeling 
+  agg_event_dt[, ':='(event = get.light.event(light_usage_diff))]
   
   ## 'lunch_label' for dinner 
-  agg_operation_dt[, ':='(dinner_label = get.dinner.label(dts))]
+  agg_event_dt[, ':='(dinner_label = get.dinner.label(dts))]
   
   ## 'initial_on': right after zero-usage status 
-  no_use_index = which(agg_operation_dt$light_usage == 0)
+  no_use_index = which(agg_event_dt$light_usage == 0)
   initial_on_index  = no_use_index[-length(no_use_index)] + 1
   
-  initial_on = rep(0, nrow(agg_operation_dt))
+  initial_on = rep(0, nrow(agg_event_dt))
   initial_on[initial_on_index] = 1
   
-  agg_operation_dt = cbind(agg_operation_dt, initial_on)
+  agg_event_dt = cbind(agg_event_dt, initial_on)
   
-  return(agg_operation_dt)
+  return(agg_event_dt)
 }
 
-# get.light.tidy.operation.dt(marg_agg_status_dt, VALID_STAY_DURATION)
+# get.light.tidy.event.dt(marg_agg_status_dt, VALID_STAY_DURATION)
 
 ## -------------------------- ##
 ## plot
 
-# 1. average_light_on_lift: User's fine control for light-on operation  
+# 1. average_light_on_lift: User's fine control for light-on event  
 for(lab in LAB_LABLES){
   
   file_name = paste0(STATUS_AGG_PATH, lab, "_light_aggregated_status_dt.csv")
-  agg_operation_dt = get.light.tidy.operation.dt(fread(file_name) , VALID_STAY_DURATION)
-  agg_operation_dt = agg_operation_dt[dts < PLOT_END_DATE]
+  agg_event_dt = get.light.tidy.event.dt(fread(file_name) , VALID_STAY_DURATION)
+  agg_event_dt = agg_event_dt[dts < PLOT_END_DATE]
   print(file_name)
   
   # # # average lift for 'ON' event 
-  average_light_on_lift_dt = agg_operation_dt[operation == 'ON', 
+  average_light_on_lift_dt = agg_event_dt[event == 'ON', 
                                               .(light_on_lift_average = mean(light_usage_diff)), by=aggDay]
 
 
@@ -121,12 +121,12 @@ for(lab in LAB_LABLES){
 for(lab in LAB_LABLES){
   
   file_name = paste0(STATUS_AGG_PATH, lab, "_light_aggregated_status_dt.csv")
-  agg_operation_dt = get.light.tidy.operation.dt(fread(file_name), VALID_STAY_DURATION)
-  agg_operation_dt = agg_operation_dt[dts < PLOT_END_DATE]
+  agg_event_dt = get.light.tidy.event.dt(fread(file_name), VALID_STAY_DURATION)
+  agg_event_dt = agg_event_dt[dts < PLOT_END_DATE]
   print(file_name)
   
   # # # dinner time OFF event counting 
-  dinner_time_off_dt = agg_operation_dt[dinner_label == 1 & operation=='OFF', 
+  dinner_time_off_dt = agg_event_dt[dinner_label == 1 & event=='OFF', 
                                         .(dinner_time_saving_count = .N), by=aggWeek]
    
   p <- ggplot(dinner_time_off_dt, aes(aggWeek, dinner_time_saving_count)) +
@@ -144,12 +144,12 @@ for(lab in LAB_LABLES){
 for(lab in LAB_LABLES){
   
   file_name = paste0(STATUS_AGG_PATH, lab, "_light_aggregated_status_dt.csv")
-  agg_operation_dt = get.light.tidy.operation.dt(fread(file_name), VALID_STAY_DURATION)
-  agg_operation_dt = agg_operation_dt[dts < PLOT_END_DATE]
+  agg_event_dt = get.light.tidy.event.dt(fread(file_name), VALID_STAY_DURATION)
+  agg_event_dt = agg_event_dt[dts < PLOT_END_DATE]
   print(file_name)
   
   # # # dinner time OFF event counting 
-  initial_light_on_dt = agg_operation_dt[initial_on == 1 & operation=='ON', 
+  initial_light_on_dt = agg_event_dt[initial_on == 1 & event=='ON', 
                                         .(initial_light_on = mean(light_usage_diff)), by=aggDay]
   
   p <- ggplot(initial_light_on_dt, aes(aggDay, initial_light_on)) +
@@ -164,8 +164,8 @@ for(lab in LAB_LABLES){
 
 # 
 # f = "../data/status/aggregated/ux_light_aggregated_status_dt.csv"
-# tmp = get.light.tidy.operation.dt(fread(f), VALID_STAY_DURATION)
-# tmp_dt = tmp[light_usage_diff > 700 & operation=='ON', .(tmp = .N), by=aggDay]
+# tmp = get.light.tidy.event.dt(fread(f), VALID_STAY_DURATION)
+# tmp_dt = tmp[light_usage_diff > 700 & event=='ON', .(tmp = .N), by=aggDay]
 # ggplot(tmp_dt, aes(aggDay, tmp)) +
 #   stat_smooth() +
 #   geom_point() +

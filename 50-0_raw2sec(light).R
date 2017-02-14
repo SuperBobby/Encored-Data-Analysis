@@ -17,8 +17,8 @@ fid_UX = 23
 
 LAB_LABLES = c('marg', 'hcc', 'ux')
 
-RAW_DATA_DIR = "data/raw/snu/"
-TIDY_DATA_DIR = "data/sec/"
+RAW_DATA_DIR = "../data/raw/sec_raw/"
+TIDY_DATA_DIR = "../data/sec_tidy/"
 
 # RAW_DATA_DIR = "R/"
 # TIDY_DATA_DIR = "R/sec/"
