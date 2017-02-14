@@ -120,7 +120,7 @@ for(lab in LAB_LABLES){
       
       if(is.null(light_dt)){
         
-        print(paste0(TARGET_DATE, " is passed(no existing or invalid file)"))
+        print(paste0(TARGET_DATE, " is passed(not existing or invalid file)"))
         if(TARGET_DATE == END_DATE){
           break
         } else {

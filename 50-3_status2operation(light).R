@@ -89,7 +89,7 @@ get.light.tidy.operation.dt <- function(agg_status_dt, valid_stay_duration){
   return(agg_operation_dt)
 }
 
-get.light.tidy.operation.dt(marg_agg_status_dt, VALID_STAY_DURATION)
+# get.light.tidy.operation.dt(marg_agg_status_dt, VALID_STAY_DURATION)
 
 ## -------------------------- ##
 ## plot
