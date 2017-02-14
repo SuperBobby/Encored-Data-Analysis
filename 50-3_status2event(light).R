@@ -67,9 +67,9 @@ get.light.tidy.event.dt <- function(agg_status_dt, valid_stay_duration){
   agg_event_dt[, ':='(aggDay = get.officehour(dts))]
   agg_event_dt[, ':='(aggWeek=as.Date(cut(aggDay, breaks = "week", start.on.monday = T)))]
   
-  ## 'light_usage_diff' to consider a change of light usage
+  ## 'light_usage_diff' to consider a valid change (over 10W) of light usage
   agg_event_dt[, ':='(light_usage_diff = c(0, diff(agg_event_dt$light_usage)))]
-  agg_event_dt = agg_event_dt[light_usage_diff != 0]
+  agg_event_dt = agg_event_dt[abs(light_usage_diff) > 10]
   
   ## 'event' for ON, OFF labeling 
   agg_event_dt[, ':='(event = get.light.event(light_usage_diff))]
