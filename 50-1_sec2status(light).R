@@ -19,11 +19,11 @@ STATUS_CHECK_PLOTTING = F
 
 LAB_LABLES = c('marg', 'hcc', 'ux')
 
-# START_DATE = as.Date("2015-09-01")
-# END_DATE = as.Date("2016-12-06")
-
 START_DATE = as.Date("2015-09-01")
-END_DATE = START_DATE + 1
+END_DATE = as.Date("2016-12-06")
+
+# START_DATE = as.Date("2015-09-01")
+# END_DATE = START_DATE + 1
 
 
 ## -----------------------------
@@ -48,7 +48,7 @@ load.light.sec.tidy.data = function(TARGET_DATE, lab){
     dt_duration = get.sec.dt.duration(dt)
     if(dt_duration == 24){
       print(paste(FILE_PATH, 'loaded'))
-      # names(dt) <- c('dts', 'light')
+      names(dt) <- c('dts', 'light') ## column naming 
       return(dt)        
       
     } else {
@@ -135,11 +135,11 @@ for(lab in LAB_LABLES){
       status = rep("stay", length(light_usage))
       
       ## build the index for light_usage subsetting 
-      STARTING_INDEX = REF_LENGTH+1
-      FINISHING_INDEX = nrow(light_dt) - COMPARING_LENGTH
+      START_INDEX = REF_LENGTH+1
+      END_INDEX = nrow(light_dt) - COMPARING_LENGTH
       
-      index = STARTING_INDEX
-      while(index <= FINISHING_INDEX){
+      index = START_INDEX
+      while(index <= END_INDEX){
         
         light_usage_subset = light_usage[(index-REF_LENGTH):(index+COMPARING_LENGTH)]
         status[index] = get.light.status(light_usage_subset, LIGHT_PRE_POST_GAP_THRE)
@@ -147,7 +147,7 @@ for(lab in LAB_LABLES){
         index = index + 1
         
         # show the current status to the console  
-        if(index %% 6000 == 0) {
+        if(index %% 2*60*60 == 0) {
           print(light_dt[index])
         }
       }
@@ -159,6 +159,7 @@ for(lab in LAB_LABLES){
     ## saving light_status_dt
     light_status_dt = na.omit(light_status_dt)
     write.csv(light_status_dt, output_status_file, row.names = F)
+    print(paste0("status file saved: ", output_status_file))
     
     ## STATUS_CHECK_PLOTTING
     if(STATUS_CHECK_PLOTTING){
