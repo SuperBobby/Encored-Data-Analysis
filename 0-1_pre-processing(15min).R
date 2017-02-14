@@ -6,18 +6,17 @@
 ### ------------------------------------------------------------ ###
 
 library(data.table)
+library(scales)
 library(ggplot2)
 library(gridExtra)
 library(timeDate)
 library(zoo)
 library(lubridate)
 library(plyr)
-library(scales)
 library(reshape2)
 library(bit64)
 library(gtable)
 library(gridExtra)
-library(scales)
 
 source("getSNUdata.R")
 
@@ -180,7 +179,7 @@ hcc_dt = hcc_dt[aggDay >= "2014-09-01" & aggDay <= as.Date(update_end)-2]
 ux_dt = ux_dt[aggDay >= "2014-09-01" & aggDay <= as.Date(update_end)-2]
 
 ##
-## Update columns depending on addDay & index update
+## Update columns depending on aggDay & index update
 ## --> index, day, workindday
 ## 
 Sys.setlocale("LC_TIME", "English")
@@ -250,11 +249,13 @@ hcc_dt = hcc_dt[, ':='(total_woHVAC = total - hvac,
 ux_dt = ux_dt[, ':='(total_woHVAC = total - hvac,
                      total_woETC = total - etc)]
 
-
-
 summary(marg_dt)
 summary(hcc_dt)
 summary(ux_dt)
+
+write.csv(marg_dt, '../data/marg_dt(tidy).csv')
+write.csv(hcc_dt, '../data/hcc_dt(tidy).csv')
+write.csv(ux_dt, '../data/ux_dt(tidy).csv')
 
 
 

@@ -156,7 +156,6 @@ plot.partial.lightOn <- function(dt, expDate, PLOT_PATH, partial_lightON_color =
 
 
 #plot
-#plot
 if(PLOTTING){
   # for(lab in 1:length(PARTIAL_LIGHT_ON_RATIO_list)){
   #   plot_partial_lightOn <- plot.partial.lightOn(PARTIAL_LIGHT_ON_RATIO_list[lab], get.expDate.1.1(), PLOT_PATH)  
