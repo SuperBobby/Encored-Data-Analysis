@@ -4,7 +4,7 @@ library(zoo)
 
 REF_LENGTH = 90
 COMPARING_LENGTH = 90
-COM_PRE_POST_GAP_THRE = 40 # Watts
+COM_PRE_POST_GAP_THRE = 50 # Watts
 
 DEFAULT_STATUS = 'stay'
 RISING_STATUS  = 'up'
@@ -14,16 +14,16 @@ TIDY_DATA_DIR = "../data/sec_tidy/"
 STATUS_DT_SAVE_PATH = "../data/status/"
 PLOT_PATH = "../plots/milli/status_check/"
 
-STATUS_CHECK_PLOTTING = F
+STATUS_CHECK_PLOTTING = T
 
 # LAB_LABLES = c('marg')
 LAB_LABLES = c('marg', 'hcc', 'ux')
 
-START_DATE = as.Date("2015-09-01")
-END_DATE = as.Date("2016-12-06")
-
 # START_DATE = as.Date("2015-09-01")
-# END_DATE = START_DATE 
+# END_DATE = as.Date("2016-12-06")
+# 
+START_DATE = as.Date("2015-09-01")
+END_DATE = START_DATE + 7
 
 ## -----------------------------
 ## Functions 
@@ -168,7 +168,7 @@ for(lab in LAB_LABLES){
           index = index + 1
           
           # show the current status change at console  
-          if(index %% 2*60*60 == 0) {
+          if(index %% (6*60*60) == 0) {
             print(cbind(lab, one_com_feeder_dt[index]))
           }
         }
@@ -238,7 +238,5 @@ for(lab in LAB_LABLES){
 print((LOOP_END - LOOP_START)[-1]/60/60)
 
 # Time differences in secs
-# [1] 25512.514  9188.196  3237.337
-
-# [1] 7.0868093 2.5522766 0.8992602 # about 8 hours!
+# [1] 2.2266725 1.5413171 0.7854194
 

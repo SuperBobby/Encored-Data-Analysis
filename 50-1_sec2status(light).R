@@ -147,7 +147,7 @@ for(lab in LAB_LABLES){
         index = index + 1
         
         # show the current status to the console  
-        if(index %% 2*60*60 == 0) {
+        if(index %% (6*60*60) == 0) {
           print(light_dt[index])
         }
       }
