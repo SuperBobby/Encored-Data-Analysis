@@ -23,7 +23,7 @@ PLOT_END_DATE = "2016-10-01"
 
 LAB_LABLES = c("marg", "hcc", "ux") 
 
-get.officehour <- function(dts, office_hour_start = 7){
+get.officehour.date <- function(dts, office_hour_start = 7){
   new_dts = as.POSIXct(dts)
   new_dts = new_dts - office_hour_start*60*60
   new_dts = as.Date(new_dts, tz='ROK')
@@ -64,7 +64,7 @@ get.light.tidy.event.dt <- function(agg_status_dt, valid_stay_duration){
 
   # --- new columns --- #
   ##  'aggDay' & 'aggWeek' for aggregation (considering an office hour 7AM to 7AM)
-  agg_event_dt[, ':='(aggDay = get.officehour(dts))]
+  agg_event_dt[, ':='(aggDay = get.officehour.date(dts))]
   agg_event_dt[, ':='(aggWeek=as.Date(cut(aggDay, breaks = "week", start.on.monday = T)))]
   
   ## 'light_usage_diff' to consider a valid change (over 10W) of light usage
@@ -88,8 +88,6 @@ get.light.tidy.event.dt <- function(agg_status_dt, valid_stay_duration){
   
   return(agg_event_dt)
 }
-
-# get.light.tidy.event.dt(marg_agg_status_dt, VALID_STAY_DURATION)
 
 ## -------------------------- ##
 ## plot
