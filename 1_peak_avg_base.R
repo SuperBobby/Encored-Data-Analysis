@@ -9,11 +9,30 @@
 # * base : 10th percentile of usage in the aggregate unit 
 # * average : average of usage in the aggregate unit 
 
+
+#' @title The functions for describing basic statistics
+#' (peak, base, average) of each feeder.
+#'
+#' @description retrieving or plotting basic statistics of a feeder's usage.
+#'
+#' @author Jeongyoon Han \email{hanjy@snu.ac.kr}
+#' @author Eunjung Lee \email{ej-lee@snu.ac.kr}
+#' @author Hyunghun Cho \email{webofthink@snu.ac.kr}
+#'
+#' @exportMethod get.basic.stats
+#' @exportMethod plot.basic.stats
+#'
+#' @include 0-1_pre-processing(15min).R
+#' @include 0-2_pre-processing(RealSense).R
+#' @include 0-3_functions_for_table.R
+#' @include 0-4_funtions_for_plot.R
+
 ### --------------------------------------------------------------------- ###
 ### Build list of tables : STATS_list
 ### 
 ### table_name = {lab}_{agg_unit}_{day_type}_{feeder} (with peak, base, avg columns)
 ### --------------------------------------------------------------------- ### 
+
 
 STATS_list = list()
 
