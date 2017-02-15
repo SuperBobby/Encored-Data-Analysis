@@ -56,20 +56,24 @@ get.com.tidy.event.dt <- function(agg_status_dt, valid_stay_duration, valid_diff
   # 1. 'stay' with 'valid duration'
   # 2. 'com_usage_diff' with valid change of com usage (over COM_PRE_POST_GAP_THRE) 
   #
+  repeat{
+    agg_event_dt[, ':='(com_usage_diff = c(valid_diff, diff(agg_event_dt$com)))]
+    agg_event_dt = agg_event_dt[status=='stay' 
+                                & duration > valid_stay_duration
+                                & abs(com_usage_diff) > valid_diff]
+    
+    agg_event_dt[, ':='(com_usage_diff = c(valid_diff, diff(agg_event_dt$com)))]
+
+    if(sum(abs(agg_event_dt$com_usage_diff) < valid_diff)){
+      invalid_stay_index = which(abs(agg_event_dt$com_usage_diff) < valid_diff)
+      print(agg_event_dt[invalid_stay_index])
+      
+    } else {
+      break
+    }
+  }
+
   agg_event_dt[, ':='(com_usage_diff = c(valid_diff, diff(agg_event_dt$com)))]
-  agg_event_dt = agg_event_dt[status=='stay' 
-                              & duration > valid_stay_duration
-                              & abs(com_usage_diff) > valid_diff]
-  # repeat{
-  #   agg_event_dt[, ':='(com_usage_diff = c(valid_diff, diff(agg_event_dt$com)))]
-  #   
-  #   invalid_stay_index = which(abs(agg_event_dt$com_usage_diff) < valid_diff)
-  #   
-  #   print(agg_event_dt[invalid_stay_index])
-  # 
-  #   break
-  #   # agg_event_dt = agg_event_dt[-invalid_stay_index]
-  # }
   
   # --- new columns --- #
   ##  'aggDay' & 'aggWeek' for aggregation (considering an office hour 7AM to 7AM)
@@ -94,12 +98,14 @@ get.com.tidy.event.dt <- function(agg_status_dt, valid_stay_duration, valid_diff
   return(agg_event_dt)
 }
 
-# f = paste0(STATUS_AGG_PATH, lab, "_com_aggregated_status_dt.csv")
-# tmp = get.com.tidy.event.dt(fread(f), VALID_STAY_DURATION, 40)
-# 
-# which(abs(tmp$com_usage_diff) < 40)
-# 
-# range((tmp$com_usage_diff))
+f = paste0(STATUS_AGG_PATH, 'marg', "_com_aggregated_status_dt.csv")
+tmp = get.com.tidy.event.dt(fread(f), VALID_STAY_DURATION, 40)
+
+View(tmp)
+
+which(abs(tmp$com_usage_diff) < 40)
+
+range((tmp$com_usage_diff))
 
 ## -------------------------- ##
 ## plot
