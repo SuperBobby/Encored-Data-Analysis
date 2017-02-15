@@ -10,7 +10,8 @@ VALID_STAY_DURATION = 60 # secs
 STATUS_AGG_PATH = "../data/status/aggregated/"
 
 PLOTTING = F
-PLOT_PATH = "../plots/milli/com/"
+# PLOT_PATH = "../plots/milli/com/"
+PLOT_PATH = "../plots/"
 PLOT_END_DATE = "2016-10-01"
 
 # LAB_LABLES = c("marg", "hcc", "ux") 
@@ -122,14 +123,28 @@ for(lab in LAB_LABLES){
   average_com_on_lift_dt = agg_event_dt[event == 'ON', 
                                         .(com_on_lift_average = mean(com_usage_diff)), by=aggDay]
   
+  setnames(average_com_on_lift_dt, "aggDay", "timestamp")
+  average_com_on_lift_dt[, timestamp := as.Date(timestamp)]
   
-  p <- ggplot(average_com_on_lift_dt, aes(aggDay, com_on_lift_average)) + 
-    stat_smooth() +
-    geom_point() + 
-    scale_x_date("Timestamp", labels = date_format("%Y-%m"), breaks = date_breaks("month")) +
-    ggtitle(paste(lab, ": average lift for 'ON' event "))
+  average_com_on_lift_dt = merge(DAY_LABEL, average_com_on_lift_dt, by = "timestamp", all.x = T)
   
-  print(p)
+  p <- ggplot(average_com_on_lift_dt, aes(x = timestamp)) +
+    ggtitle(paste0(lab, ": average lift for 'ON' event "))
+  
+  p = add.window.line(p, average_com_on_lift_dt, "com_on_lift_average", windowingWeek, get.expDate.2())
+  p = add.event.vline.exp2(p)
+  p = set.default.theme(p)
+  
+  save.plot(paste0(PLOT_PATH, lab, "_average lift for ON event.png"), p)
+  
+  
+#   p <- ggplot(average_com_on_lift_dt, aes(aggDay, com_on_lift_average)) + 
+#     stat_smooth() +
+#     geom_point() + 
+#     scale_x_date("Timestamp", labels = date_format("%Y-%m"), breaks = date_breaks("month")) +
+#     ggtitle(paste(lab, ": average lift for 'ON' event "))
+#   
+#   print(p)
 }
 
 
