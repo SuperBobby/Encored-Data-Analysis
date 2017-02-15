@@ -106,7 +106,7 @@ plot.com.base.ratio <- function(dt, expDate, PLOT_PATH, com_base_ratio_color = '
     ggtitle(plot_name)+
     ylab("Computer Base Ratio (%)")
   
-  com_base_ratio = add.colorful.window.line(com_base_ratio, plot_dt, plot_name, 'com_base_ratio', windowingWeek, com_base_ratio_color, expDate)
+  com_base_ratio = add.colorful.window.line(com_base_ratio, plot_dt, 'com_base_ratio', windowingWeek, com_base_ratio_color, expDate)
   
   if(expDate[length(expDate)] == "2014-11-17"){
     #exp1-1

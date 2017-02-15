@@ -121,7 +121,7 @@ plot.max.consecutive.hvac <- function(dt, expDate, PLOT_PATH, max_consecutive_hv
     ggtitle(plot_name) +
     ylab("Max Consecutive HVAC duration (hrs)")
   
-  max_consecutive_hvac = add.colorful.window.line(max_consecutive_hvac, plot_dt, plot_name, 'max_consecutive_hvac', windowingWeek, max_consecutive_hvac_color, expDate)
+  max_consecutive_hvac = add.colorful.window.line(max_consecutive_hvac, plot_dt, 'max_consecutive_hvac', windowingWeek, max_consecutive_hvac_color, expDate)
   
   if(expDate[length(expDate)] == "2014-11-17"){
     #exp1-1

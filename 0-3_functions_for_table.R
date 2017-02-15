@@ -32,8 +32,20 @@ get.expDate.2 <- function() {
   return(exp_Date)
 }
 
-
 get.expDate.all <- function() {
+  exp_Date <-     c(as.Date("2014-11-10"),
+                    as.Date("2014-11-17"),
+                    as.Date("2015-01-15"),
+                    as.Date("2015-01-22"),
+                    as.Date("2015-10-08"),
+                    as.Date("2015-12-01"),
+                    as.Date("2016-01-11"),
+                    as.Date("2016-02-01"),
+                    as.Date("2016-06-13"))
+  return(exp_Date)
+}
+
+get.labeled.expDate.all <- function() {
   exp_Date = list(c(as.Date("2014-09-01"), as.Date("2014-09-30")), # Sep 2014 
                   c(as.Date("2014-10-01"), as.Date("2014-10-31")), # Oct 2014
                   c(as.Date("2014-11-10"), as.Date("2014-11-16")), # int 1-1

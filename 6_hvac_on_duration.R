@@ -118,7 +118,7 @@ plot.hvac.On.duration <- function(dt, expDate, PLOT_PATH, hvacON_duration_color 
     ylab("HVAC-ON duration (hours)")+
     scale_color_discrete(breaks = c("hvac_on_duration"), labels = c("hvac on duration (hours/day)"))
   
-  hvac_on_duration = add.colorful.window.line(hvac_on_duration, plot_dt, plot_name, 'hvac_on_duration', 
+  hvac_on_duration = add.colorful.window.line(hvac_on_duration, plot_dt, 'hvac_on_duration', 
                                                windowingWeek, hvacON_duration_color, expDate)
   
   if(expDate[length(expDate)] == "2014-11-17"){

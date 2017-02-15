@@ -120,9 +120,9 @@ plot.status <- function(lab, dt, expDate, PLOT_PATH) {
     scale_linetype_discrete(breaks=c(RISING_STATUS, FALLING_STATUS))
   # scale_linetype_discrete(breaks=c(RISING_STATUS, DEFAULT_STATUS, FALLING_STATUS))
   
-  status = add.window.line(status, plot_dt, plot_name, RISING_STATUS, windowingWeek, expDate)
-  status = add.window.line(status, plot_dt, plot_name, FALLING_STATUS, windowingWeek, expDate)
-  # status = add.window.line(status, plot_dt, plot_name, DEFAULT_STATUS, windowingWeek, expDate)
+  status = add.window.line(status, plot_dt, RISING_STATUS, windowingWeek, expDate)
+  status = add.window.line(status, plot_dt, FALLING_STATUS, windowingWeek, expDate)
+  # status = add.window.line(status, plot_dt, DEFAULT_STATUS, windowingWeek, expDate)
   
   if(expDate[length(expDate)] == "2014-11-17"){
     #exp1-1

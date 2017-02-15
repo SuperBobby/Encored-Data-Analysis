@@ -133,7 +133,7 @@ plot.partial.lightOn <- function(dt, expDate, PLOT_PATH, partial_lightON_color =
     ggtitle(plot_name)+
     ylab("Partial light-ON (%)")
   
-  partial_lightON = add.colorful.window.line(partial_lightON, plot_dt, plot_name, 'partial_light_on_ratio', windowingWeek, partial_lightON_color, expDate)
+  partial_lightON = add.colorful.window.line(partial_lightON, plot_dt, 'partial_light_on_ratio', windowingWeek, partial_lightON_color, expDate)
   
   if(expDate[length(expDate)] == "2014-11-17"){
     #exp1-1

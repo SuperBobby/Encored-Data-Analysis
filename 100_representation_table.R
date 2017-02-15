@@ -3,7 +3,7 @@
 ### -------------------------------- ### 
 
 ## initialize representation_table 
-representation_table = data.frame(exp_label = names(get.expDate.all()))
+representation_table = data.frame(exp_label = names(get.labeled.expDate.all()))
 # representation_func  = mean
 
 for(category in names(summary_list)){

@@ -120,7 +120,7 @@ plot.light.On.duration <- function(dt, expDate, PLOT_PATH, lightON_duration_colo
     ylab("Light-ON duration (hours)")+
     scale_color_discrete(breaks = c("light_on_duration"), labels = c("light on duration (hours/day)"))
   
-  light_on_duration = add.colorful.window.line(light_on_duration, plot_dt, plot_name, 'light_on_duration', 
+  light_on_duration = add.colorful.window.line(light_on_duration, plot_dt, 'light_on_duration', 
                                                windowingWeek, lightON_duration_color, expDate)
   
   if(expDate[length(expDate)] == "2014-11-17"){

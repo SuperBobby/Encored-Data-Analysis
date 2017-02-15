@@ -13,7 +13,7 @@
 # * X, Y 축 선
 # * Y축 min -- 0 
 
-windowingByExpDate <- function(data, data_name, target, windowingWeek, expDate){
+windowingByExpDate <- function(data, target, windowingWeek, expDate){
   #windowing before and after n days
   n <- windowingWeek/2*7
   
@@ -66,9 +66,9 @@ windowingByExpDate <- function(data, data_name, target, windowingWeek, expDate){
   return (windowing)
 }
 
-add.window.line <- function(plot_body, data, data_name, target, windowingWeek, expDate) {
-#   window_df = windowingByExpDate(data, data_name, target, windowingWeek, rownum_expDate)
-  window_df = windowingByExpDate(data, data_name, target, windowingWeek, expDate)
+add.window.line <- function(plot_body, data, target, windowingWeek, expDate) {
+#   window_df = windowingByExpDate(data, target, windowingWeek, rownum_expDate)
+  window_df = windowingByExpDate(data, target, windowingWeek, expDate)
 
   result = plot_body +
     geom_line(data=window_df, aes_string(y = "mean", linetype = shQuote(target)), size=1) +
@@ -78,8 +78,8 @@ add.window.line <- function(plot_body, data, data_name, target, windowingWeek, e
 }
 
 
-add.colorful.window.line <- function(plot_body, data, data_name, target, windowingWeek, colorName, expDate, ribbon=TRUE) {
-  window_df = windowingByExpDate(data, data_name, target, windowingWeek, expDate)
+add.colorful.window.line <- function(plot_body, data, target, windowingWeek, colorName, expDate, ribbon=TRUE) {
+  window_df = windowingByExpDate(data, target, windowingWeek, expDate)
   
   if(ribbon==TRUE) {
     result = plot_body +
@@ -122,6 +122,24 @@ add.event.vline.exp2 <- function(plot_body){
   result = plot_body + 
     scale_x_date("Timestamp", labels = date_format("%Y-%m"), breaks = date_breaks("month")) +
     theme_bw()+
+    geom_vline(aes(xintercept = as.numeric(as.Date("2015-10-08"))),color="gray40", linetype = "longdash") +
+    geom_vline(aes(xintercept = as.numeric(as.Date("2015-12-01"))),color="gray40", linetype = "longdash") +
+    geom_vline(aes(xintercept = as.numeric(as.Date("2016-01-11"))),color="gray40", linetype = "longdash") +
+    geom_vline(aes(xintercept = as.numeric(as.Date("2016-02-01"))),color="gray40", linetype = "longdash") +
+    # geom_vline(aes(xintercept = as.numeric(as.Date("2016-05-16"))),color="gray40", linetype = "longdash") +
+    geom_vline(aes(xintercept = as.numeric(as.Date("2016-06-13"))),color="gray40", linetype = "longdash")
+  
+  return(result)
+}
+
+add.event.vline.all <- function(plot_body){
+  result = plot_body + 
+    scale_x_date("Timestamp", labels = date_format("%Y-%m"), breaks = date_breaks("month")) +
+    theme_bw()+
+    geom_vline(aes(xintercept = as.numeric(as.Date("2014-11-10"))),color="gray40", linetype = "longdash") +
+    geom_vline(aes(xintercept = as.numeric(as.Date("2014-11-17"))),color="gray40", linetype = "longdash") +
+    geom_vline(aes(xintercept = as.numeric(as.Date("2015-01-15"))),color="gray40", linetype = "longdash") +
+    geom_vline(aes(xintercept = as.numeric(as.Date("2015-01-22"))),color="gray40", linetype = "longdash") +
     geom_vline(aes(xintercept = as.numeric(as.Date("2015-10-08"))),color="gray40", linetype = "longdash") +
     geom_vline(aes(xintercept = as.numeric(as.Date("2015-12-01"))),color="gray40", linetype = "longdash") +
     geom_vline(aes(xintercept = as.numeric(as.Date("2016-01-11"))),color="gray40", linetype = "longdash") +

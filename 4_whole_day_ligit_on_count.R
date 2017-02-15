@@ -110,7 +110,7 @@ plot.24hr.lightOn.counting <- function(dt, expDate, PLOT_PATH, whole_day_ligit_o
     ggtitle(plot_name)+
     ylab("24hrs light-ON day (count/week)")
   
-  p = add.colorful.window.line(p, plot_dt, plot_name, 'whole_day_ligit_on_count', windowingWeek, whole_day_ligit_on_count_color, expDate)
+  p = add.colorful.window.line(p, plot_dt, 'whole_day_ligit_on_count', windowingWeek, whole_day_ligit_on_count_color, expDate)
   
   if(expDate[length(expDate)] == "2014-11-17"){
     #exp1-1
