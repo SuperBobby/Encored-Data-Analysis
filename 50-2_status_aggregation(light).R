@@ -64,8 +64,7 @@ for(lab in LAB_LABLES){
   
   ## initialize aggregated_light_status_dt
   aggregated_light_status_dt = data.frame(matrix(data=NA, nrow=1, ncol=4))
-  names(aggregated_light_status_dt) <-c("dts", "light_usage", "status", "duration")
-  
+
   repeat {
     
     ## load status data
@@ -74,6 +73,7 @@ for(lab in LAB_LABLES){
     
     if(!is.null(light_status_dt)){
       agg_dt = get.aggregated.light.status.dt(light_status_dt, 0)
+      names(aggregated_com_status_dt) <- names(agg_dt)
       aggregated_light_status_dt = rbind(aggregated_light_status_dt, agg_dt)
       
     } else {

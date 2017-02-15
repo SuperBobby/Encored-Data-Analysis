@@ -9,9 +9,9 @@ library(timeDate)
 # hcc_agg_status_dt = fread("../data/status/aggregated/hcc_light_aggregated_status_dt.csv")
 # ux_agg_status_dt = fread("../data/status/aggregated/ux_light_aggregated_status_dt.csv")
 # 
-# hist(marg_agg_status_dt$light_usage, 100)
-# hist(hcc_agg_status_dt$light_usage, 100)
-# hist(ux_agg_status_dt$light_usage, 100)
+# hist(marg_agg_status_dt$light, 100)
+# hist(hcc_agg_status_dt$light, 100)
+# hist(ux_agg_status_dt$light, 100)
 
 VALID_STAY_DURATION = 60 # secs
 
@@ -68,7 +68,7 @@ get.light.tidy.event.dt <- function(agg_status_dt, valid_stay_duration){
   agg_event_dt[, ':='(aggWeek=as.Date(cut(aggDay, breaks = "week", start.on.monday = T)))]
   
   ## 'light_usage_diff' to consider a valid change (over 10W) of light usage
-  agg_event_dt[, ':='(light_usage_diff = c(0, diff(agg_event_dt$light_usage)))]
+  agg_event_dt[, ':='(light_usage_diff = c(0, diff(agg_event_dt$light)))]
   agg_event_dt = agg_event_dt[abs(light_usage_diff) > 10]
   
   ## 'event' for ON, OFF labeling 
@@ -78,7 +78,7 @@ get.light.tidy.event.dt <- function(agg_status_dt, valid_stay_duration){
   agg_event_dt[, ':='(dinner_label = get.dinner.label(dts))]
   
   ## 'initial_on': right after zero-usage status 
-  no_use_index = which(agg_event_dt$light_usage == 0)
+  no_use_index = which(agg_event_dt$light == 0)
   initial_on_index  = no_use_index[-length(no_use_index)] + 1
   
   initial_on = rep(0, nrow(agg_event_dt))

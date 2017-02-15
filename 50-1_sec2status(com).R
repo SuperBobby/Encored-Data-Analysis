@@ -267,7 +267,6 @@ for(lab in LAB_LABLES){
 }
 
 print((LOOP_END - LOOP_START)[-1]/60/60)
-
 # Time differences in secs
-# [1] 2.2266725 1.5413171 0.7854194
+# [1] 2.366261 2.332963 1.013373
 
