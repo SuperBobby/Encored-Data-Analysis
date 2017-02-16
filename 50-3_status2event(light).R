@@ -5,20 +5,10 @@ library(scales)
 library(gridExtra)
 library(timeDate)
 
-# marg_agg_status_dt = fread("../data/status/aggregated/marg_light_aggregated_status_dt.csv")
-# hcc_agg_status_dt = fread("../data/status/aggregated/hcc_light_aggregated_status_dt.csv")
-# ux_agg_status_dt = fread("../data/status/aggregated/ux_light_aggregated_status_dt.csv")
-
-# hist(marg_agg_status_dt$light, 100)
-# hist(hcc_agg_status_dt$light, 100)
-# hist(ux_agg_status_dt$light, 100)
-
-
-VALID_STAY_DURATION = 60 # secs
+VALID_STAY_DURATION = 10 # secs
 
 STATUS_AGG_PATH = "../data/status/aggregated/"
 
-# PLOTTING = F
 PLOT_PATH = "../plots/milli/light/"
 PLOT_END_DATE = "2016-10-01"
 
@@ -85,7 +75,7 @@ get.light.tidy.event.dt <- function(agg_status_dt, valid_stay_duration){
   agg_event_dt[, ':='(dinner_label = get.dinner.label(dts))]
   
   ## 'initial_on': right after zero-usage status 
-  no_use_index = which(agg_event_dt$light == 0)
+  no_use_index = which(agg_event_dt$light_usage == 0)
   initial_on_index  = no_use_index[-length(no_use_index)] + 1
   
   initial_on = rep(0, nrow(agg_event_dt))
@@ -95,6 +85,39 @@ get.light.tidy.event.dt <- function(agg_status_dt, valid_stay_duration){
   
   return(agg_event_dt)
 }
+
+
+marg_agg_status_dt = fread("../data/status/aggregated/marg_light_aggregated_status_dt.csv")
+hcc_agg_status_dt = fread("../data/status/aggregated/hcc_light_aggregated_status_dt.csv")
+ux_agg_status_dt = fread("../data/status/aggregated/ux_light_aggregated_status_dt.csv")
+
+View(marg_agg_status_dt)
+# hist(marg_agg_status_dt$light, 100)
+# hist(hcc_agg_status_dt$light, 100)
+# hist(ux_agg_status_dt$light, 100)
+
+for(i in seq(10, 100, 10)){
+  tmp = get.light.tidy.event.dt(hcc_agg_status_dt, i)
+  hist(tmp$light_usage_diff, 100, main=paste0('hcc, valid_stay = ',i))
+  
+}
+
+
+
+
+
+tmp = get.light.tidy.event.dt(hcc_agg_status_dt, 30)
+hist(tmp$light_usage_diff, 100)
+
+tmp = get.light.tidy.event.dt(ux_agg_status_dt, 30)
+hist(tmp$light_usage_diff, 100)
+
+
+tmp = get.light.tidy.event.dt(marg_agg_status_dt, 30)
+View(tmp[event == 'ON' & initial_on == 1])
+
+tmp[event == 'ON' & light_usage_diff > 600, .(all_switch_on = .N), by=aggDay]
+
 
 ## -------------------------- ##
 ## plot
@@ -131,8 +154,8 @@ for(lab in LAB_LABLES){
   
   # # # average lift for 'ON' event 
   average_light_on_lift_dt = agg_event_dt[event == 'ON', 
-                                          .(light_on_lift_average = mean(light_usage_diff)), by=aggDay]
-  
+                                          .(light_on_lift_average = mean(light_usage_diff, na.rm = T)), by=aggDay]
+
   setnames(average_light_on_lift_dt, "aggDay", "timestamp")
   average_light_on_lift_dt[, timestamp := as.Date(timestamp)]
   
@@ -180,27 +203,33 @@ for(lab in LAB_LABLES){
   # # # dinner time OFF event counting 
   dinner_time_off_dt = agg_event_dt[dinner_label == 1 & event=='OFF', 
                                     .(dinner_time_off_count = .N), by=aggWeek]
-  dinner_time_on_dt = agg_event_dt[dinner_label == 1 & event=='ON', 
-                                    .(dinner_time_on_count = .N), by=aggWeek]
+  # dinner_time_on_dt = agg_event_dt[dinner_label == 1 & event=='ON', 
+  #                                   .(dinner_time_on_count = .N), by=aggWeek]
+  
+  # fill the empty date to '0'
+  aggWeek_vec = unique(agg_event_dt$aggWeek)
+  dinner_time_off_dt = merge(data.frame(aggWeek = aggWeek_vec), dinner_time_off_dt, all = T)
+  dinner_time_off_dt$dinner_time_off_count[is.na(dinner_time_off_dt$dinner_time_off_count)] = 0
+  dinner_time_off_dt = data.table(dinner_time_off_dt)
   
   setnames(dinner_time_off_dt, "aggWeek", "timestamp")
-  setnames(dinner_time_on_dt, "aggWeek", "timestamp")
-  dinner_time_on_dt[, timestamp := as.Date(timestamp)]
+  # setnames(dinner_time_on_dt, "aggWeek", "timestamp")
+  # dinner_time_on_dt[, timestamp := as.Date(timestamp)]
   dinner_time_off_dt[, timestamp := as.Date(timestamp)]
   
   dinner_time_dt = merge(WEEK_LABEL, dinner_time_off_dt, by = "timestamp", all.x = T)
-  dinner_time_dt = merge(dinner_time_dt, dinner_time_on_dt, by = "timestamp", all.x = T)
+  # dinner_time_dt = merge(dinner_time_dt, dinner_time_on_dt, by = "timestamp", all.x = T)
   
   p <- ggplot(dinner_time_dt, aes(x = timestamp)) +
-    ggtitle(paste0(lab, ": dinner time ONOFF count"))
+    ggtitle(paste0(lab, ": dinner time light ONOFF count"))
   
-  p = add.colorful.window.line(p, dinner_time_dt, "dinner_time_on_count", windowingWeek, "orange3",get.expDate.2())
+  # p = add.colorful.window.line(p, dinner_time_dt, "dinner_time_on_count", windowingWeek, "orange3",get.expDate.2())
   p = add.colorful.window.line(p, dinner_time_dt, "dinner_time_off_count", windowingWeek, "darkorchid4", get.expDate.2())
 
   p = add.event.vline.exp2(p)
   p = set.default.theme(p)
   
-  save.plot(paste0(PLOT_PATH, lab, "_dinner time ONOFF count.png"), p)
+  save.plot(paste0(PLOT_PATH, lab, "_dinner time light ON_OFF count.png"), p)
   
 }
 
