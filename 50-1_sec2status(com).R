@@ -18,12 +18,12 @@ TIDY_DATA_DIR = "../data/sec_tidy/"
 STATUS_DT_SAVE_PATH = "../data/status/"
 PLOT_PATH = "../plots/milli/status_check/"
 
-STATUS_OUTPUT_FILE_UPDATE = T
+STATUS_OUTPUT_FILE_UPDATE = F
 
 STATUS_CHECK_PLOTTING = F
 TARGET_FEEDER_FOR_PLOT = 0  # 0 means all 
 
-# LAB_LABLES = c('marg')
+# LAB_LABLES = c('ux')
 LAB_LABLES = c('marg', 'hcc', 'ux')
 
 START_DATE = as.Date("2015-09-01")
@@ -61,7 +61,7 @@ load.com.sec.tidy.data = function(TARGET_DATE, lab, feeder){ ### should be unifi
     
     ## valid duration check: should be 24 hours
     dt_duration = get.sec.dt.duration(dt)
-    if(dt_duration == 24){
+    if(dt_duration > 24){
       print(paste(FILE_PATH, 'loaded'))
       names(dt) <- col_names
       return(dt)        

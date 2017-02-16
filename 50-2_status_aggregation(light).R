@@ -73,7 +73,7 @@ for(lab in LAB_LABLES){
     
     if(!is.null(light_status_dt)){
       agg_dt = get.aggregated.light.status.dt(light_status_dt, 0)
-      names(aggregated_com_status_dt) <- names(agg_dt)
+      names(aggregated_light_status_dt) <- names(agg_dt)
       aggregated_light_status_dt = rbind(aggregated_light_status_dt, agg_dt)
       
     } else {
@@ -101,7 +101,7 @@ for(lab in LAB_LABLES){
   } else {
     
     existing_file = fread(output_file_name)
-    if(max(aggregated_light_status_dt$dts) > max(existing_file$dts)){
+    if(max(aggregated_light_status_dt$dts) >= max(existing_file$dts)){
       write.csv(aggregated_light_status_dt, output_file_name, row.names = F)
       print(paste(output_file_name, "is over written - ", max(aggregated_light_status_dt$dts)))
       

@@ -46,7 +46,7 @@ load.light.sec.tidy.data = function(TARGET_DATE, lab){
     
     ## valid duration check: should be 24 hours
     dt_duration = get.sec.dt.duration(dt)
-    if(dt_duration == 24){
+    if(dt_duration > 24){
       print(paste(FILE_PATH, 'loaded'))
       names(dt) <- c('dts', 'light') ## column naming 
       return(dt)        
