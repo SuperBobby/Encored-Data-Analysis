@@ -64,11 +64,13 @@ get.labeled.expDate.all <- function() {
                   # c(as.Date("2016-02-01"), as.Date("2016-05-15")), # int 2-4
                   # c(as.Date("2016-05-16"), as.Date("2016-06-12")), # int 2-5
                   c(as.Date("2016-06-13"), as.Date("2016-07-31")),   # Jul 2016
-                  c(as.Date("2016-08-01"), as.Date("2016-08-31"))    # Aug 2015
+                  c(as.Date("2016-08-01"), as.Date("2016-08-31")),    # Aug 2016
+                  c(as.Date("2016-09-01"), as.Date("2016-09-30")),    # Sep 2016
+                  c(as.Date("2016-10-01"), as.Date("2016-10-31")),    # Oct 2016
                   ) 
 
   exp_Names = c('Sep 2014', 'Oct 2014', 'int 1-1', 'btw 1-1 & 1-2', 'int 1-2', 'Feb 2015', 'Mar 2015', 'Apr 2015',
-                'Aug 2015', 'Sep 2015', 'int 2-1', 'int 2-2', 'int 2-3', 'int 2-4', 'Jul 2016', 'Aug 2016')
+                'Aug 2015', 'Sep 2015', 'int 2-1', 'int 2-2', 'int 2-3', 'int 2-4', 'Jul 2016', 'Aug 2016', 'Sep 2016', 'Oct 2016')
   exp_Date = setNames(exp_Date, exp_Names)
 
   return(exp_Date)
@@ -89,7 +91,7 @@ cut.expDate.1.2 <- function(raw_dt) {
 }
 
 cut.expDate.2 <- function(raw_dt) {
-  cut_dt <- raw_dt[timestamp>= "2015-08-01" & timestamp<= "2016-08-31"]
+  cut_dt <- raw_dt[timestamp>= "2015-08-01" & timestamp<= "2016-11-01"]
   
   return(cut_dt)
 }

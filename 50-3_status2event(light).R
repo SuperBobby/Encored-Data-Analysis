@@ -102,9 +102,8 @@ for(i in seq(10, 100, 10)){
   
 }
 
-
-
-
+tmp = get.light.tidy.event.dt(marg_agg_status_dt, 30)
+hist(tmp$light_usage_diff, 100)
 
 tmp = get.light.tidy.event.dt(hcc_agg_status_dt, 30)
 hist(tmp$light_usage_diff, 100)
@@ -256,7 +255,11 @@ for(lab in LAB_LABLES){
 #   
 # }
 
+
+
 for(lab in LAB_LABLES){
+
+  windowingWeek = 6
   
   file_name = paste0(STATUS_AGG_PATH, lab, "_light_aggregated_status_dt.csv")
   agg_event_dt = get.light.tidy.event.dt(fread(file_name), VALID_STAY_DURATION)
@@ -265,31 +268,47 @@ for(lab in LAB_LABLES){
   
   # # # dinner time OFF event counting 
   initial_light_on_dt = agg_event_dt[initial_on == 1 & event=='ON', 
-                                     .(initial_light_on = mean(light_usage_diff)), by=aggDay]
-  
+                                     .(initial_light_on = max(light_usage_diff)), by=aggDay]
   setnames(initial_light_on_dt, "aggDay", "timestamp")
-  dinner_time_off_dt[, timestamp := as.Date(timestamp)]
+  initial_light_on_dt[, timestamp := as.Date(timestamp)]
   
   initial_light_on_dt = merge(DAY_LABEL, initial_light_on_dt, by = "timestamp", all.x = T)
   
   p <- ggplot(initial_light_on_dt, aes(x = timestamp)) +
-    ggtitle(paste0(lab, ": initial light-on lifting"))
+    ggtitle(paste0(lab, ": initial light-on lifting (daily max)"))
   
   p = add.window.line(p, initial_light_on_dt, "initial_light_on", windowingWeek, get.expDate.2())
   p = add.event.vline.exp2(p)
   p = set.default.theme(p)
   
-  save.plot(paste0(PLOT_PATH, lab, "_initial light-on lifting.png"), p)
+  print(p)
+#   save.plot(paste0(PLOT_PATH, lab, "_initial light-on lifting.png"), p)
   
 }
 
-# 
-# f = "../data/status/aggregated/ux_light_aggregated_status_dt.csv"
-# tmp = get.light.tidy.event.dt(fread(f), VALID_STAY_DURATION)
-# tmp_dt = tmp[light_usage_diff > 700 & event=='ON', .(tmp = .N), by=aggDay]
-# ggplot(tmp_dt, aes(aggDay, tmp)) +
-#   stat_smooth() +
-#   geom_point() +
-#   scale_x_date("Timestamp", labels = date_format("%Y-%m"), breaks = date_breaks("month")) +
-#   ggtitle(paste0(f))
 
+##
+## 4. inital light on event
+##    -- daily initial light on duration (unit: hours)
+##    -- ratio of daily initial light on duration to daily total light on duration 
+
+for(lab in LAB_LABLES){
+  
+  file_name = paste0(STATUS_AGG_PATH, lab, "_light_aggregated_status_dt.csv")
+  
+  
+  tmp = get.light.tidy.event.dt(fread(file_name), 10)
+  
+  daily_light_on_duration = tmp[light_usage != 0, .(daily_light_on_duration = sum(duration)/60/60), by=aggDay]
+  daily_inital_light_on_duration = tmp[initial_on == 1, .(daily_initial_light_on_duration = sum(duration)/60/60), by=aggDay]
+  
+  # fill the empty date to '0'
+  aggDay_vec = unique(tmp$aggDay)
+  light_on_duration_dt = merge(data.frame(aggDay = aggDay_vec), daily_light_on_duration, all = T)
+  light_on_duration_dt = merge(light_on_duration_dt, daily_inital_light_on_duration)
+  
+  print(lab)
+  print(mean(light_on_duration_dt$daily_initial_light_on_duration))
+  print(mean(light_on_duration_dt$daily_initial_light_on_duration / light_on_duration_dt$daily_light_on_duration))
+  
+}
