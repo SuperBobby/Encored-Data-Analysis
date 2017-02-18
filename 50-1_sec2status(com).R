@@ -16,7 +16,7 @@ FALLING_STATUS = 'down'
 
 TIDY_DATA_DIR = "../data/sec_tidy/"
 STATUS_DT_SAVE_PATH = "../data/status/"
-PLOT_PATH = "../plots/milli/status_check/"
+PLOT_PATH = "../plots/milli/status_check/takealook/"
 
 STATUS_OUTPUT_FILE_UPDATE = F
 
@@ -61,7 +61,7 @@ load.com.sec.tidy.data = function(TARGET_DATE, lab, feeder){ ### should be unifi
     
     ## valid duration check: should be 24 hours
     dt_duration = get.sec.dt.duration(dt)
-    if(dt_duration > 24){
+    if(dt_duration >= 24){
       print(paste(FILE_PATH, 'loaded'))
       names(dt) <- col_names
       return(dt)        

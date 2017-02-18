@@ -104,6 +104,27 @@ for(i in seq(10, 100, 10)){
 
 
 
+par(mfrow = c(1,3))
+event_dt = get.light.tidy.event.dt(marg_agg_status_dt, 10)
+daily_init_on_count = event_dt[, .(daily_init_on_count = sum(initial_on)), by=aggDay]
+hist((daily_init_on_count$daily_init_on_count), max(daily_init_on_count$daily_init_on_count), 
+     main = 'marg daily inital-light-on count')
+
+
+event_dt = get.light.tidy.event.dt(hcc_agg_status_dt, 10)
+daily_init_on_count = event_dt[, .(daily_init_on_count = sum(initial_on)), by=aggDay]
+hist((daily_init_on_count$daily_init_on_count), max(daily_init_on_count$daily_init_on_count), 
+     main = 'hcc daily inital-light-on count' )
+
+
+
+event_dt = get.light.tidy.event.dt(marg_agg_status_dt, 10)
+daily_init_on_count = event_dt[, .(daily_init_on_count = sum(initial_on)), by=aggDay]
+hist((daily_init_on_count$daily_init_on_count), max(daily_init_on_count$daily_init_on_count), 
+     main = 'ux daily inital-light-on count')
+
+
+
 
 
 tmp = get.light.tidy.event.dt(hcc_agg_status_dt, 30)

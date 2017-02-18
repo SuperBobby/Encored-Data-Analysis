@@ -1,7 +1,7 @@
 #-----------------------#
 # 15min data analysis
 
-PLOTTING = T
+PLOTTING = F
 
 source("0-1_pre-processing(15min).R")
 source("0-2_pre-processing(RealSense).R")
@@ -23,8 +23,18 @@ source("100_representation_table.R")
 #-----------------------#
 # sec data analysis 
 
-PLOTTING = T
+## light 
+## 
 
-# source("50-0_raw2sec.R")
-source("50-1_sec2status.R")
-source("50-2_status2daily.R")
+# source("50-0_raw2sec(light).R")
+source("50-1_sec2status(light).R")
+source("50-2_status_aggregation(light).R")
+source("50-3_status2operation(light).R")
+
+## computer
+## 
+## 
+source("50-0_raw2sec(com).R")
+source("50-1_sec2status(com).R")
+
+
