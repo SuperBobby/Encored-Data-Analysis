@@ -29,7 +29,6 @@ load("../data/raw/ux_15min.RData")
 update_start = "2014-09-01"
 update_end = "2016-12-01"
 
-
 marg_defalut_table_15min <- reviseSNUData(marg_defalut_table_15min, "marg", update_start, update_end, verbose = T)
 hcc_defalut_table_15min <- reviseSNUData( hcc_defalut_table_15min, "hcc",  update_start, update_end, verbose = T)
 ux_defalut_table_15min <- reviseSNUData(  ux_defalut_table_15min, "ux",   update_start, update_end, verbose = T)
@@ -37,6 +36,10 @@ ux_defalut_table_15min <- reviseSNUData(  ux_defalut_table_15min, "ux",   update
 save(marg_defalut_table_15min, file ="../data/raw/marg_15min.RData")
 save( hcc_defalut_table_15min, file ="../data/raw/hcc_15min.RData")
 save(  ux_defalut_table_15min, file ="../data/raw/ux_15min.RData")
+
+write.csv(marg_defalut_table_15min, file ="../data/raw/marg_15min.csv")
+write.csv( hcc_defalut_table_15min, file ="../data/raw/hcc_15min.csv")
+write.csv(  ux_defalut_table_15min, file ="../data/raw/ux_15min.csv")
 
 ## Add default index for each day (1:96 per day)
 marg_dt = data.table(marg_defalut_table_15min, index=rep(1:96, (nrow(marg_defalut_table_15min)/96)))
