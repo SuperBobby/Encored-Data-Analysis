@@ -62,7 +62,6 @@ get.lunch.time.saving.ratio <- function(sub_dt, feeder){
   lunch_dt = merge(before_dt, during_dt, by='aggDay')
   lunch_dt = merge(lunch_dt, after_dt, by='aggDay')
   
-  
   lunch_dt[, ':='(before_on = 0)][round(before_lunch_max,2) > target_on_usage, ':='(before_on = 1)]
   lunch_dt[, ':='(lunch_saving = 0)]
   lunch_dt[(during_lunch_min < (before_lunch_max * lunch_saving_threshold_ratio)) 
@@ -72,20 +71,57 @@ get.lunch.time.saving.ratio <- function(sub_dt, feeder){
   # print(target_on_usage)
   # print(lunch_dt)
   
-  before_lunch_on_ratio = sum(lunch_dt$before_on)
-  lunch_saving_ratio = sum(lunch_dt[before_on == 1]$lunch_saving)
+  before_lunch_on_count = sum(lunch_dt$before_on)
+  lunch_saving_count = sum(lunch_dt[before_on == 1]$lunch_saving)
   
-  if(before_lunch_on_ratio != 0){
-    lunch_time_saving_ratio = lunch_saving_ratio / before_lunch_on_ratio  
+#   # * before supper usage: 17:00 ~ 18:00 -- index 41:44
+#   # * during supper usage: 17:30 ~ 19:30 -- index 43:50
+#   # *  after supper usage: 19:00 ~ 20:00 -- index 49:52
+#   before_supper_index = 41:44
+#   during_supper_index = 43:50
+#   after_supper_index  = 49:52
+#   
+#   supper_saving_threshold_ratio = 0.9
+#   
+#   week_usage = unlist(sub_dt[, feeder, with=F])
+#   target_on_usage = quantile(week_usage, BASE_PERCENTILE)
+#   
+#   # print(class(target_on_usage))
+#   
+#   before_dt = sub_dt[index %in% before_supper_index, .(before_supper_max = max(get(feeder))), by=aggDay]
+#   during_dt = sub_dt[index %in% during_supper_index, .(during_supper_min = min(get(feeder))), by=aggDay]
+#   after_dt = sub_dt[index %in%  after_supper_index, .( after_supper_max = max(get(feeder))), by=aggDay]
+#   
+#   supper_dt = merge(before_dt, during_dt, by='aggDay')
+#   supper_dt = merge(supper_dt, after_dt, by='aggDay')
+#   
+#   supper_dt[, ':='(before_on = 0)][round(before_supper_max,2) > target_on_usage, ':='(before_on = 1)]
+#   supper_dt[, ':='(supper_saving = 0)]
+#   supper_dt[(during_supper_min < (before_supper_max * supper_saving_threshold_ratio)) 
+#            & (during_supper_min < (after_supper_max * supper_saving_threshold_ratio)), 
+#            ':='(supper_saving = 1), by=aggDay]
+#   
+#   # print(target_on_usage)
+#   # print(supper_dt)
+#   
+#   before_meal_on_count = sum(lunch_dt$before_on) + sum(supper_dt$before_on)
+#   meal_saving_count = sum(lunch_dt[before_on == 1]$lunch_saving) + sum(supper_dt[before_on == 1]$supper_saving)
+
+
+  before_meal_on_count = sum(lunch_dt$before_on) 
+  meal_saving_count = sum(lunch_dt[before_on == 1]$lunch_saving) 
+
+  if(before_meal_on_count != 0){
+    meal_time_saving_ratio = meal_saving_count / before_meal_on_count
   } else {
-    lunch_time_saving_ratio = NA
+    meal_time_saving_ratio = NA
   }
   
   # print(before_lunch_on_ratio)
   # print(lunch_saving_ratio)
-  # print(lunch_time_saving_ratio)
+  # print(meal_time_saving_ratio)
   
-  return(lunch_time_saving_ratio)
+  return(meal_time_saving_ratio)
 }
 
 
@@ -186,6 +222,7 @@ plot.lunch.saving <- function(dt, expDate, PLOT_PATH){
   return(p1)
 }
 
+PLOTTING = T
 
 #plot
 if(PLOTTING){
@@ -193,7 +230,7 @@ if(PLOTTING){
   #   plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_RATIO_list[lab], get.expDate.1.1(), PLOT_PATH)  
   # }
   for(lab in 1:(length(LUNCH_TIME_SAVING_RATIO_list)/2)){
-    plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_RATIO_list[(lab*2 - 1):(lab*2)], get.expDate.1.2(), PLOT_PATH)
+#     plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_RATIO_list[(lab*2 - 1):(lab*2)], get.expDate.1.2(), PLOT_PATH)
     plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_RATIO_list[(lab*2 - 1):(lab*2)], get.expDate.2(), PLOT_PATH)  
   }
 }
