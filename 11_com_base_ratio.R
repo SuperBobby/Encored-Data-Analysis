@@ -29,7 +29,7 @@ PLOT_PATH = "../plots/"
 
 LABS = c("MARG", "HCC", "UX")                                # lab
 AGG_UNITS = c("aggDay")                                      # agg_unit
-TYPES_OF_DAY = c("allDay", "workingday", "nonworkingday")   # day_type
+TYPES_OF_DAY = c("allDay", "workingday", "nonworkingday")[2]   # day_type
 
 dt_list = setNames(dt_list, LABS)
 
@@ -95,7 +95,7 @@ plot.com.base.ratio <- function(dt, expDate, PLOT_PATH, com_base_ratio_color = '
     plot_name = paste('exp1-2', names(dt), sep="_")
   } else{
     #exp2
-    plot_dt = cut.expDate.2(plot_dt)
+    plot_dt = cut.expDate.hvac(plot_dt)
     plot_name = paste('exp2', names(dt), sep="_")
   }
   
@@ -134,9 +134,9 @@ if(PLOTTING){
   #   plot_com_base <- plot.com.base.ratio(COM_BASE_RATIO_list[lab], get.expDate.1.1(), PLOT_PATH)  
   # }
   
-  for(lab in 1:length(COM_BASE_RATIO_list)){
-    plot_com_base <- plot.com.base.ratio(COM_BASE_RATIO_list[lab], get.expDate.1.2(), PLOT_PATH)  
-  }
+  # for(lab in 1:length(COM_BASE_RATIO_list)){
+  #   plot_com_base <- plot.com.base.ratio(COM_BASE_RATIO_list[lab], get.expDate.1.2(), PLOT_PATH)  
+  # }
   
   for(lab in 1:length(COM_BASE_RATIO_list)){
     plot_com_base <- plot.com.base.ratio(COM_BASE_RATIO_list[lab], get.expDate.2(), PLOT_PATH)  

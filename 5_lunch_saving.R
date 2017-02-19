@@ -22,7 +22,7 @@ LUNCH_TIME_SAVING_RATIO_list = list()
 
 LABEL = "lunch_time_saving_ratio"
 
-PLOT_PATH = "../plots/lunch_saving/"
+PLOT_PATH = "../plots/"
 
 ## Loop parameters 
 # 1. lab
@@ -216,7 +216,7 @@ plot.lunch.saving <- function(dt, expDate, PLOT_PATH){
   p1 = set.default.theme(p1) + 
     scale_y_continuous(limits = c(0.0, 1.0), oob=rescale_none)
   
-  save.plot(paste0(PLOT_PATH, plot_name, ".png"), p1)
+  save.plot(paste0(PLOT_PATH, plot_name, "lunch_time_saving_ratio.png"), p1)
   
   print(paste("plot:", plot_name))
   return(p1)

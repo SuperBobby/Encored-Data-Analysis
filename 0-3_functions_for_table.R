@@ -91,11 +91,16 @@ cut.expDate.1.2 <- function(raw_dt) {
 }
 
 cut.expDate.2 <- function(raw_dt) {
-  cut_dt <- raw_dt[timestamp>= "2015-08-01" & timestamp<= "2016-11-01"]
+  cut_dt <- raw_dt[timestamp>= "2015-07-01" & timestamp<= "2016-12-01"]
   
   return(cut_dt)
 }
 
+cut.expDate.hvac <- function(raw_dt) {
+  cut_dt <- raw_dt[timestamp>= "2014-10-01" & timestamp<= "2016-12-01"]
+  
+  return(cut_dt)
+}
 
 
 split.table.by.expDate <- function(input_table, expDate){

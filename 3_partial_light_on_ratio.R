@@ -32,8 +32,8 @@ PLOT_PATH = "../plots/"
 # 4. target feeder
 
 LABS = c("MARG", "HCC", "UX")                                # lab
-AGG_UNITS = c("aggWeek", "aggDay")                           # agg_unit
-TYPES_OF_DAY = c("allDay", "workingday", "nonworkingday")   # day_type
+AGG_UNITS = c("aggWeek", "aggDay")[2]                           # agg_unit
+TYPES_OF_DAY = c("allDay", "workingday", "nonworkingday")[1]   # day_type
 
 dt_list = setNames(dt_list, LABS)
 
@@ -161,9 +161,9 @@ if(PLOTTING){
   #   plot_partial_lightOn <- plot.partial.lightOn(PARTIAL_LIGHT_ON_RATIO_list[lab], get.expDate.1.1(), PLOT_PATH)  
   # }
   
-  for(lab in 1:length(PARTIAL_LIGHT_ON_RATIO_list)){
-    plot_partial_lightOn <- plot.partial.lightOn(PARTIAL_LIGHT_ON_RATIO_list[lab], get.expDate.1.2(), PLOT_PATH)  
-  }
+  # for(lab in 1:length(PARTIAL_LIGHT_ON_RATIO_list)){
+  #   plot_partial_lightOn <- plot.partial.lightOn(PARTIAL_LIGHT_ON_RATIO_list[lab], get.expDate.1.2(), PLOT_PATH)  
+  # }
   
   for(lab in 1:length(PARTIAL_LIGHT_ON_RATIO_list)){
     plot_partial_lightOn <- plot.partial.lightOn(PARTIAL_LIGHT_ON_RATIO_list[lab], get.expDate.2(), PLOT_PATH)  

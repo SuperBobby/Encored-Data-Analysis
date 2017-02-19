@@ -111,7 +111,7 @@ plot.max.consecutive.hvac <- function(dt, expDate, PLOT_PATH, max_consecutive_hv
     plot_name = paste('exp1-2', names(dt), sep="_")
   } else{
     #exp2
-    plot_dt = cut.expDate.2(plot_dt)
+    plot_dt = cut.expDate.hvac(plot_dt)
     plot_name = paste('exp2', names(dt), sep="_")
   }
   
@@ -149,9 +149,9 @@ if(PLOTTING){
   #   plot_max_consecutive_hvac <- plot.max.consecutive.hvac(MAX_CONSECUTIVE_HVAC_list[lab], get.expDate.1.1(), PLOT_PATH)  
   # }
   
-  for(lab in 1:length(MAX_CONSECUTIVE_HVAC_list)){
-    plot_max_consecutive_hvac <- plot.max.consecutive.hvac(MAX_CONSECUTIVE_HVAC_list[lab], get.expDate.1.2(), PLOT_PATH)  
-  }
+  # for(lab in 1:length(MAX_CONSECUTIVE_HVAC_list)){
+  #   plot_max_consecutive_hvac <- plot.max.consecutive.hvac(MAX_CONSECUTIVE_HVAC_list[lab], get.expDate.1.2(), PLOT_PATH)  
+  # }
   
   for(lab in 1:length(MAX_CONSECUTIVE_HVAC_list)){
     plot_max_consecutive_hvac <- plot.max.consecutive.hvac(MAX_CONSECUTIVE_HVAC_list[lab], get.expDate.2(), PLOT_PATH)  

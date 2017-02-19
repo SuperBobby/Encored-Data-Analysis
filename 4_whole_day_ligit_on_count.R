@@ -137,9 +137,9 @@ if(PLOTTING){
   #   plot_24hr_lightOn_counting <- plot.24hr.lightOn.counting(WHOLE_DAY_LIGHT_ON_COUNT_list[lab], get.expDate.1.1(), PLOT_PATH)  
   # }
   
-  for(lab in 1:length(WHOLE_DAY_LIGHT_ON_COUNT_list)){
-    plot_24hr_lightOn_counting <- plot.24hr.lightOn.counting(WHOLE_DAY_LIGHT_ON_COUNT_list[lab], get.expDate.1.2(), PLOT_PATH)  
-  }
+  # for(lab in 1:length(WHOLE_DAY_LIGHT_ON_COUNT_list)){
+  #   plot_24hr_lightOn_counting <- plot.24hr.lightOn.counting(WHOLE_DAY_LIGHT_ON_COUNT_list[lab], get.expDate.1.2(), PLOT_PATH)  
+  # }
   
   for(lab in 1:length(WHOLE_DAY_LIGHT_ON_COUNT_list)){
     plot_24hr_lightOn_counting <- plot.24hr.lightOn.counting(WHOLE_DAY_LIGHT_ON_COUNT_list[lab], get.expDate.2(), PLOT_PATH)  
