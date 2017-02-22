@@ -61,7 +61,7 @@ LABS = c("MARG", "HCC", "UX")                                  # lab
 AGG_UNITS = c("aggDay")                                        # agg_unit
 # AGG_UNITS = c("aggWeek", "aggDay")                           # agg_unit
 TYPES_OF_DAY = c("allDay", "workingday", "nonworkingday")[1]     # day_type
-FEEDERS = c("total", "total_woHVAC", "computer", "light", "hvac")[-1]                         # feeder
+FEEDERS = c("total", "total_woHVAC", "computer", "light", "hvac")                         # feeder
 # FEEDERS = c("total", "total_woHVAC", "total_woETC", "computer", "light", "hvac")            # feeder
 
 
@@ -128,7 +128,8 @@ plot.stats <- function(dt, expDate, PLOT_PATH) {
   
   stats <- ggplot(plot_dt, aes(x=timestamp)) +
     ggtitle(plot_name) +
-    ylab("Energy use (kWh/day)")+
+    # ylab("Energy use (kWh/day)")+
+    ylab("Power consumption in 15min")+
     scale_linetype_discrete(breaks=c("peak", "avg", "base"))
   
   stats = add.window.line(stats, plot_dt, "peak", windowingWeek, expDate)

@@ -59,7 +59,7 @@ get.partial.light.on.ratio <- function(light, LIGHT_ON_MIN_USAGE, light_peak, PA
   if(sum(light_on) == 0){
     return(0)
   } else {
-    partial_light_on_ratio = (sum(partial_light_on) / sum(light_on)) * 100
+    partial_light_on_ratio = (sum(partial_light_on) / sum(light_on))
   }
   return(partial_light_on_ratio)
 }
@@ -130,10 +130,13 @@ plot.partial.lightOn <- function(dt, expDate, PLOT_PATH, partial_lightON_color =
   
   #   print(plot_name)
   partial_lightON <- ggplot(plot_dt, aes(x=timestamp)) +
-    ggtitle(plot_name)+
-    ylab("Partial light-ON (%)")
+    ggtitle(paste0(plot_name, '\n'))+
+    ylab("Partial light-ON ratio (%)") +
+    scale_y_continuous(labels = percent) +
+    coord_cartesian(ylim=c(0,1))
   
-  partial_lightON = add.colorful.window.line(partial_lightON, plot_dt, 'partial_light_on_ratio', windowingWeek, partial_lightON_color, expDate)
+  # partial_lightON = add.colorful.window.line(partial_lightON, plot_dt, 'partial_light_on_ratio', windowingWeek, partial_lightON_color, expDate)
+  partial_lightON = add.window.line(partial_lightON, plot_dt, 'partial_light_on_ratio', windowingWeek, expDate)
   
   if(expDate[length(expDate)] == "2014-11-17"){
     #exp1-1
