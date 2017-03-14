@@ -131,7 +131,7 @@ plot.partial.lightOn <- function(dt, expDate, PLOT_PATH, partial_lightON_color =
   #   print(plot_name)
   partial_lightON <- ggplot(plot_dt, aes(x=timestamp)) +
     ggtitle(paste0(plot_name, '\n'))+
-    ylab("Partial light-ON ratio (%)") +
+    ylab("Partial light-on (%/day)") +
     scale_y_continuous(labels = percent) +
     coord_cartesian(ylim=c(0,1))
   
@@ -206,4 +206,12 @@ for(lab in target_labs){
   }
 }
 
-# source('10_representation_table.R')
+write.csv(PARTIAL_LIGHT_ON_RATIO_list$MARG_aggDay_allDay_partial_light_on_ratio, 
+          '../data/partial_light_on_daily_ratio(Lab_A).csv')
+write.csv(PARTIAL_LIGHT_ON_RATIO_list$HCC_aggDay_allDay_partial_light_on_ratio, 
+          '../data/partial_light_on_daily_ratio(Lab_B).csv')
+write.csv(PARTIAL_LIGHT_ON_RATIO_list$UX_aggDay_allDay_partial_light_on_ratio, 
+          '../data/partial_light_on_daily_ratio(Lab_C).csv')
+
+
+

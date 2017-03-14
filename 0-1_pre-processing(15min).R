@@ -157,21 +157,36 @@ ux_dt = replace.server.issue(ux_dt)
 ## Add 'aggDay' column
 ## aggDay: Key index column for aggreagtion by day
 ##
-aggDay = c(rep((as.Date(marg_defalut_table_15min$timestamp[1], tz="rok")-1),28), 
-           as.Date(marg_defalut_table_15min$timestamp, tz='rok')[29:(nrow(marg_defalut_table_15min))-28])
-
-marg_dt = data.table(marg_dt, aggDay)
-hcc_dt = data.table(hcc_dt, aggDay)
-ux_dt = data.table(ux_dt, aggDay)
+##
+get.officehour.date <- function(dts, office_hour_start = 7){
+  new_dts = as.POSIXct(dts)
+  new_dts = new_dts - office_hour_start*60*60
+  new_dts = as.Date(new_dts, tz='ROK')
+  
+  return(new_dts)
+}
+marg_dt[, ':='(aggDay = get.officehour.date(timestamp))]
+hcc_dt[, ':='(aggDay = get.officehour.date(timestamp))]
+ux_dt[, ':='(aggDay = get.officehour.date(timestamp))]
 
 ##
 ## Add 'aggWeek' column
 ## aggWeek: Key index column for aggreagtion by week
 ##
-
+##
 marg_dt[, ':='(aggWeek=as.Date(cut(aggDay, breaks = "week", start.on.monday = T)))]
 hcc_dt[, ':='(aggWeek=as.Date(cut(aggDay, breaks = "week", start.on.monday = T)))]
 ux_dt[, ':='(aggWeek=as.Date(cut(aggDay, breaks = "week", start.on.monday = T)))]
+
+# aggDay = c(rep((as.Date(marg_defalut_table_15min$timestamp[1], tz="rok")-1),28), 
+#            as.Date(marg_defalut_table_15min$timestamp, tz='rok')[29:(nrow(marg_defalut_table_15min))-28])
+# marg_dt = data.table(marg_dt, aggDay)
+# hcc_dt = data.table(hcc_dt, aggDay)
+# ux_dt = data.table(ux_dt, aggDay)
+# 
+# marg_dt[, ':='(aggWeek=as.Date(cut(aggDay, breaks = "week", start.on.monday = T)))]
+# hcc_dt[, ':='(aggWeek=as.Date(cut(aggDay, breaks = "week", start.on.monday = T)))]
+# ux_dt[, ':='(aggWeek=as.Date(cut(aggDay, breaks = "week", start.on.monday = T)))]
 
 
 ## 
@@ -256,9 +271,9 @@ summary(marg_dt)
 summary(hcc_dt)
 summary(ux_dt)
 
-write.csv(marg_dt, '../data/marg_dt(tidy).csv')
-write.csv(hcc_dt, '../data/hcc_dt(tidy).csv')
-write.csv(ux_dt, '../data/ux_dt(tidy).csv')
+write.csv(marg_dt, '../data/15min_Lab_A(tidy).csv')
+write.csv(hcc_dt, '../data/15min_Lab_B(tidy).csv')
+write.csv(ux_dt, '../data/15min_Lab_C(tidy).csv')
 
 
 

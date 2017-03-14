@@ -36,7 +36,7 @@ source("12_max_consecutive_hvac.R")
 # source("50-0_raw2sec(light).R")
 source("50-1_sec2status(light).R")
 source("50-2_status_aggregation(light).R")
-source("50-3_status2operation(light).R")
+source("50-3_status2event(light).R")
 
 ## computer
 ## 
@@ -44,4 +44,5 @@ source("50-3_status2operation(light).R")
 source("50-0_raw2sec(com).R")
 source("50-1_sec2status(com).R")
 
+source("50-3_status2event(com).R")
 

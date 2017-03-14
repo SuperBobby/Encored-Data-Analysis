@@ -38,7 +38,6 @@ FEEDERS = c("computer", "light")                             # feeder
 dt_list = setNames(dt_list, LABS)
 
 
-
 get.lunch.time.saving.ratio <- function(sub_dt, feeder){
   
   # * before lunch usage: 11:00 ~ 12:00 — index 17:20
@@ -195,7 +194,7 @@ plot.lunch.saving <- function(dt, expDate, PLOT_PATH){
       plot_name = paste(c(exp_name, strsplit(names(dt)[1],"_")[[1]][1:3]),collapse="_")
       
       p1 = ggplot(plot_dt, aes(x = timestamp)) +
-        ggtitle(plot_name)
+        ggtitle(paste0(plot_name,"\n"))
     }
     
     target_col = colnames(plot_dt)[2]
@@ -214,7 +213,10 @@ plot.lunch.saving <- function(dt, expDate, PLOT_PATH){
   }
   
   p1 = set.default.theme(p1) + 
-    scale_y_continuous(limits = c(0.0, 1.0), oob=rescale_none)
+    ylab("lunchtime saving (%/week)\n") +
+    scale_y_continuous(labels = percent) +
+    coord_cartesian(ylim=c(0,1))
+    # scale_y_continuous(limits = c(0.0, 1.0), oob=rescale_none)
   
   save.plot(paste0(PLOT_PATH, plot_name, "lunch_time_saving_ratio.png"), p1)
   
@@ -273,4 +275,17 @@ for(lab in target_labs){
   }
 }
 
-# source('10_representation_table.R')
+write.csv(LUNCH_TIME_SAVING_RATIO_list$MARG_aggWeek_allDay_computer_lunch_time_saving_ratio, 
+          '../data/lunchtime_saving_computer_weekly_ratio(Lab_A).csv')
+write.csv(LUNCH_TIME_SAVING_RATIO_list$HCC_aggWeek_allDay_computer_lunch_time_saving_ratio, 
+          '../data/lunchtime_saving_computer_weekly_ratio(Lab_B).csv')
+write.csv(LUNCH_TIME_SAVING_RATIO_list$UX_aggWeek_allDay_computer_lunch_time_saving_ratio, 
+          '../data/lunchtime_saving_computer_weekly_ratio(Lab_C).csv')
+
+write.csv(LUNCH_TIME_SAVING_RATIO_list$MARG_aggWeek_allDay_light_lunch_time_saving_ratio, 
+          '../data/lunchtime_saving_light_weekly_ratio(Lab_A).csv')
+write.csv(LUNCH_TIME_SAVING_RATIO_list$HCC_aggWeek_allDay_light_lunch_time_saving_ratio, 
+          '../data/lunchtime_saving_light_weekly_ratio(Lab_B).csv')
+write.csv(LUNCH_TIME_SAVING_RATIO_list$UX_aggWeek_allDay_light_lunch_time_saving_ratio, 
+          '../data/lunchtime_saving_light_weekly_ratio(Lab_C).csv')
+
