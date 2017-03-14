@@ -12,9 +12,9 @@ did_HCC  = 1165
 did_UX   = 1165
 
 # fid for total 
-fid_MARG = 6
-fid_HCC = 3
-fid_UX = 9
+fid_MARG = c(6,7,8)
+fid_HCC = c(3,4,5)
+fid_UX = c(9,10,11)
 
 LAB_LABLES = c('marg', 'hcc', 'ux')
 
@@ -25,7 +25,7 @@ TIDY_DATA_DIR = "../data/sec_tidy/"
 # TIDY_DATA_DIR = "R/sec/"
 
 START_DATE = as.Date("2015-09-01")
-# END_DATE = START_DATE 
+# END_DATE = START_DATE
 END_DATE = as.Date("2016-12-06")
 
 ## -----------------------------
@@ -98,7 +98,6 @@ repeat {
   for(target_lab in LAB_LABLES){
     
     # print(target_lab)
-    col_names = c('dts', 'total')
     
     if(target_lab == 'marg') {
       did_lab = did_MARG
@@ -113,17 +112,19 @@ repeat {
       fid_lab = fid_UX
     }
     
+    col_names = c('dts', paste0('total', 1:3))
+    
     ## subset of the target lab
     lab_dt = get.dt.lab.tidy(raw_dt, TARGET_DATE, did_lab)
     
     ## total-feeder-only tables of each lab   
     total_feeder_cols = paste0('watt_', fid_lab)
-    lab_dt_com = lab_dt[, c('dts', total_feeder_cols), with=F]
+    lab_dt_total = lab_dt[, c('dts', total_feeder_cols), with=F]
     
-    names(lab_dt_com) = col_names
+    names(lab_dt_total) = col_names
     
     output_file_name = paste0(TIDY_DATA_DIR, target_lab, '_', TARGET_DATE, '(total).csv')
-    write.csv(lab_dt_com, output_file_name, row.names = F)
+    write.csv(lab_dt_total, output_file_name, row.names = F)
     print(paste(output_file_name, 'saved'))
     
   }
