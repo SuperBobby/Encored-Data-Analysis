@@ -16,7 +16,8 @@ fid_MARG = c(6,7,8)
 fid_HCC = c(3,4,5)
 fid_UX = c(9,10,11)
 
-LAB_LABLES = c('marg', 'hcc', 'ux')
+LAB_LABLES = c('marg')
+# LAB_LABLES = c('marg', 'hcc', 'ux')
 
 RAW_DATA_DIR = "../data/raw/sec_raw/"
 TIDY_DATA_DIR = "../data/sec_tidy/"
@@ -25,8 +26,7 @@ TIDY_DATA_DIR = "../data/sec_tidy/"
 # TIDY_DATA_DIR = "R/sec/"
 
 START_DATE = as.Date("2015-09-01")
-# END_DATE = START_DATE
-END_DATE = as.Date("2016-12-06")
+END_DATE = as.Date("2015-12-30")
 
 ## -----------------------------
 ## Functions 
@@ -123,8 +123,12 @@ repeat {
     
     names(lab_dt_total) = col_names
     
+    lab_dt_total$total = lab_dt_total$total1 + lab_dt_total$total2 + lab_dt_total$total3
+    
+    lab_dt_total_forsave = lab_dt_total[, c('dts', 'total'), with=F]
+    
     output_file_name = paste0(TIDY_DATA_DIR, target_lab, '_', TARGET_DATE, '(total).csv')
-    write.csv(lab_dt_total, output_file_name, row.names = F)
+    write.csv(lab_dt_total_forsave, output_file_name, row.names = F)
     print(paste(output_file_name, 'saved'))
     
   }
