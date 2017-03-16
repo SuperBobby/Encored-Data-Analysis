@@ -1,5 +1,6 @@
 library(data.table)
 library(ggplot2)
+library(scales)
 
 PLOT_PATH = "../plots/waste_investigation/"
 Sys.setlocale("LC_ALL", "English")
@@ -21,8 +22,8 @@ daily_dt$timestamp = as.POSIXct(daily_dt$timestamp, tz='ROK')
 daily_dt$timestamp= daily_dt$timestamp - 9*60*60
 # View(daily_dt)
 
-DATE_FROM = "2014-10-20"
-DATE_TO = "2014-10-23"
+DATE_FROM = "2014-10-21"
+DATE_TO = "2014-10-24"
 
 daily_plot_dt = daily_dt[timestamp >= DATE_FROM & timestamp <= DATE_TO]
 
@@ -175,11 +176,19 @@ load.total.sec.tidy.data = function(TARGET_DATE, lab){
   }
 }
 
+
+PLOT_PATH = "../plots/waste_investigation/"
+
+T_DATE     = "2015-09-01"
+FIRST_CUT  = "2015-09-01 12:00"
+SECOND_CUT = "2015-09-01 13:30"
+  
 # 3.1. sec - total
-sec_total_dt = load.total.sec.tidy.data("2015-09-01", 'marg')
+sec_total_dt = load.total.sec.tidy.data(T_DATE, 'marg')
 sec_total_dt$dts = as.POSIXct(sec_total_dt$dts)
 
-sec_plot_dt = head(sec_total_dt, 40000)
+# sec_plot_dt = sec_total_dt
+sec_plot_dt = sec_total_dt[(dts > FIRST_CUT) & (dts < SECOND_CUT)]
 
 sec_total_plot <- ggplot(sec_plot_dt, aes(x = dts, y=total/1000/1000)) +
   # geom_bar(stat = "identity") +
@@ -187,63 +196,114 @@ sec_total_plot <- ggplot(sec_plot_dt, aes(x = dts, y=total/1000/1000)) +
   geom_point() +
   ylab("Power consumption of total (kW/sec)\n") +
   xlab("")+
-  ylim(0, 21) +
+  ylim(0, 10) +
   ggtitle("sec - total \n") +
-  scale_x_datetime(date_breaks = "hours", date_minor_breaks = "hours",
+  scale_x_datetime(date_breaks = "hours", date_minor_breaks = "30 mins",
                    date_labels = "%H:%M\n")
 print(sec_total_plot)
 save.plot(paste0(PLOT_PATH, "sec_total_plot.png"), sec_total_plot)
 
 
 # 3.2. sec - light
-sec_light_dt = load.light.sec.tidy.data("2015-09-01", 'marg')
+sec_light_dt = load.light.sec.tidy.data(T_DATE, 'marg')
 sec_light_dt$dts = as.POSIXct(sec_light_dt$dts)
 
-sec_plot_dt = head(sec_light_dt, 40000)
+# sec_plot_dt = sec_light_dt
+sec_plot_dt = sec_light_dt[(dts > FIRST_CUT) & (dts < SECOND_CUT)]
 
 sec_light_plot <- ggplot(sec_plot_dt, aes(x = dts, y=light/1000/1000)) +
-  # geom_bar(stat = "identity") +
   geom_line() +
   geom_point() +
   ylab("Power consumption of light (kW/sec)\n") +
   xlab("")+
-  ylim(0, 1.5) +
+  ylim(0, 0.8) +
   ggtitle("sec - light \n") +
-  scale_x_datetime(date_breaks = "hours", date_minor_breaks = "hours",
+  scale_x_datetime(date_breaks = "hours", date_minor_breaks = "30 mins",
                    date_labels = "%H:%M\n")
 print(sec_light_plot)
 save.plot(paste0(PLOT_PATH, "sec_light_plot.png"), sec_light_plot)
 
 
+## zoom in --> 잠시 보류 
+## 
+# zoom_in_sec_plot_dt = sec_light_dt[(dts > "2015-09-01 12:48:10" ) & (dts < "2015-09-01 12:48:25")]
+# sec_light_plot <- ggplot(zoom_in_sec_plot_dt, aes(x = dts, y=light/1000/1000)) +
+#   geom_line() +
+#   geom_point() +
+#   ylab("Power consumption of light (kW/sec)\n") +
+#   xlab("")+
+#   ylim(0, 0.8) +
+#   ggtitle("sec - light \n") +
+# scale_x_datetime(date_breaks = "secs", date_minor_breaks = "secs",
+#                  date_labels = "%H:%M:%S\n")
+# print(sec_light_plot)
+# save.plot(paste0(PLOT_PATH, "sec_light_plot.png"), sec_light_plot)
+
+
 
 # 3.3. sec - com
-sec_com_dt = load.com.sec.tidy.data("2015-09-01", 'marg', 'com')
-sec_com_dt$dts = as.POSIXct(sec_com_dt$dts)
+sec_com_dt = load.com.sec.tidy.data(T_DATE, 'marg', 'com')
+sec_com_dt$dts = as.POSIXct(sec_com_dt$dts, tz='rok')
 
-sec_plot_dt = head(sec_com_dt, 40000)
+# sec_plot_dt = sec_com_dt
+sec_plot_dt = sec_com_dt[(dts > FIRST_CUT) & (dts < SECOND_CUT)]
 
-sec_com_plot <- ggplot(sec_plot_dt, aes(x = dts, y=com2/1000/1000)) +
+sec_com_plot <- ggplot(sec_plot_dt, aes(x = dts, y=com1/1000/1000)) +
   # geom_bar(stat = "identity") +
   geom_line() +
   geom_point() +
   ylab("Power consumption of com (kW/sec)\n") +
   xlab("")+
-  ylim(0, 0.8) +
+  ylim(0.5, 1.3) +
   ggtitle("sec - com \n") +
-  scale_x_datetime(date_breaks = "hours", date_minor_breaks = "hours",
+  scale_x_datetime(date_breaks = "hours", date_minor_breaks = "30 mins",
                    date_labels = "%H:%M\n")
 print(sec_com_plot)
 save.plot(paste0(PLOT_PATH, "sec_com_plot.png"), sec_com_plot)
 
 
 
+# 
+# {
+#   START_DATE = as.Date("2015-09-29")
+#   END_DATE = as.Date("2016-12-06")
+#   
+#   TARGET_DATE = START_DATE
+#   
+#   repeat {
+#     
+#     sec_light_dt = load.light.sec.tidy.data(TARGET_DATE, 'marg')
+#     sec_light_dt$dts = as.POSIXct(sec_light_dt$dts)
+#     
+#     sec_plot_dt = sec_light_dt
+#     # sec_plot_dt = sec_light_dt[(dts > "2015-09-01 12:00") & (dts < "2015-09-01 14:00")]
+#     
+#     sec_light_plot <- ggplot(sec_plot_dt, aes(x = dts, y=light/1000/1000)) +
+#       # geom_bar(stat = "identity") +
+#       geom_line() +
+#       geom_point() +
+#       ylab("Power consumption of light (kW/sec)\n") +
+#       xlab("")+
+#       # ylim(0, 1.5) +
+#       ggtitle("sec - light \n") +
+#       scale_x_datetime(date_breaks = "hours", date_minor_breaks = "hours",
+#                        date_labels = "%H:%M\n")
+#     print(sec_light_plot)
+#     save.plot(paste0(PLOT_PATH, "sec_light_plot", TARGET_DATE, ".png"), sec_light_plot)
+#     
+#     
+#     ## Loop until the END_DATE 
+#     if(TARGET_DATE == END_DATE){
+#       break
+#     } else {
+#       TARGET_DATE = TARGET_DATE + 1
+#     }
+#   }
+# }
+# 
 
 
-
-
-
-
-
+# 3.2. sec - light
 
 
 
