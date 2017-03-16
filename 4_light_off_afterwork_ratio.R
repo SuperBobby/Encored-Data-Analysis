@@ -1,5 +1,5 @@
 ### ------------------------------------------------------------ ###
-### whole_day_ligit_on_count per week 
+### light_off_afterwork_ratio per week 
 ### 
 ### JY, EJ @ ADSL, SNU 
 ###                                   last update : 2016. 9. 3.
@@ -12,13 +12,13 @@
 ### -------------------------------------------------------------------- ###
 ### Build list of tables : WHOLE_DAY_LIGHT_ON_COUNT_list
 ### 
-### table_name = {lab}_{agg_unit}_{day_type}_'whole_day_ligit_on_count' 
+### table_name = {lab}_{agg_unit}_{day_type}_'light_off_afterwork_ratio' 
 ### -------------------------------------------------------------------- ### 
 
 WHOLE_DAY_LIGHT_ON_COUNT_list = list()
 LIGHT_ON_MIN_USAGE = 0.01
 
-LABEL = "whole_day_ligit_on_count"
+LABEL = "light_off_afterwork_ratio"
 
 PLOT_PATH = "../plots/"
 
@@ -30,15 +30,14 @@ PLOT_PATH = "../plots/"
 
 LABS = c("MARG", "HCC", "UX")                                # lab
 AGG_UNITS = c("aggWeek")                                     # agg_unit
-TYPES_OF_DAY = c("allDay", "workingday", "nonworkingday")   # day_type
+TYPES_OF_DAY = c("allDay", "workingday", "nonworkingday")[1]   # day_type
 
 dt_list = setNames(dt_list, LABS)
 
-
-get.whole.day.ligit.on.count <- function(sub_dt){
+get.light.off.afterwork.ratio <- function(sub_dt){
   whole_day_ligit_on_dt = sub_dt[, .(whole_day_ligit_on = (sum(light > LIGHT_ON_MIN_USAGE)==96)), by=aggDay]
   
-  return(sum(whole_day_ligit_on_dt$whole_day_ligit_on))
+  return((7-sum(whole_day_ligit_on_dt$whole_day_ligit_on))/7)
 }
 
 
@@ -58,32 +57,32 @@ for(lab in LABS){
       
       if(day_type == "allDay"){
         
-        whole_day_ligit_on_count_dt = lab_dt[, .(whole_day_ligit_on_count = get.whole.day.ligit.on.count(.SD)), by=aggWeek]
+        light_off_afterwork_ratio_dt = lab_dt[, .(light_off_afterwork_ratio = get.light.off.afterwork.ratio(.SD)), by=aggWeek]
         
       } else if(day_type == "workingday") {
         
-        whole_day_ligit_on_count_dt = lab_dt[workingday == T, .(whole_day_ligit_on_count = get.whole.day.ligit.on.count(.SD)), by=aggWeek]
+        light_off_afterwork_ratio_dt = lab_dt[workingday == T, .(light_off_afterwork_ratio = get.light.off.afterwork.ratio(.SD)), by=aggWeek]
         
       } else if(day_type == "nonworkingday") {
         
-        whole_day_ligit_on_count_dt = lab_dt[workingday == F, .(whole_day_ligit_on_count = get.whole.day.ligit.on.count(.SD)), by=aggWeek]
+        light_off_afterwork_ratio_dt = lab_dt[workingday == F, .(light_off_afterwork_ratio = get.light.off.afterwork.ratio(.SD)), by=aggWeek]
       }
       
       # change column name
-      names(whole_day_ligit_on_count_dt) = c("timestamp", LABEL)
+      names(light_off_afterwork_ratio_dt) = c("timestamp", LABEL)
       
       # append data.table to list 
-      WHOLE_DAY_LIGHT_ON_COUNT_list = append(WHOLE_DAY_LIGHT_ON_COUNT_list, setNames(list(whole_day_ligit_on_count_dt),dt_name))
+      WHOLE_DAY_LIGHT_ON_COUNT_list = append(WHOLE_DAY_LIGHT_ON_COUNT_list, setNames(list(light_off_afterwork_ratio_dt),dt_name))
     }
   }
 }
 
 
 ### -------------------------------- ###
-### Plot: whole_day_ligit_on_count     
+### Plot: light_off_afterwork_ratio     
 ### -------------------------------- ### 
 
-plot.24hr.lightOn.counting <- function(dt, expDate, PLOT_PATH, whole_day_ligit_on_count_color = "violetred4"){
+plot.24hr.lightOn.counting <- function(dt, expDate, PLOT_PATH, light_off_afterwork_ratio_color = "violetred4"){
   
   plot_dt = dt[[1]]
   
@@ -106,11 +105,13 @@ plot.24hr.lightOn.counting <- function(dt, expDate, PLOT_PATH, whole_day_ligit_o
 #   print(plot_name)
   
   p <- ggplot(plot_dt, aes(x=timestamp)) +
-    geom_point(aes(y=whole_day_ligit_on_count), colour='gray70') +
-    ggtitle(plot_name)+
-    ylab("24hrs light-ON day (count/week)")
+    geom_point(aes(y=light_off_afterwork_ratio), colour='gray70') +
+    ggtitle(paste0(plot_name, "\n"))+
+    scale_y_continuous(labels = percent) +
+    coord_cartesian(ylim=c(0,1)) +
+    ylab("light-off afterwork (%/week)\n")
   
-  p = add.colorful.window.line(p, plot_dt, 'whole_day_ligit_on_count', windowingWeek, whole_day_ligit_on_count_color, expDate)
+  p = add.window.line(p, plot_dt, 'light_off_afterwork_ratio', windowingWeek, expDate)
   
   if(expDate[length(expDate)] == "2014-11-17"){
     #exp1-1
@@ -151,7 +152,7 @@ if(PLOTTING){
 ### Update summary_list
 ###
 ### category = {lab} + {day_type} + {label} 
-###                                 {label} = 'whole_day_ligit_on_count' 
+###                                 {label} = 'light_off_afterwork_ratio' 
 ### ------------------------------------------------------------ ### 
 
 target_summary_list = WHOLE_DAY_LIGHT_ON_COUNT_list
@@ -179,4 +180,10 @@ for(lab in target_labs){
   }
 }
 
-# source('10_representation_table.R')
+write.csv(WHOLE_DAY_LIGHT_ON_COUNT_list$MARG_aggWeek_allDay_light_off_afterwork_ratio, 
+          '../data/light_off_afterwork_weekly_ratio(Lab_A).csv')
+write.csv(WHOLE_DAY_LIGHT_ON_COUNT_list$HCC_aggWeek_allDay_light_off_afterwork_ratio, 
+          '../data/light_off_afterwork_weekly_ratio(Lab_B).csv')
+write.csv(WHOLE_DAY_LIGHT_ON_COUNT_list$UX_aggWeek_allDay_light_off_afterwork_ratio, 
+          '../data/light_off_afterwork_weekly_ratio(Lab_C).csv')
+

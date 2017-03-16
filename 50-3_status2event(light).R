@@ -14,7 +14,7 @@ PLOT_END_DATE = "2016-12-01"
 
 LAB_LABLES = c("marg", "hcc", "ux") 
 
-DAY_LABEL = as.Date(c(as.Date("2015-09-01"):as.Date(PLOT_END_DATE)))
+DAY_LABEL = as.Date(seq(as.Date("2015-09-01"), as.Date(PLOT_END_DATE), by = "days"))
 DAY_LABEL = data.table(timestamp = DAY_LABEL)
 
 WEEK_LABEL = as.Date(seq(as.Date("2015-08-31"), as.Date(PLOT_END_DATE), by = "weeks"))
@@ -217,7 +217,7 @@ par(mfrow = c(1,1))
 # }
 
 
-# 3. initial light-on lifting
+# 3. Maximum initial light-on lifting
 
 for(lab in LAB_LABLES){
 
@@ -228,25 +228,32 @@ for(lab in LAB_LABLES){
   agg_event_dt = agg_event_dt[dts < PLOT_END_DATE]
   print(file_name)
   
+  denominator = quantile(agg_event_dt$light_usage, 1)/2
+  print(denominator)
+  
   # # # dinner time OFF event counting 
-  initial_light_on_dt = agg_event_dt[initial_on == 1 & event=='ON', 
-                                     .(initial_light_on = max(light_usage_diff)), by=aggDay]
-  setnames(initial_light_on_dt, "aggDay", "timestamp")
-  initial_light_on_dt[, timestamp := as.Date(timestamp)]
+  max_initial_light_on_dt = agg_event_dt[initial_on == 1 & event=='ON', 
+                                     .(initial_light_switch_on_ratio = max(light_usage_diff)/denominator), by=aggDay]
+  setnames(max_initial_light_on_dt, "aggDay", "timestamp")
+  max_initial_light_on_dt[, timestamp := as.Date(timestamp)]
   
-  initial_light_on_dt = merge(DAY_LABEL, initial_light_on_dt, by = "timestamp", all.x = T)
+  max_initial_light_on_dt = merge(DAY_LABEL, max_initial_light_on_dt, by = "timestamp", all.x = T)
   
-  p <- ggplot(initial_light_on_dt, aes(x = timestamp)) +
-    ggtitle(paste0(lab, ": initial light-on lifting (daily max) - 1"))
+  p <- ggplot(max_initial_light_on_dt, aes(x = timestamp)) +
+    ylab("Light switch operation (%/day)") +
+    scale_y_continuous(labels = percent) +
+    coord_cartesian(ylim=c(0,1)) +
+    ggtitle(paste0(lab, ": initial light-on lifting (daily max)\n"))
   
   # p = add.window.line(p, initial_light_on_dt, "initial_light_on", windowingWeek, get.expDate.2())
   p = add.colorful.window.line(p, initial_light_on_dt, "initial_light_on", windowingWeek, 'black', get.expDate.2(), shadowing=T)
-  
   p = add.event.vline.exp2(p)
   p = set.default.theme(p)
   
   # print(p)
   save.plot(paste0(PLOT_PATH, lab, "_initial light-on lifting.png"), p)
+  
+  write.csv(max_initial_light_on_dt, paste0('../data/max_initial_light_switch_on_ratio(', lab, ').csv'))
   
 }
 

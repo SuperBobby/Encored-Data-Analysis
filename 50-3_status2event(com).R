@@ -169,7 +169,8 @@ for(lab in LAB_LABLES){
   daily_dt = merge(daily_dt, daily_on_dt, by = "timestamp", all.x = T)
   
   p <- ggplot(daily_dt, aes(x = timestamp)) +
-    ggtitle(paste0(lab, ": _daily ONOFF count"))
+    ggtitle(paste0(lab, ": _daily ONOFF count")) + 
+    ylab("on/off count")
   
   p = add.colorful.window.line(p, daily_dt, "daily_on_count", windowingWeek, "orange3",get.expDate.2())
   p = add.colorful.window.line(p, daily_dt, "daily_off_count", windowingWeek, "darkorchid4", get.expDate.2())
