@@ -16,7 +16,6 @@ library(plyr)
 library(reshape2)
 library(bit64)
 library(gtable)
-library(gridExtra)
 
 source("getSNUdata.R")
 

@@ -131,9 +131,36 @@ plot.stats <- function(dt, expDate, PLOT_PATH) {
     ylab("Energy use (kWh/day)")+
     scale_linetype_discrete(breaks=c("peak", "avg", "base"))
   
-  stats = add.window.line(stats, plot_dt, "peak", windowingWeek, expDate)
-  stats = add.window.line(stats, plot_dt, "base", windowingWeek, expDate)
-  stats = add.window.line(stats, plot_dt, "avg", windowingWeek, expDate)
+  # stats = add.window.line(stats, plot_dt, "peak", windowingWeek, expDate)
+  # stats = add.window.line(stats, plot_dt, "base", windowingWeek, expDate)
+  # stats = add.window.line(stats, plot_dt, "avg", windowingWeek, expDate)
+  
+  # feeder = strsplit(plot_name, "_")[[1]][5]
+  # if (feeder == "computer") {
+  #   line.palette = c("#2B4077", "#5275C5", "#78AED7")
+  # } else if (feeder == "light") {
+  #   line.palette = c("#C66205", "#F0960E", "#EFBE42")
+  # } else if (feeder == "hvac") {
+  #   line.palette = c("#851A0E", "#AC4239", "#DA6257")
+  # } else {
+  #   line.palette = c("#444A45", "#677969", "#96A597")
+  # }
+  
+  feeder = strsplit(plot_name, "_")[[1]][5]
+  if (feeder == "computer") {
+    line.palette = c("#3D5799", "#3D5799", "#3D5799")
+  } else if (feeder == "light") {
+    line.palette = c("#F0960E", "#F0960E", "#F0960E")
+  } else if (feeder == "hvac") {
+    line.palette = c("#CA3E34", "#CA3E34", "#CA3E34")
+  } else {
+    line.palette = c("#444A45", "#444A45", "#444A45")
+  }
+  
+  stats = add.colorful.window.line(stats, plot_dt, "peak", windowingWeek, line.palette[1], expDate)
+  stats = add.colorful.window.line(stats, plot_dt, "avg", windowingWeek, line.palette[2], expDate, shadowing=T)
+  stats = add.colorful.window.line(stats, plot_dt, "base", windowingWeek, line.palette[3], expDate)
+  
     
   if(expDate[length(expDate)] == "2014-11-17"){
     #exp1-1
@@ -148,6 +175,10 @@ plot.stats <- function(dt, expDate, PLOT_PATH) {
   
   stats = set.default.theme(stats)
   
+  if(feeder == "hvac") {
+    stats = stats + scale_y_continuous(limits=c(0, 3), oob=rescale_none)
+  }
+
   save.plot(paste0(PLOT_PATH, plot_name, "_peak_avg_base.png"), stats)
   
   print(paste("plot:", plot_name))
@@ -161,9 +192,9 @@ if(PLOTTING){
   #   plot_stats <- plot.stats(STATS_list[lab], get.expDate.1.1(), PLOT_PATH)
   # }
   
-  # for(lab in 1:length(STATS_list)){
-  #   plot_stats <- plot.stats(STATS_list[lab], get.expDate.1.2(), PLOT_PATH)
-  # }
+  for(lab in 1:length(STATS_list)){
+    plot_stats <- plot.stats(STATS_list[lab], get.expDate.1.2(), PLOT_PATH)
+  }
   
   for(lab in 1:length(STATS_list)){
     plot_stats <- plot.stats(STATS_list[lab], get.expDate.2(), PLOT_PATH)

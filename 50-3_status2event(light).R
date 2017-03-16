@@ -9,7 +9,7 @@ VALID_STAY_DURATION = 10 # secs
 
 STATUS_AGG_PATH = "../data/status/aggregated/"
 
-PLOT_PATH = "../plots/milli/light/"
+PLOT_PATH = "../plots/"
 PLOT_END_DATE = "2016-12-01"
 
 LAB_LABLES = c("marg", "hcc", "ux") 
@@ -239,7 +239,9 @@ for(lab in LAB_LABLES){
   p <- ggplot(initial_light_on_dt, aes(x = timestamp)) +
     ggtitle(paste0(lab, ": initial light-on lifting (daily max) - 1"))
   
-  p = add.window.line(p, initial_light_on_dt, "initial_light_on", windowingWeek, get.expDate.2())
+  # p = add.window.line(p, initial_light_on_dt, "initial_light_on", windowingWeek, get.expDate.2())
+  p = add.colorful.window.line(p, initial_light_on_dt, "initial_light_on", windowingWeek, 'black', get.expDate.2(), shadowing=T)
+  
   p = add.event.vline.exp2(p)
   p = set.default.theme(p)
   

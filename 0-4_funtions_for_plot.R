@@ -78,20 +78,53 @@ add.window.line <- function(plot_body, data, target, windowingWeek, expDate) {
 }
 
 
-add.colorful.window.line <- function(plot_body, data, target, windowingWeek, colorName, expDate, ribbon=TRUE) {
+# add.colorful.window.line <- function(plot_body, data, target, windowingWeek, colorName, expDate, ribbon=TRUE, shadowing=FALSE, shadowingDirection="below") {
+#   window_df = windowingByExpDate(data, target, windowingWeek, expDate)
+#   
+#   if(ribbon==TRUE) {
+#     result = plot_body +
+#       geom_line(data=window_df, aes_string(y = "mean", linetype = shQuote(target)), color=colorName, size=1) +
+#       geom_ribbon(data=window_df, aes(ymin = mean - sd, ymax = mean + sd), fill=colorName, alpha = 0.2)
+#   }else {
+#     result = plot_body +
+#       geom_line(data=window_df, aes_string(y = "mean", color = shQuote(target)), size=1)
+#   }
+#   
+#   return (result)
+# }
+
+add.colorful.window.line <- function(plot_body, data, target, windowingWeek, colorName, expDate, ribbon=TRUE, shadowing=FALSE, shadowingDirection="below") {
   window_df = windowingByExpDate(data, target, windowingWeek, expDate)
   
-  if(ribbon==TRUE) {
+  if (ribbon==TRUE) {
     result = plot_body +
       geom_line(data=window_df, aes_string(y = "mean", linetype = shQuote(target)), color=colorName, size=1) +
       geom_ribbon(data=window_df, aes(ymin = mean - sd, ymax = mean + sd), fill=colorName, alpha = 0.2)
-  }else {
+  } else {
     result = plot_body +
       geom_line(data=window_df, aes_string(y = "mean", color = shQuote(target)), size=1)
   }
   
+  if (shadowing==TRUE) {
+    shadowingStandard = quantile(window_df[timestamp < expDate[1]]$mean, 0.1, na.rm = T)
+    if (shadowingDirection == "below") {
+      shadowDays = window_df[timestamp >= expDate[1] & mean <= shadowingStandard]$timestamp
+    } else {
+      shadowDays = window_df[timestamp >= expDate[1] & mean >= shadowingStandard]$timestamp
+    }
+    
+    for (shadowDay in shadowDays) {
+      result = result + 
+        geom_vline(aes_string(xintercept = as.numeric(shadowDay)),color="gold", alpha = 0.3)
+    }
+    
+    result = result + 
+      geom_hline(aes_string(yintercept = shadowingStandard), linetype = "longdash", color="magenta4")
+  }
+  
   return (result)
 }
+
 
 
 # add.event.vline.exp1.1
@@ -113,21 +146,30 @@ add.event.vline.exp1.2 <- function(plot_body){
     geom_vline(aes(xintercept = as.numeric(as.Date("2014-11-10"))),color="gray40", linetype = "longdash") +
     geom_vline(aes(xintercept = as.numeric(as.Date("2014-11-17"))),color="gray40", linetype = "longdash") +
     geom_vline(aes(xintercept = as.numeric(as.Date("2015-01-15"))),color="gray40", linetype = "longdash") +
-    geom_vline(aes(xintercept = as.numeric(as.Date("2015-01-22"))),color="gray40", linetype = "longdash")
+    geom_vline(aes(xintercept = as.numeric(as.Date("2015-01-22"))),color="gray40", linetype = "longdash") +
+    geom_text(size = 4, aes(x=as.Date(mean(c(as.numeric(as.Date("2014-10-01")),as.numeric(as.Date("2014-10-31"))))), y=-0.03, label="E1-1-Pre"), colour="black",size=3) +
+    geom_text(size = 4, aes(x=as.Date(mean(c(as.numeric(as.Date("2014-11-10")),as.numeric(as.Date("2014-11-17"))))), y=-0.03, label="E1-1"), colour="black",size=3) +
+    geom_text(size = 4, aes(x=as.Date(mean(c(as.numeric(as.Date("2014-11-17")),as.numeric(as.Date("2015-01-15"))))), y=-0.03, label="E1-2-Pre"), colour="black",size=3) +
+    geom_text(size = 4, aes(x=as.Date(mean(c(as.numeric(as.Date("2015-01-15")),as.numeric(as.Date("2015-01-22"))))), y=-0.03, label="E1-2"), colour="black",size=3) +
+    geom_text(size = 4, aes(x=as.Date(mean(c(as.numeric(as.Date("2015-01-22")),as.numeric(as.Date("2015-04-30"))))), y=-0.03, label="E1-Post"), colour="black",size=3)
   
   return(result)
 }
 
 add.event.vline.exp2 <- function(plot_body){
   result = plot_body + 
-    scale_x_date("Timestamp", labels = date_format("%Y-%m"), breaks = date_breaks("month")) +
+    scale_x_date("Timestamp", labels = date_format("%Y-%m"), breaks = date_breaks("month"),limits=c(as.Date("2015-08-01"),as.Date("2016-12-01"))) +
     theme_bw()+
     geom_vline(aes(xintercept = as.numeric(as.Date("2015-10-08"))),color="gray40", linetype = "longdash") +
     geom_vline(aes(xintercept = as.numeric(as.Date("2015-12-01"))),color="gray40", linetype = "longdash") +
     geom_vline(aes(xintercept = as.numeric(as.Date("2016-01-11"))),color="gray40", linetype = "longdash") +
     geom_vline(aes(xintercept = as.numeric(as.Date("2016-02-01"))),color="gray40", linetype = "longdash") +
     # geom_vline(aes(xintercept = as.numeric(as.Date("2016-05-16"))),color="gray40", linetype = "longdash") +
-    geom_vline(aes(xintercept = as.numeric(as.Date("2016-06-13"))),color="gray40", linetype = "longdash")
+    geom_vline(aes(xintercept = as.numeric(as.Date("2016-06-13"))),color="gray40", linetype = "longdash") +
+    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2015-10-08")),as.numeric(as.Date("2015-12-01"))))), y=-0.03, label="E2-1"), colour="black",size=3) +
+    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2015-12-01")),as.numeric(as.Date("2016-01-11"))))), y=-0.03, label="E2-2"), colour="black",size=3) +
+    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2016-01-11")),as.numeric(as.Date("2016-02-01"))))), y=-0.03, label="E2-3"), colour="black",size=3) +
+    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2016-02-01")),as.numeric(as.Date("2016-06-13"))))), y=-0.03, label="E2-4"), colour="black",size=3)
   
   return(result)
 }

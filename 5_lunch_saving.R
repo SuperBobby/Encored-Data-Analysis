@@ -172,35 +172,60 @@ for(lab in LABS){
 plot.lunch.saving <- function(dt, expDate, PLOT_PATH){
   
   windowingWeek <- 4
-  p1 = ggplot()
+  # p1 = ggplot()
   
-  for (i in 1:2) {
-    plot_dt = dt[[i]]
-    
-    if(expDate[length(expDate)] == "2014-11-17"){
-      #exp1-1
-      plot_dt = cut.expDate.1.1(plot_dt)
-      exp_name = 'exp1-1'
-    } else if(expDate[length(expDate)] == "2015-01-22"){
-      #exp1-2
-      plot_dt = cut.expDate.1.2(plot_dt)
-      exp_name = 'exp1-2'
-    } else{
-      #exp2
-      plot_dt = cut.expDate.2(plot_dt)
-      exp_name = 'exp2'
-    }
-    
-    if (i == 1) {
-      plot_name = paste(c(exp_name, strsplit(names(dt)[1],"_")[[1]][1:3]),collapse="_")
-      
-      p1 = ggplot(plot_dt, aes(x = timestamp)) +
-        ggtitle(plot_name)
-    }
-    
-    target_col = colnames(plot_dt)[2]
-    p1 = add.window.line(p1, plot_dt, target_col, windowingWeek, expDate)
+  # for (i in 1:2) {
+  #   plot_dt = dt[[i]]
+  #   
+  #   if(expDate[length(expDate)] == "2014-11-17"){
+  #     #exp1-1
+  #     plot_dt = cut.expDate.1.1(plot_dt)
+  #     exp_name = 'exp1-1'
+  #   } else if(expDate[length(expDate)] == "2015-01-22"){
+  #     #exp1-2
+  #     plot_dt = cut.expDate.1.2(plot_dt)
+  #     exp_name = 'exp1-2'
+  #   } else{
+  #     #exp2
+  #     plot_dt = cut.expDate.2(plot_dt)
+  #     exp_name = 'exp2'
+  #   }
+  #   
+  #   if (i == 1) {
+  #     plot_name = paste(c(exp_name, strsplit(names(dt)[1],"_")[[1]][1:3]),collapse="_")
+  #     
+  #     p1 = ggplot(plot_dt, aes(x = timestamp)) +
+  #       ggtitle(plot_name)
+  #   }
+  #   
+  #   target_col = colnames(plot_dt)[2]
+  #   p1 = add.colorful.window.line(p1, plot_dt, target_col, windowingWeek, 'black', expDate, shadowing=T, shadowingDirection = "above")
+  #   
+  # }
+  plot_dt = dt[[1]]
+  
+  if(expDate[length(expDate)] == "2014-11-17"){
+    #exp1-1
+    plot_dt = cut.expDate.1.1(plot_dt)
+    exp_name = 'exp1-1'
+  } else if(expDate[length(expDate)] == "2015-01-22"){
+    #exp1-2
+    plot_dt = cut.expDate.1.2(plot_dt)
+    exp_name = 'exp1-2'
+  } else{
+    #exp2
+    plot_dt = cut.expDate.2(plot_dt)
+    exp_name = 'exp2'
   }
+  
+  # plot_name = paste(c(exp_name, strsplit(names(dt)[1],"_")[[1]][1:3]),collapse="_")
+  plot_name = paste(c(exp_name, names(dt)), collapse="_")
+  
+  p1 = ggplot(plot_dt, aes(x = timestamp)) +
+    ggtitle(plot_name)
+  
+  target_col = colnames(plot_dt)[2]
+  p1 = add.colorful.window.line(p1, plot_dt, target_col, windowingWeek, 'black', expDate, shadowing=T, shadowingDirection = "above")
   
   if(expDate[length(expDate)] == "2014-11-17"){
     #exp1-1
@@ -216,7 +241,9 @@ plot.lunch.saving <- function(dt, expDate, PLOT_PATH){
   p1 = set.default.theme(p1) + 
     scale_y_continuous(limits = c(0.0, 1.0), oob=rescale_none)
   
-  save.plot(paste0(PLOT_PATH, plot_name, "lunch_time_saving_ratio.png"), p1)
+  # save.plot(paste0(PLOT_PATH, plot_name, "lunch_time_saving_ratio.png"), p1)
+  save.plot(paste0(PLOT_PATH, plot_name, ".png"), p1)
+  
   
   print(paste("plot:", plot_name))
   return(p1)
@@ -227,11 +254,11 @@ PLOTTING = T
 #plot
 if(PLOTTING){
   # for(lab in 1:length(LUNCH_TIME_SAVING_RATIO_list)){
-  #   plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_RATIO_list[lab], get.expDate.1.1(), PLOT_PATH)  
+  #   plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_RATIO_list[lab], get.expDate.1.1(), PLOT_PATH)
   # }
-  for(lab in 1:(length(LUNCH_TIME_SAVING_RATIO_list)/2)){
-#     plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_RATIO_list[(lab*2 - 1):(lab*2)], get.expDate.1.2(), PLOT_PATH)
-    plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_RATIO_list[(lab*2 - 1):(lab*2)], get.expDate.2(), PLOT_PATH)  
+  for(lab in 1:(length(LUNCH_TIME_SAVING_RATIO_list))){
+    plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_RATIO_list[lab], get.expDate.1.2(), PLOT_PATH)
+    plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_RATIO_list[lab], get.expDate.2(), PLOT_PATH)
   }
 }
 

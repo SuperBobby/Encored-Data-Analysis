@@ -79,7 +79,7 @@ get.labeled.expDate.all <- function() {
 
 # Cut the data.table depending on experiment date 
 cut.expDate.1.1 <- function(raw_dt) {
-  cut_dt <- raw_dt[timestamp>= "2014-10-01" & timestamp<= "2014-12-16"]
+  cut_dt <- raw_dt[timestamp>= "2014-10-01" & timestamp <= "2014-12-16"]
   
   return(cut_dt)
 }
@@ -91,13 +91,13 @@ cut.expDate.1.2 <- function(raw_dt) {
 }
 
 cut.expDate.2 <- function(raw_dt) {
-  cut_dt <- raw_dt[timestamp>= "2015-07-01" & timestamp<= "2016-12-01"]
+  cut_dt <- raw_dt[timestamp>= "2015-07-01" & timestamp <= "2016-12-01"]
   
   return(cut_dt)
 }
 
 cut.expDate.hvac <- function(raw_dt) {
-  cut_dt <- raw_dt[timestamp>= "2014-10-01" & timestamp<= "2016-12-01"]
+  cut_dt <- raw_dt[timestamp>= "2014-10-01" & timestamp <= "2016-12-01"]
   
   return(cut_dt)
 }
