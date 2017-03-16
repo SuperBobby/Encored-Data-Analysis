@@ -1,6 +1,9 @@
 library(data.table)
 library(ggplot2)
 
+PLOT_PATH = "../plots/waste_investigation/"
+Sys.setlocale("LC_ALL", "English")
+
 ##
 ## NEW examples(cases) of waste investigation 
 ## 
@@ -13,62 +16,69 @@ hourly_dt[, ':='(aggDay = get.officehour.date(timestamp))]
 daily_dt = hourly_dt[, .(computer = sum(computer),
                          light = sum(light),
                          total = sum(total)), by=(timestamp = aggDay)]
-daily_dt$timestamp = as.Date(daily_dt$timestamp)
-# daily_dt$timestamp = as.POSIXct(daily_dt$timestamp, tz='utc')
-View(daily_dt)
+# daily_dt$timestamp = as.Date(daily_dt$timestamp, tz='ROK')
+daily_dt$timestamp = as.POSIXct(daily_dt$timestamp, tz='ROK')
+daily_dt$timestamp= daily_dt$timestamp - 9*60*60
+# View(daily_dt)
 
-# 1.1. Daily - total 
 DATE_FROM = "2014-10-20"
 DATE_TO = "2014-10-23"
 
-plot_dt = daily_dt[timestamp >= DATE_FROM & timestamp <= DATE_TO]
+daily_plot_dt = daily_dt[timestamp >= DATE_FROM & timestamp <= DATE_TO]
 
-daily_total_plot <- ggplot(plot_dt, aes(x = timestamp, y=total)) +
+# 1.1. Daily - total 
+daily_total_plot <- ggplot(daily_plot_dt, aes(x = timestamp, y=total)) +
   # geom_bar(stat = "identity") +
   geom_line() +
   geom_point() +
-  ylab("Power consumption of total (kW/day)\n") +
+  ylab("Power consumption of total (kWh/day)\n") +
   xlab("")+
   ylim(0, 75) + 
-  ggtitle("daily - total \n")
-
+  ggtitle("daily - total \n") +
+  scale_x_datetime(date_breaks = "days", date_minor_breaks = "days",
+                   date_labels = "%Y/%m/%d\n")
 print(daily_total_plot)
+save.plot(paste0(PLOT_PATH, "daily_total_plot.png"), daily_total_plot)
 
 
 # 1.2. Daily - light 
-DATE_FROM = "2014-10-20"
-DATE_TO = "2014-10-23"
+# DATE_FROM = "2014-10-20"
+# DATE_TO = "2014-10-23"
+# 
+# daily_plot_dt = daily_dt[timestamp >= DATE_FROM & timestamp <= DATE_TO]
 
-plot_dt = daily_dt[timestamp >= DATE_FROM & timestamp <= DATE_TO]
-
-daily_light_plot <- ggplot(plot_dt, aes(x = timestamp, y=light)) +
+daily_light_plot <- ggplot(daily_plot_dt, aes(x = timestamp, y=light)) +
   # geom_bar(stat = "identity") +
   geom_line() +
   geom_point() +
-  ylab("Power consumption of light (kW/day)\n") +
+  ylab("Power consumption of light (kWh/day)\n") +
   xlab("")+
   ylim(0, 25) + 
-  ggtitle("daily - light \n")
-
+  ggtitle("daily - light \n") +
+  scale_x_datetime(date_breaks = "days", date_minor_breaks = "days",
+                   date_labels = "%Y/%m/%d\n")
 print(daily_light_plot)
+save.plot(paste0(PLOT_PATH, "daily_light_plot.png"), daily_light_plot)
 
 
 # 1.3. Daily - computer 
-DATE_FROM = "2014-10-06"
-DATE_TO = "2014-10-13"
+# DATE_FROM = "2014-10-06"
+# DATE_TO = "2014-10-13"
+# 
+# daily_plot_dt = daily_dt[timestamp >= DATE_FROM & timestamp <= DATE_TO]
 
-plot_dt = daily_dt[timestamp >= DATE_FROM & timestamp <= DATE_TO]
-
-daily_computer_plot <- ggplot(plot_dt, aes(x = timestamp, y=computer)) +
+daily_computer_plot <- ggplot(daily_plot_dt, aes(x = timestamp, y=computer)) +
   # geom_bar(stat = "identity") +
   geom_line() +
   geom_point() +
-  ylab("Power consumption of computer (kW/day)\n") +
+  ylab("Power consumption of computer (kWh/day)\n") +
   xlab("")+
   ylim(0, 45) +
-  ggtitle("daily - computer \n")
-
+  ggtitle("daily - computer \n") +
+  scale_x_datetime(date_breaks = "days", date_minor_breaks = "days",
+                   date_labels = "%Y/%m/%d\n")
 print(daily_computer_plot)
+save.plot(paste0(PLOT_PATH, "daily_computer_plot.png"), daily_computer_plot)
 
 
 
@@ -76,62 +86,69 @@ print(daily_computer_plot)
 # 2. 15-min data (quarter) 
 # 
 quarter_dt = data.table(marg_dt)
+DATE_FROM = "2014-10-19 24:00"
+DATE_TO = "2014-10-22 24:00"
 
-# 1.1. quarter - total 
-DATE_FROM = "2014-10-20"
-DATE_TO = "2014-10-23"
+quarter_plot_dt = quarter_dt[timestamp >= DATE_FROM & timestamp <= DATE_TO]
 
-plot_dt = quarter_dt[timestamp >= DATE_FROM & timestamp <= DATE_TO]
-
-quarter_total_plot <- ggplot(plot_dt, aes(x = timestamp, y=total)) +
+# 2.1. quarter - total 
+quarter_total_plot <- ggplot(quarter_plot_dt, aes(x = timestamp, y=total*4)) +
   # geom_bar(stat = "identity") +
   geom_line() +
   geom_point() +
   ylab("Power consumption of total (kW/15min)\n") +
   xlab("")+
-  ylim(0, 1.1) +
-  ggtitle("quarter - total \n")
+  ylim(0, 4.1) +
+  ggtitle("quarter - total \n") +
+  scale_x_datetime(date_breaks = "days", date_minor_breaks = "days",
+                   date_labels = "%Y/%m/%d\n")
 print(quarter_total_plot)
+save.plot(paste0(PLOT_PATH, "quarter_total_plot.png"), quarter_total_plot)
 
-# 1.2. quarter - light 
-DATE_FROM = "2014-10-20"
-DATE_TO = "2014-10-23"
 
-plot_dt = quarter_dt[timestamp >= DATE_FROM & timestamp <= DATE_TO]
 
-quarter_light_plot <- ggplot(plot_dt, aes(x = timestamp, y=light)) +
+# 2.2. quarter - light 
+# DATE_FROM = "2014-10-20"
+# DATE_TO = "2014-10-23"
+# quarter_plot_dt = quarter_dt[timestamp >= DATE_FROM & timestamp <= DATE_TO]
+
+quarter_light_plot <- ggplot(quarter_plot_dt, aes(x = timestamp, y=light*4)) +
   # geom_bar(stat = "identity") +
   geom_line() +
   geom_point() +
   ylab("Power consumption of light (kW/15min)\n") +
   xlab("")+
-  # ylim(0, 25) + 
-  ggtitle("quarter - light \n")
+  ylim(0, 1.5) +
+  ggtitle("quarter - light \n") +
+  scale_x_datetime(date_breaks = "days", date_minor_breaks = "days",
+                   date_labels = "%Y/%m/%d\n")
 print(quarter_light_plot)
+save.plot(paste0(PLOT_PATH, "quarter_light_plot.png"), quarter_light_plot)
 
-# 1.3. quarter - computer 
-DATE_FROM = "2014-10-06"
-DATE_TO = "2014-10-13"
+# 2.3. quarter - computer 
+# DATE_FROM = "2014-10-19 22:00"
+# DATE_TO = "2014-10-22 23:00"
 
-plot_dt = quarter_dt[timestamp >= DATE_FROM & timestamp <= DATE_TO]
+# quarter_plot_dt = quarter_dt[timestamp >= DATE_FROM & timestamp <= DATE_TO]
 
-quarter_computer_plot <- ggplot(plot_dt, aes(x = timestamp, y=computer)) +
+quarter_computer_plot <- ggplot(quarter_plot_dt, aes(x = timestamp, y=computer*4)) +
   # geom_bar(stat = "identity") +
   geom_line() +
   geom_point() +
   ylab("Power consumption of computer (kW/15min)\n") +
   xlab("")+
-  ylim(0, 0.7) +
-  ggtitle("quarter - computer \n")
-
+  ylim(0, 2.5) +
+  ggtitle("quarter - computer \n") +
+  scale_x_datetime(date_breaks = "days", date_minor_breaks = "days",
+                   date_labels = "%Y/%m/%d\n")
 print(quarter_computer_plot)
+save.plot(paste0(PLOT_PATH, "quarter_computer_plot.png"), quarter_computer_plot)
 
 
 
 ##
 # 3. 1Hz data (sec) 
 # 
-
 
 load.total.sec.tidy.data = function(TARGET_DATE, lab){
   
@@ -158,67 +175,65 @@ load.total.sec.tidy.data = function(TARGET_DATE, lab){
   }
 }
 
+# 3.1. sec - total
 sec_total_dt = load.total.sec.tidy.data("2015-09-01", 'marg')
+sec_total_dt$dts = as.POSIXct(sec_total_dt$dts)
 
-# # 1.1. quarter - total 
-# DATE_FROM = "2014-10-20"
-# DATE_TO = "2014-10-23"
-# 
-# plot_dt = quarter_dt[timestamp >= DATE_FROM & timestamp <= DATE_TO]
-# 
-# quarter_total_plot <- ggplot(plot_dt, aes(x = timestamp, y=total)) +
-#   # geom_bar(stat = "identity") +
-#   geom_line() +
-#   geom_point() +
-#   ylab("Power consumption of total (kW/15min)\n") +
-#   xlab("")+
-#   ylim(0, 1.1) +
-#   ggtitle("quarter - total \n")
-# print(quarter_total_plot)
-# 
-# # 1.2. quarter - light 
-# DATE_FROM = "2014-10-20"
-# DATE_TO = "2014-10-23"
-# 
-# plot_dt = quarter_dt[timestamp >= DATE_FROM & timestamp <= DATE_TO]
-# 
-# quarter_light_plot <- ggplot(plot_dt, aes(x = timestamp, y=light)) +
-#   # geom_bar(stat = "identity") +
-#   geom_line() +
-#   geom_point() +
-#   ylab("Power consumption of light (kW/15min)\n") +
-#   xlab("")+
-#   # ylim(0, 25) + 
-#   ggtitle("quarter - light \n")
-# print(quarter_light_plot)
-# 
-# # 1.3. quarter - computer 
-# DATE_FROM = "2014-10-06"
-# DATE_TO = "2014-10-13"
-# 
-# plot_dt = quarter_dt[timestamp >= DATE_FROM & timestamp <= DATE_TO]
-# 
-# quarter_computer_plot <- ggplot(plot_dt, aes(x = timestamp, y=computer)) +
-#   # geom_bar(stat = "identity") +
-#   geom_line() +
-#   geom_point() +
-#   ylab("Power consumption of computer (kW/15min)\n") +
-#   xlab("")+
-#   ylim(0, 0.7) +
-#   ggtitle("quarter - computer \n")
-# 
-# print(quarter_computer_plot)
+sec_plot_dt = head(sec_total_dt, 40000)
+
+sec_total_plot <- ggplot(sec_plot_dt, aes(x = dts, y=total/1000/1000)) +
+  # geom_bar(stat = "identity") +
+  geom_line() +
+  geom_point() +
+  ylab("Power consumption of total (kW/sec)\n") +
+  xlab("")+
+  ylim(0, 21) +
+  ggtitle("sec - total \n") +
+  scale_x_datetime(date_breaks = "hours", date_minor_breaks = "hours",
+                   date_labels = "%H:%M\n")
+print(sec_total_plot)
+save.plot(paste0(PLOT_PATH, "sec_total_plot.png"), sec_total_plot)
+
+
+# 3.2. sec - light
+sec_light_dt = load.light.sec.tidy.data("2015-09-01", 'marg')
+sec_light_dt$dts = as.POSIXct(sec_light_dt$dts)
+
+sec_plot_dt = head(sec_light_dt, 40000)
+
+sec_light_plot <- ggplot(sec_plot_dt, aes(x = dts, y=light/1000/1000)) +
+  # geom_bar(stat = "identity") +
+  geom_line() +
+  geom_point() +
+  ylab("Power consumption of light (kW/sec)\n") +
+  xlab("")+
+  ylim(0, 1.5) +
+  ggtitle("sec - light \n") +
+  scale_x_datetime(date_breaks = "hours", date_minor_breaks = "hours",
+                   date_labels = "%H:%M\n")
+print(sec_light_plot)
+save.plot(paste0(PLOT_PATH, "sec_light_plot.png"), sec_light_plot)
 
 
 
+# 3.3. sec - com
+sec_com_dt = load.com.sec.tidy.data("2015-09-01", 'marg', 'com')
+sec_com_dt$dts = as.POSIXct(sec_com_dt$dts)
 
+sec_plot_dt = head(sec_com_dt, 40000)
 
-
-
-
-
-
-
+sec_com_plot <- ggplot(sec_plot_dt, aes(x = dts, y=com2/1000/1000)) +
+  # geom_bar(stat = "identity") +
+  geom_line() +
+  geom_point() +
+  ylab("Power consumption of com (kW/sec)\n") +
+  xlab("")+
+  ylim(0, 0.8) +
+  ggtitle("sec - com \n") +
+  scale_x_datetime(date_breaks = "hours", date_minor_breaks = "hours",
+                   date_labels = "%H:%M\n")
+print(sec_com_plot)
+save.plot(paste0(PLOT_PATH, "sec_com_plot.png"), sec_com_plot)
 
 
 
