@@ -60,7 +60,9 @@ LABS = c("MARG", "HCC", "UX")                                  # lab
 # LABS = c("MARG", "HCC", "UX", "All_Labs")                    # lab
 AGG_UNITS = c("aggDay")                                        # agg_unit
 # AGG_UNITS = c("aggWeek", "aggDay")                           # agg_unit
-TYPES_OF_DAY = c("allDay", "workingday", "nonworkingday")      # day_type
+# TYPES_OF_DAY = c("allDay", "workingday", "nonworkingday")      # day_type
+TYPES_OF_DAY = c("allDay")      # day_type
+
 FEEDERS = c("total", "total_woHVAC", "computer", "light", "hvac")                         # feeder
 # FEEDERS = c("total", "total_woHVAC", "total_woETC", "computer", "light", "hvac")            # feeder
 
@@ -132,35 +134,24 @@ plot.stats <- function(dt, expDate, PLOT_PATH) {
     ylab("Power comsumption (Watt/15min)\n")+
     scale_linetype_discrete(breaks=c("peak", "avg", "base"))
   
-  # stats = add.window.line(stats, plot_dt, "peak", windowingWeek, expDate)
-  # stats = add.window.line(stats, plot_dt, "base", windowingWeek, expDate)
-  # stats = add.window.line(stats, plot_dt, "avg", windowingWeek, expDate)
+  stats = add.window.line(stats, plot_dt, "peak", windowingWeek, expDate)
+  stats = add.window.line(stats, plot_dt, "base", windowingWeek, expDate, shadowing=T)
+  stats = add.window.line(stats, plot_dt, "avg", windowingWeek, expDate)
   
   # feeder = strsplit(plot_name, "_")[[1]][5]
   # if (feeder == "computer") {
-  #   line.palette = c("#2B4077", "#5275C5", "#78AED7")
+  #   line.palette = c("#3D5799", "#3D5799", "#3D5799")
   # } else if (feeder == "light") {
-  #   line.palette = c("#C66205", "#F0960E", "#EFBE42")
+  #   line.palette = c("#F0960E", "#F0960E", "#F0960E")
   # } else if (feeder == "hvac") {
-  #   line.palette = c("#851A0E", "#AC4239", "#DA6257")
+  #   line.palette = c("#CA3E34", "#CA3E34", "#CA3E34")
   # } else {
-  #   line.palette = c("#444A45", "#677969", "#96A597")
+  #   line.palette = c("#444A45", "#444A45", "#444A45")
   # }
-  
-  feeder = strsplit(plot_name, "_")[[1]][5]
-  if (feeder == "computer") {
-    line.palette = c("#3D5799", "#3D5799", "#3D5799")
-  } else if (feeder == "light") {
-    line.palette = c("#F0960E", "#F0960E", "#F0960E")
-  } else if (feeder == "hvac") {
-    line.palette = c("#CA3E34", "#CA3E34", "#CA3E34")
-  } else {
-    line.palette = c("#444A45", "#444A45", "#444A45")
-  }
-  
-  stats = add.colorful.window.line(stats, plot_dt, "peak", windowingWeek, line.palette[1], expDate)
-  stats = add.colorful.window.line(stats, plot_dt, "avg", windowingWeek, line.palette[2], expDate, shadowing=T)
-  stats = add.colorful.window.line(stats, plot_dt, "base", windowingWeek, line.palette[3], expDate)
+  # 
+  # stats = add.colorful.window.line(stats, plot_dt, "peak", windowingWeek, line.palette[1], expDate)
+  # stats = add.colorful.window.line(stats, plot_dt, "avg", windowingWeek, line.palette[2], expDate, shadowing=T)
+  # stats = add.colorful.window.line(stats, plot_dt, "base", windowingWeek, line.palette[3], expDate)
   
     
   if(expDate[length(expDate)] == "2014-11-17"){

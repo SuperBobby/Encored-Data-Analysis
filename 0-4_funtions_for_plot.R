@@ -66,13 +66,30 @@ windowingByExpDate <- function(data, target, windowingWeek, expDate){
   return (windowing)
 }
 
-add.window.line <- function(plot_body, data, target, windowingWeek, expDate) {
+add.window.line <- function(plot_body, data, target, windowingWeek, expDate, shadowing=FALSE, shadowingDirection="below") {
 #   window_df = windowingByExpDate(data, target, windowingWeek, rownum_expDate)
   window_df = windowingByExpDate(data, target, windowingWeek, expDate)
 
   result = plot_body +
     geom_line(data=window_df, aes_string(y = "mean", linetype = shQuote(target)), size=1) +
     geom_ribbon(data=window_df, aes(ymin = mean - sd, ymax = mean + sd), alpha = 0.2)
+  
+  if (shadowing==TRUE) {
+    shadowingStandard = quantile(window_df[timestamp < expDate[1]]$mean, 0.1, na.rm = T)
+    if (shadowingDirection == "below") {
+      shadowDays = window_df[timestamp >= expDate[1] & mean <= shadowingStandard]$timestamp
+    } else {
+      shadowDays = window_df[timestamp >= expDate[1] & mean >= shadowingStandard]$timestamp
+    }
+    
+    for (shadowDay in shadowDays) {
+      result = result + 
+        geom_vline(aes_string(xintercept = as.numeric(shadowDay)), color = "green4",alpha = 0.3)
+    }
+    
+    result = result + 
+      geom_hline(aes_string(yintercept = shadowingStandard), linetype = "longdash", color="magenta4")
+  }
   
   return (result)
 }
