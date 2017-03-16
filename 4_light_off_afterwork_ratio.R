@@ -111,7 +111,7 @@ plot.24hr.lightOn.counting <- function(dt, expDate, PLOT_PATH, light_off_afterwo
     coord_cartesian(ylim=c(0,1)) +
     ylab("light-off afterwork (%/week)\n")
   
-  p = add.window.line(p, plot_dt, 'light_off_afterwork_ratio', windowingWeek, expDate)
+  p = add.window.line(p, plot_dt, 'light_off_afterwork_ratio', windowingWeek, expDate, shadowing=T, shadowingDirection = "above")
   
   if(expDate[length(expDate)] == "2014-11-17"){
     #exp1-1

@@ -135,7 +135,9 @@ plot.partial.lightOn <- function(dt, expDate, PLOT_PATH, partial_lightON_color =
     scale_y_continuous(labels = percent) +
     coord_cartesian(ylim=c(0,1))
 
-  partial_lightON = add.colorful.window.line(partial_lightON, plot_dt, 'partial_light_on_ratio', windowingWeek, partial_lightON_color, expDate, shadowing=T, shadowingDirection = "above")
+  partial_lightON = add.window.line(partial_lightON, plot_dt, 'partial_light_on_ratio', windowingWeek, expDate, shadowing=T, shadowingDirection = "above")
+  # stats = add.window.line(stats, plot_dt, "avg", windowingWeek, expDate, shadowing=T)
+  
   # partial_lightON = add.colorful.window.line(partial_lightON, plot_dt, 'partial_light_on_ratio', windowingWeek, partial_lightON_color, expDate)
   
   if(expDate[length(expDate)] == "2014-11-17"){

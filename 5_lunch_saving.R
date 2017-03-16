@@ -224,7 +224,8 @@ plot.lunch.saving <- function(dt, expDate, PLOT_PATH){
     ggtitle(plot_name)
   
   target_col = colnames(plot_dt)[2]
-  p1 = add.colorful.window.line(p1, plot_dt, target_col, windowingWeek, 'black', expDate, shadowing=T, shadowingDirection = "above")
+  p1 = add.window.line(p1, plot_dt, target_col, windowingWeek, expDate, shadowing=T, shadowingDirection = "above")
+  # p1 = add.colorful.window.line(p1, plot_dt, target_col, windowingWeek, 'black', expDate, shadowing=T, shadowingDirection = "above")
   
   if(expDate[length(expDate)] == "2014-11-17"){
     #exp1-1

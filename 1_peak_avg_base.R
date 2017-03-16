@@ -135,8 +135,8 @@ plot.stats <- function(dt, expDate, PLOT_PATH) {
     scale_linetype_discrete(breaks=c("peak", "avg", "base"))
   
   stats = add.window.line(stats, plot_dt, "peak", windowingWeek, expDate)
-  stats = add.window.line(stats, plot_dt, "base", windowingWeek, expDate, shadowing=T)
-  stats = add.window.line(stats, plot_dt, "avg", windowingWeek, expDate)
+  stats = add.window.line(stats, plot_dt, "base", windowingWeek, expDate)
+  stats = add.window.line(stats, plot_dt, "avg", windowingWeek, expDate, shadowing=T)
   
   # feeder = strsplit(plot_name, "_")[[1]][5]
   # if (feeder == "computer") {
@@ -167,9 +167,9 @@ plot.stats <- function(dt, expDate, PLOT_PATH) {
   
   stats = set.default.theme(stats)
   
-  if(feeder == "hvac") {
-    stats = stats + scale_y_continuous(limits=c(0, 3), oob=rescale_none)
-  }
+  # if(feeder == "hvac") {
+  #   stats = stats + scale_y_continuous(limits=c(0, 3), oob=rescale_none)
+  # }
 
   save.plot(paste0(PLOT_PATH, plot_name, "_peak_avg_base.png"), stats)
   
@@ -187,11 +187,11 @@ if(PLOTTING){
   for(lab in 1:length(STATS_list)){
     plot_stats <- plot.stats(STATS_list[lab], get.expDate.1.2(), PLOT_PATH)
   }
-  
+
   for(lab in 1:length(STATS_list)){
     plot_stats <- plot.stats(STATS_list[lab], get.expDate.2(), PLOT_PATH)
   }
-  
+
 }
 
 ### ------------------------------------------------------------ ###

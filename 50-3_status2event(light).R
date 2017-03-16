@@ -218,6 +218,7 @@ par(mfrow = c(1,1))
 
 
 # 3. Maximum initial light-on lifting
+PLOT_PATH = "../plots/milli/"
 
 for(lab in LAB_LABLES){
 
@@ -245,8 +246,8 @@ for(lab in LAB_LABLES){
     coord_cartesian(ylim=c(0,1)) +
     ggtitle(paste0(lab, ": initial light-on lifting (daily max)\n"))
   
-  # p = add.window.line(p, initial_light_on_dt, "initial_light_on", windowingWeek, get.expDate.2())
-  p = add.colorful.window.line(p, initial_light_on_dt, "initial_light_on", windowingWeek, 'black', get.expDate.2(), shadowing=T)
+  p = add.window.line(p, max_initial_light_on_dt, "initial_light_on", windowingWeek, get.expDate.2(), shadowing=T)
+  # p = add.colorful.window.line(p, max_initial_light_on_dt, "initial_light_on", windowingWeek, 'black', get.expDate.2(), shadowing=T)
   p = add.event.vline.exp2(p)
   p = set.default.theme(p)
   

@@ -75,12 +75,16 @@ add.window.line <- function(plot_body, data, target, windowingWeek, expDate, sha
     geom_ribbon(data=window_df, aes(ymin = mean - sd, ymax = mean + sd), alpha = 0.2)
   
   if (shadowing==TRUE) {
-    shadowingStandard = quantile(window_df[timestamp < expDate[1]]$mean, 0.1, na.rm = T)
     if (shadowingDirection == "below") {
+      shadowingStandard = quantile(window_df[timestamp < expDate[1]]$mean, 0.1, na.rm = T)
       shadowDays = window_df[timestamp >= expDate[1] & mean <= shadowingStandard]$timestamp
+      
     } else {
+      shadowingStandard = quantile(window_df[timestamp < expDate[1]]$mean, 0.9, na.rm = T)
       shadowDays = window_df[timestamp >= expDate[1] & mean >= shadowingStandard]$timestamp
     }
+    
+    print(shadowingStandard)
     
     for (shadowDay in shadowDays) {
       result = result + 
