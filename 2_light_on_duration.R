@@ -92,7 +92,7 @@ for(lab in LABS){
 ### -------------------------------- ### 
 
 
-plot.light.On.duration <- function(dt, expDate, PLOT_PATH, lightON_duration_color = "darkolivegreen"){
+plot.light.On.duration <- function(dt, expDate, PLOT_PATH, lightON_duration_color = "darkolivegreen", plotting = T){
   
   plot_dt = dt[[1]]
 
@@ -114,14 +114,15 @@ plot.light.On.duration <- function(dt, expDate, PLOT_PATH, lightON_duration_colo
   
   windowingWeek = 4
  
-  light_on_duration <- ggplot(plot_dt, aes(x=timestamp)) +
+  light_on_duration <- ggplot() + 
+    geom_path() +
     ggtitle(plot_name)+
     scale_y_continuous(limits=c(0,24), oob=rescale_none) +
     ylab("Light-ON duration (hours)")+
     scale_color_discrete(breaks = c("light_on_duration"), labels = c("light on duration (hours/day)"))
   
   light_on_duration = add.colorful.window.line(light_on_duration, plot_dt, 'light_on_duration', 
-                                               windowingWeek, lightON_duration_color, expDate)
+                                               windowingWeek, 'black', expDate)
   
   if(expDate[length(expDate)] == "2014-11-17"){
     #exp1-1
@@ -134,10 +135,12 @@ plot.light.On.duration <- function(dt, expDate, PLOT_PATH, lightON_duration_colo
     light_on_duration = add.event.vline.exp2(light_on_duration)
   }
 
-  light_on_duration = set.colorful.theme(light_on_duration)
+  light_on_duration = set.default.theme(light_on_duration)
   
-  save.plot(paste0(PLOT_PATH, plot_name, ".png"), light_on_duration)
-  
+  if (plotting) {
+    save.plot(paste0(PLOT_PATH, plot_name, ".png"), light_on_duration)
+  }
+
   print(paste("plot:", plot_name))
   return(light_on_duration)
 }
@@ -150,12 +153,15 @@ if(PLOTTING){
   #   plot_lightOn_duration <- plot.light.On.duration(LIGHT_ON_DURATION_list[lab], get.expDate.1.1(), PLOT_PATH)  
   # }
   
-  for(lab in 1:length(LIGHT_ON_DURATION_list)){
-    plot_lightOn_duration <- plot.light.On.duration(LIGHT_ON_DURATION_list[lab], get.expDate.1.2(), PLOT_PATH)  
-  }
-  
-  for(lab in 1:length(LIGHT_ON_DURATION_list)){
-    plot_lightOn_duration <- plot.light.On.duration(LIGHT_ON_DURATION_list[lab], get.expDate.2(), PLOT_PATH)  
+  # for(lab in 1:length(LIGHT_ON_DURATION_list)){
+  #   plot_lightOn_duration <- plot.light.On.duration(LIGHT_ON_DURATION_list[lab], get.expDate.1.2(), PLOT_PATH)  
+  # }
+  # 
+  # for(lab in 1:length(LIGHT_ON_DURATION_list)){
+  #   plot_lightOn_duration <- plot.light.On.duration(LIGHT_ON_DURATION_list[lab], get.expDate.2(), PLOT_PATH)  
+  # }
+  for(lab in 1:(length(LIGHT_ON_DURATION_list)/3)){
+    combined.plot(plot.light.On.duration, LIGHT_ON_DURATION_list[lab], LIGHT_ON_DURATION_list[lab + (length(LIGHT_ON_DURATION_list)/3)], LIGHT_ON_DURATION_list[lab + 2*(length(LIGHT_ON_DURATION_list)/3)], get.expDate.2(), PLOT_PATH, LABEL, individualPlotting = F)
   }
 }
 

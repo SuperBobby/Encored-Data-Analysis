@@ -41,6 +41,8 @@ BASE_PERCENTILE = 0.1
 
 PLOT_PATH = "../plots/"
 
+LABEL = 'peak_avg_base'
+
 ## four stat : peak, base, avg 
 get.four.stats <- function(usage, thre_peak, thre_base){
   peak = quantile(usage, thre_peak, na.rm = T)
@@ -109,7 +111,7 @@ for(lab in LABS){
 ### Plot: stats    
 ### -------------------------------- ### 
 
-plot.stats <- function(dt, expDate, PLOT_PATH) {
+plot.stats <- function(dt, expDate, PLOT_PATH, plotting = T) {
   plot_dt = dt[[1]]
   
   if(expDate[length(expDate)] == "2014-11-17"){
@@ -128,10 +130,11 @@ plot.stats <- function(dt, expDate, PLOT_PATH) {
  
   windowingWeek = 4
   
-  stats <- ggplot(plot_dt, aes(x=timestamp)) +
+  stats <- ggplot() + 
+    geom_path() +
     ggtitle(paste0(plot_name,'\n')) +
     # ylab("Energy use (kWh/day)")+
-    ylab("Power comsumption (Watt/15min)\n")+
+    ylab("Power comsumption (Watt/15min)\n") +
     scale_linetype_discrete(breaks=c("peak", "avg", "base"))
   
   stats = add.window.line(stats, plot_dt, "peak", windowingWeek, expDate)
@@ -171,11 +174,14 @@ plot.stats <- function(dt, expDate, PLOT_PATH) {
   #   stats = stats + scale_y_continuous(limits=c(0, 3), oob=rescale_none)
   # }
 
-  save.plot(paste0(PLOT_PATH, plot_name, "_peak_avg_base.png"), stats)
+  if (plotting) {
+    save.plot(paste0(PLOT_PATH, plot_name, "_peak_avg_base.png"), stats)
+  }
   
   print(paste("plot:", plot_name))
   return(stats)
 }
+
 
 
 ### plot
@@ -184,12 +190,22 @@ if(PLOTTING){
   #   plot_stats <- plot.stats(STATS_list[lab], get.expDate.1.1(), PLOT_PATH)
   # }
   
-  for(lab in 1:length(STATS_list)){
-    plot_stats <- plot.stats(STATS_list[lab], get.expDate.1.2(), PLOT_PATH)
-  }
+  # for(lab in 1:length(STATS_list)){
+  #   plot_stats <- plot.stats(STATS_list[lab], get.expDate.1.2(), PLOT_PATH)
+  # }
 
-  for(lab in 1:length(STATS_list)){
-    plot_stats <- plot.stats(STATS_list[lab], get.expDate.2(), PLOT_PATH)
+  # for(lab in 1:length(STATS_list)){
+  #   plot_stats <- plot.stats(STATS_list[lab], get.expDate.2(), PLOT_PATH)
+  # }
+  
+  for(lab in 1:(length(STATS_list)/3)){
+    combined.plot(plot.stats, STATS_list[lab], STATS_list[lab + (length(STATS_list)/3)], STATS_list[lab + 2*(length(STATS_list)/3)], get.expDate.1.2(), PLOT_PATH, LABEL, individualPlotting = F)
+    # plot.stats(STATS_list[lab], get.expDate.2(), PLOT_PATH)
+  }
+  
+  for(lab in 1:(length(STATS_list)/3)){
+    combined.plot(plot.stats, STATS_list[lab], STATS_list[lab + (length(STATS_list)/3)], STATS_list[lab + 2*(length(STATS_list)/3)], get.expDate.2(), PLOT_PATH, LABEL, individualPlotting = F)
+      # plot.stats(STATS_list[lab], get.expDate.2(), PLOT_PATH)
   }
 
 }
@@ -202,38 +218,38 @@ if(PLOTTING){
 ### ------------------------------------------------------------ ### 
 
 ## initialize summary list 
-summary_list = list()
-
-target_summary_list = STATS_list
-
-target_labs         = LABS                    # lab 
-target_types_of_day = TYPES_OF_DAY            # day_type
-target_feeders      = FEEDERS                 # feeder  
-target_stats        = c('peak','avg','base')  # stats ----> {feeder}_{stats} = label
-
-agg_unit = "aggDay"
-
-for(lab in target_labs){
-  
-  for(day_type in target_types_of_day){
-    
-    for(feeder in target_feeders){
-      
-      for(stats in target_stats){
-        
-        dt_name = paste(lab, agg_unit, day_type, feeder, sep="_")
-        target_dt = target_summary_list[[dt_name]][,c('timestamp',stats),with=F]
-        # print(head(target_dt))
-        
-        label = paste(feeder, stats, sep='_')
-        category_name = paste(lab, day_type, label, sep='_')
-        
-        print(category_name)
-        
-        split_list = split.table.by.expDate(target_dt, all_expDate)
-        
-        summary_list = append(summary_list, setNames(list(split_list), category_name))
-      }
-    }
-  }
-}
+# summary_list = list()
+# 
+# target_summary_list = STATS_list
+# 
+# target_labs         = LABS                    # lab 
+# target_types_of_day = TYPES_OF_DAY            # day_type
+# target_feeders      = FEEDERS                 # feeder  
+# target_stats        = c('peak','avg','base')  # stats ----> {feeder}_{stats} = label
+# 
+# agg_unit = "aggDay"
+# 
+# for(lab in target_labs){
+#   
+#   for(day_type in target_types_of_day){
+#     
+#     for(feeder in target_feeders){
+#       
+#       for(stats in target_stats){
+#         
+#         dt_name = paste(lab, agg_unit, day_type, feeder, sep="_")
+#         target_dt = target_summary_list[[dt_name]][,c('timestamp',stats),with=F]
+#         # print(head(target_dt))
+#         
+#         label = paste(feeder, stats, sep='_')
+#         category_name = paste(lab, day_type, label, sep='_')
+#         
+#         print(category_name)
+#         
+#         split_list = split.table.by.expDate(target_dt, all_expDate)
+#         
+#         summary_list = append(summary_list, setNames(list(split_list), category_name))
+#       }
+#     }
+#   }
+# }

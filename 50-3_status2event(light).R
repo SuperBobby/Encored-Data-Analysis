@@ -220,10 +220,15 @@ par(mfrow = c(1,1))
 # 3. Maximum initial light-on lifting
 PLOT_PATH = "../plots/milli/"
 
+LABEL = 'daily_max_of_light_off-to-on_ration'
+windowingWeek = 4
+
+p1 = ggplot()
+p2 = ggplot()
+p3 = ggplot()
+
 for(lab in LAB_LABLES){
 
-  windowingWeek = 4
-  
   file_name = paste0(STATUS_AGG_PATH, lab, "_light_aggregated_status_dt.csv")
   agg_event_dt = get.light.tidy.event.dt(fread(file_name), VALID_STAY_DURATION)
   agg_event_dt = agg_event_dt[dts < PLOT_END_DATE]
@@ -240,34 +245,51 @@ for(lab in LAB_LABLES){
   
   max_initial_light_on_dt = merge(DAY_LABEL, max_initial_light_on_dt, by = "timestamp", all.x = T)
   
-  p <- ggplot(max_initial_light_on_dt, aes(x = timestamp)) +
+  p <- ggplot() + 
+    geom_path() +
     ylab("Light switch operation (%/day)") +
     scale_y_continuous(labels = percent) +
     coord_cartesian(ylim=c(0,1)) +
     ggtitle(paste0(lab, ": initial light-on lifting (daily max)\n"))
   
-  p = add.window.line(p, max_initial_light_on_dt, "initial_light_on", windowingWeek, get.expDate.2(), shadowing=T)
+  p = add.window.line(p, max_initial_light_on_dt, "initial_light_switch_on_ratio", windowingWeek, get.expDate.2(), shadowing=T)
   # p = add.colorful.window.line(p, max_initial_light_on_dt, "initial_light_on", windowingWeek, 'black', get.expDate.2(), shadowing=T)
   p = add.event.vline.exp2(p)
   p = set.default.theme(p)
   
   # print(p)
   save.plot(paste0(PLOT_PATH, lab, "_initial light-on lifting.png"), p)
+
+  if (lab == "marg") {
+    p1 = p
+  } else if (lab == "hcc") {
+    p2 = p
+  } else {
+    p3 = p
+  }
   
   write.csv(max_initial_light_on_dt, paste0('../data/max_initial_light_switch_on_ratio(', lab, ').csv'))
-  
+
 }
 
+plot_name = "MARG_HCC_UX"
+p4 <- grid.arrange(arrangeGrob(p1 + theme(legend.position="none", plot.title = element_blank()),
+                               p2 + theme(legend.position="none", plot.title = element_blank(), axis.title.y = element_blank()),
+                               p3 + theme(legend.position="none", plot.title = element_blank(), axis.title.y = element_blank()),
+                               nrow=1),
+                   nrow=2, heights=c(10, 1), top = paste0(plot_name, "_", LABEL, "\n"))
+
+save.plot(paste0(PLOT_PATH, plot_name, "_", LABEL, ".png"), p4, width_ = 24, height_ = 7)
+
+print(paste0(PLOT_PATH, plot_name, "_", LABEL, ".png saved"))
 
 ##
 ## 4. inital light on event statistics
 ##    -- daily initial light on duration (unit: hours)
 ##    -- ratio of daily initial light on duration to daily total light on duration 
-
 for(lab in LAB_LABLES){
   
   file_name = paste0(STATUS_AGG_PATH, lab, "_light_aggregated_status_dt.csv")
-  
   
   tmp = get.light.tidy.event.dt(fread(file_name), 10)
   

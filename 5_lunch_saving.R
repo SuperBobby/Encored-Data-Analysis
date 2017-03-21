@@ -168,7 +168,7 @@ for(lab in LABS){
 ### Plot: lunch_time_saving_ratio     
 ### -------------------------------- ### 
 
-plot.lunch.saving <- function(dt, expDate, PLOT_PATH){
+plot.lunch.saving <- function(dt, expDate, PLOT_PATH, plotting = T){
   
   windowingWeek <- 4
   # p1 = ggplot()
@@ -220,7 +220,8 @@ plot.lunch.saving <- function(dt, expDate, PLOT_PATH){
   # plot_name = paste(c(exp_name, strsplit(names(dt)[1],"_")[[1]][1:3]),collapse="_")
   plot_name = paste(c(exp_name, names(dt)), collapse="_")
   
-  p1 = ggplot(plot_dt, aes(x = timestamp)) +
+  p1 = ggplot() + 
+    geom_path() + 
     ggtitle(plot_name)
   
   target_col = colnames(plot_dt)[2]
@@ -243,11 +244,11 @@ plot.lunch.saving <- function(dt, expDate, PLOT_PATH){
     scale_y_continuous(labels = percent) +
     coord_cartesian(ylim=c(0,1))
     # scale_y_continuous(limits = c(0.0, 1.0), oob=rescale_none)
-  
-  # save.plot(paste0(PLOT_PATH, plot_name, "lunch_time_saving_ratio.png"), p1)
-  save.plot(paste0(PLOT_PATH, plot_name, ".png"), p1)
-  
-  
+
+  if (plotting) {
+    save.plot(paste0(PLOT_PATH, plot_name, ".png"), p1)
+  }
+
   print(paste("plot:", plot_name))
   return(p1)
 }
@@ -259,9 +260,12 @@ if(PLOTTING){
   # for(lab in 1:length(LUNCH_TIME_SAVING_RATIO_list)){
   #   plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_RATIO_list[lab], get.expDate.1.1(), PLOT_PATH)
   # }
-  for(lab in 1:(length(LUNCH_TIME_SAVING_RATIO_list))){
-    plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_RATIO_list[lab], get.expDate.1.2(), PLOT_PATH)
-    plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_RATIO_list[lab], get.expDate.2(), PLOT_PATH)
+  # for(lab in 1:(length(LUNCH_TIME_SAVING_RATIO_list))){
+  #   plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_RATIO_list[lab], get.expDate.1.2(), PLOT_PATH)
+  #   plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_RATIO_list[lab], get.expDate.2(), PLOT_PATH)
+  # }
+  for(lab in 1:(length(LUNCH_TIME_SAVING_RATIO_list)/3)){
+    combined.plot(plot.lunch.saving, LUNCH_TIME_SAVING_RATIO_list[lab], LUNCH_TIME_SAVING_RATIO_list[lab + (length(LUNCH_TIME_SAVING_RATIO_list)/3)], LUNCH_TIME_SAVING_RATIO_list[lab + 2*(length(LUNCH_TIME_SAVING_RATIO_list)/3)], get.expDate.2(), PLOT_PATH, LABEL, individualPlotting = F)
   }
 }
 

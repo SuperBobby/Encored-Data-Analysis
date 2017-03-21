@@ -65,6 +65,7 @@ get.partial.light.on.ratio <- function(light, LIGHT_ON_MIN_USAGE, light_peak, PA
 }
 
 
+
 # 1. lab
 for(lab in LABS){ 
   lab_dt = dt_list[[lab]]
@@ -108,7 +109,7 @@ for(lab in LABS){
 ### Plot: partial_light_on_ratio     
 ### -------------------------------- ### 
 
-plot.partial.lightOn <- function(dt, expDate, PLOT_PATH, partial_lightON_color = "orange2"){
+plot.partial.lightOn <- function(dt, expDate, PLOT_PATH, partial_lightON_color = "orange2", plotting = T){
   
   plot_dt = dt[[1]]
   
@@ -129,7 +130,8 @@ plot.partial.lightOn <- function(dt, expDate, PLOT_PATH, partial_lightON_color =
   windowingWeek = 4
   
   #   print(plot_name)
-  partial_lightON <- ggplot(plot_dt, aes(x=timestamp)) +
+  partial_lightON <- ggplot() + 
+    geom_path() +
     ggtitle(paste0(plot_name, '\n'))+
     ylab("Partial light-on (%/day)") +
     scale_y_continuous(labels = percent) +
@@ -151,9 +153,11 @@ plot.partial.lightOn <- function(dt, expDate, PLOT_PATH, partial_lightON_color =
     partial_lightON = add.event.vline.exp2(partial_lightON)
   }
   
-  partial_lightON = set.colorful.theme(partial_lightON)
+  partial_lightON = set.default.theme(partial_lightON)
   
-  save.plot(paste0(PLOT_PATH, plot_name, ".png"), partial_lightON)
+  if (plotting) {
+    save.plot(paste0(PLOT_PATH, plot_name, ".png"), partial_lightON)
+  }
   
   print(paste("plot:", plot_name))
   return(partial_lightON)
@@ -170,8 +174,12 @@ if(PLOTTING){
   #   plot_partial_lightOn <- plot.partial.lightOn(PARTIAL_LIGHT_ON_RATIO_list[lab], get.expDate.1.2(), PLOT_PATH)  
   # }
   
-  for(lab in 1:length(PARTIAL_LIGHT_ON_RATIO_list)){
-    plot_partial_lightOn <- plot.partial.lightOn(PARTIAL_LIGHT_ON_RATIO_list[lab], get.expDate.2(), PLOT_PATH)  
+  # for(lab in 1:length(PARTIAL_LIGHT_ON_RATIO_list)){
+  #   plot_partial_lightOn <- plot.partial.lightOn(PARTIAL_LIGHT_ON_RATIO_list[lab], get.expDate.2(), PLOT_PATH)  
+  # }
+  
+  for(lab in 1:(length(PARTIAL_LIGHT_ON_RATIO_list)/3)){
+    combined.plot(plot.partial.lightOn, PARTIAL_LIGHT_ON_RATIO_list[lab], PARTIAL_LIGHT_ON_RATIO_list[lab + (length(PARTIAL_LIGHT_ON_RATIO_list)/3)], PARTIAL_LIGHT_ON_RATIO_list[lab + 2*(length(PARTIAL_LIGHT_ON_RATIO_list)/3)], get.expDate.2(), PLOT_PATH, LABEL, individualPlotting = F)
   }
 }
 
@@ -183,37 +191,37 @@ if(PLOTTING){
 ###                                 {label} = 'partial_light_on_ratio' 
 ### ------------------------------------------------------------ ### 
 
-target_summary_list = PARTIAL_LIGHT_ON_RATIO_list
-
-target_labs         = LABS                    # lab 
-target_types_of_day = TYPES_OF_DAY            # day_type
-
-agg_unit = "aggDay"
-
-for(lab in target_labs){
-  
-  for(day_type in target_types_of_day){
-    
-    dt_name = paste(lab, agg_unit, day_type, LABEL, sep="_")
-    target_dt = target_summary_list[[dt_name]][,c('timestamp', LABEL),with=F]
-    
-    category_name = paste(lab, day_type, LABEL, sep='_')
-    
-    print(category_name)
-    
-    split_list = split.table.by.expDate(target_dt, all_expDate)
-    
-    ## update summary_list 
-    summary_list = append(summary_list, setNames(list(split_list), category_name))
-  }
-}
-
-write.csv(PARTIAL_LIGHT_ON_RATIO_list$MARG_aggDay_allDay_partial_light_on_ratio, 
-          '../data/partial_light_on_daily_ratio(Lab_A).csv')
-write.csv(PARTIAL_LIGHT_ON_RATIO_list$HCC_aggDay_allDay_partial_light_on_ratio, 
-          '../data/partial_light_on_daily_ratio(Lab_B).csv')
-write.csv(PARTIAL_LIGHT_ON_RATIO_list$UX_aggDay_allDay_partial_light_on_ratio, 
-          '../data/partial_light_on_daily_ratio(Lab_C).csv')
+# target_summary_list = PARTIAL_LIGHT_ON_RATIO_list
+# 
+# target_labs         = LABS                    # lab 
+# target_types_of_day = TYPES_OF_DAY            # day_type
+# 
+# agg_unit = "aggDay"
+# 
+# for(lab in target_labs){
+#   
+#   for(day_type in target_types_of_day){
+#     
+#     dt_name = paste(lab, agg_unit, day_type, LABEL, sep="_")
+#     target_dt = target_summary_list[[dt_name]][,c('timestamp', LABEL),with=F]
+#     
+#     category_name = paste(lab, day_type, LABEL, sep='_')
+#     
+#     print(category_name)
+#     
+#     split_list = split.table.by.expDate(target_dt, all_expDate)
+#     
+#     ## update summary_list 
+#     summary_list = append(summary_list, setNames(list(split_list), category_name))
+#   }
+# }
+# 
+# write.csv(PARTIAL_LIGHT_ON_RATIO_list$MARG_aggDay_allDay_partial_light_on_ratio, 
+#           '../data/partial_light_on_daily_ratio(Lab_A).csv')
+# write.csv(PARTIAL_LIGHT_ON_RATIO_list$HCC_aggDay_allDay_partial_light_on_ratio, 
+#           '../data/partial_light_on_daily_ratio(Lab_B).csv')
+# write.csv(PARTIAL_LIGHT_ON_RATIO_list$UX_aggDay_allDay_partial_light_on_ratio, 
+#           '../data/partial_light_on_daily_ratio(Lab_C).csv')
 
 
 

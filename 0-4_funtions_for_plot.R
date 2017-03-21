@@ -67,23 +67,61 @@ windowingByExpDate <- function(data, target, windowingWeek, expDate){
 }
 
 get.rect.boundary <- function (data, expDate, threshold, shadowingDirection) {
-  boundary = data.table(rect_start = date(),
-                        rect_end = date())
+  
+  aggDay = F
+  boundary = data.table(rect_start = integer(),
+                        rect_end = integer())
+  class(boundary$rect_start) <- "Date"
+  class(boundary$rect_end) <- "Date"
+  
+  if (data$timestamp[2] - data$timestamp[1] < 7) {
+    aggDay = T
+  }
+  
   if (shadowingDirection == "below") {
     targetDays = data[timestamp >= expDate[1] & mean <= threshold]$timestamp
   } else {
     targetDays = data[timestamp >= expDate[1] & mean >= threshold]$timestamp
   }
   
-  lastDay = targetDays[1]
-  boundary = rbind(boundary, c(lastDay, lastDay))
-  for (targetDay in targetDays) {
-    if ((lastDay - targetDay) <= 1) {
-      boundary[rect_start == lastDay]$rect_end = targetDay
-      lastDay = targetDay
+  if (aggDay) {
+    if (length(targetDays) > 0) {
+      period_start = targetDays[1]
+      lastDay = targetDays[1]
+      boundary = rbind(boundary, list(lastDay, lastDay))
+      for (targetDay in targetDays) {
+        targetDay = as.Date(targetDay, tz="Asia/Seoul")
+        if ((targetDay - lastDay) <= 1) {
+          boundary[rect_start == period_start]$rect_end = targetDay
+          lastDay = targetDay
+        } else {
+          boundary = rbind(boundary, list(targetDay, targetDay))
+          lastDay = targetDay
+          period_start = lastDay
+        }
+      }
     } else {
-      boundary = rbind(boundary, c(targetDay, targetDay))
-      lastDay = targetDay
+      boundary = NA
+    }
+  } else { 
+    ## aggWeek
+    if (length(targetDays) > 0) {
+      period_start = targetDays[1]
+      lastDay = targetDays[1]
+      boundary = rbind(boundary, list(lastDay, lastDay))
+      for (targetDay in targetDays) {
+        targetDay = as.Date(targetDay, tz="Asia/Seoul")
+        if ((targetDay - lastDay) <= 7) {
+          boundary[rect_start == period_start]$rect_end = targetDay
+          lastDay = targetDay
+        } else {
+          boundary = rbind(boundary, list(targetDay, targetDay))
+          lastDay = targetDay
+          period_start = lastDay
+        }
+      }
+    } else {
+      boundary = NA
     }
   }
   
@@ -95,28 +133,45 @@ add.window.line <- function(plot_body, data, target, windowingWeek, expDate, sha
   window_df = windowingByExpDate(data, target, windowingWeek, expDate)
 
   result = plot_body +
-    geom_line(data=window_df, aes_string(y = "mean", linetype = shQuote(target)), size=1) +
-    geom_ribbon(data=window_df, aes(ymin = mean - sd, ymax = mean + sd), alpha = 0.2)
+    geom_line(data=window_df, aes_string(x = "timestamp", y = "mean", linetype = shQuote(target)), size=1) +
+    geom_ribbon(data=window_df, aes(x = timestamp, ymin = mean - sd, ymax = mean + sd), alpha = 0.2)
+  
   
   if (shadowing==TRUE) {
     if (shadowingDirection == "below") {
       shadowingStandard = quantile(window_df[timestamp < expDate[1]]$mean, 0.1, na.rm = T)
-      shadowDays = window_df[timestamp >= expDate[1] & mean <= shadowingStandard]$timestamp
-      
+      shadow_boundary = get.rect.boundary(window_df, expDate, shadowingStandard, shadowingDirection)
     } else {
       shadowingStandard = quantile(window_df[timestamp < expDate[1]]$mean, 0.9, na.rm = T)
-      shadowDays = window_df[timestamp >= expDate[1] & mean >= shadowingStandard]$timestamp
+      shadow_boundary = get.rect.boundary(window_df, expDate, shadowingStandard, shadowingDirection)
     }
+
+    # for (shadowDay in shadowDays) {
+    #   result = result + 
+    #     geom_vline(aes_string(xintercept = as.numeric(shadowDay)), color = "green4", alpha = 0.3)
+    # }
     
-    print(shadowingStandard)
+    # print(shadow_boundary)
     
-    for (shadowDay in shadowDays) {
-      result = result + 
-        geom_vline(aes_string(xintercept = as.numeric(shadowDay)), color = "green4", alpha = 0.3)
+    ## if there are no days to shadow, shadow_boundary is NULL
+    if (length(shadow_boundary[1]) > 1) {
+      for (period_index in 1:nrow(shadow_boundary)) {
+        # print(shadow_boundary[period_index])
+        plot_xmin = shadow_boundary[period_index]$rect_start
+        plot_xmax = shadow_boundary[period_index]$rect_end
+        
+        if (plot_xmax - plot_xmin < 1) {
+          result = result + 
+            geom_vline(aes_string(xintercept = as.numeric(plot_xmin)), alpha=0.3, color = "green4", size = 0.5)
+        } else {
+          result = result + 
+            geom_rect(aes_string(xmin = plot_xmin, xmax = (plot_xmax + 1), ymin = -Inf, ymax = Inf), alpha=0.3, fill = "green4")
+        }
+      }
     }
     
     result = result + 
-      geom_hline(aes_string(yintercept = shadowingStandard), linetype = "longdash", color="magenta4")
+      geom_hline(aes_string(yintercept = shadowingStandard), linetype = "longdash", color="darkorchid4")
   }
   
   return (result)
@@ -142,11 +197,11 @@ add.colorful.window.line <- function(plot_body, data, target, windowingWeek, col
   
   if (ribbon==TRUE) {
     result = plot_body +
-      geom_line(data=window_df, aes_string(y = "mean", linetype = shQuote(target)), color=colorName, size=1) +
-      geom_ribbon(data=window_df, aes(ymin = mean - sd, ymax = mean + sd), fill=colorName, alpha = 0.2)
+      geom_line(data=window_df, aes_string(x = "timestamp", y = "mean", linetype = shQuote(target)), color=colorName, size=1) +
+      geom_ribbon(data=window_df, aes(x = timestamp, ymin = mean - sd, ymax = mean + sd), fill=colorName, alpha = 0.2)
   } else {
     result = plot_body +
-      geom_line(data=window_df, aes_string(y = "mean", color = shQuote(target)), size=1)
+      geom_line(data=window_df, aes_string(x = "timestamp", y = "mean", color = shQuote(target)), size=1)
   }
   
   if (shadowing==TRUE) {
@@ -191,16 +246,19 @@ add.event.vline.exp1.2 <- function(plot_body){
     geom_vline(aes(xintercept = as.numeric(as.Date("2014-11-17"))),color="gray40", linetype = "longdash") +
     geom_vline(aes(xintercept = as.numeric(as.Date("2015-01-15"))),color="gray40", linetype = "longdash") +
     geom_vline(aes(xintercept = as.numeric(as.Date("2015-01-22"))),color="gray40", linetype = "longdash") +
-    geom_text(size = 4, aes(x=as.Date(mean(c(as.numeric(as.Date("2014-10-01")),as.numeric(as.Date("2014-10-31"))))), y=-0.03, label="E1-1-Pre"), colour="black",size=3) +
-    geom_text(size = 4, aes(x=as.Date(mean(c(as.numeric(as.Date("2014-11-10")),as.numeric(as.Date("2014-11-17"))))), y=-0.03, label="E1-1"), colour="black",size=3) +
-    geom_text(size = 4, aes(x=as.Date(mean(c(as.numeric(as.Date("2014-11-17")),as.numeric(as.Date("2015-01-15"))))), y=-0.03, label="E1-2-Pre"), colour="black",size=3) +
-    geom_text(size = 4, aes(x=as.Date(mean(c(as.numeric(as.Date("2015-01-15")),as.numeric(as.Date("2015-01-22"))))), y=-0.03, label="E1-2"), colour="black",size=3) +
-    geom_text(size = 4, aes(x=as.Date(mean(c(as.numeric(as.Date("2015-01-22")),as.numeric(as.Date("2015-04-30"))))), y=-0.03, label="E1-Post"), colour="black",size=3)
+    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2014-10-01")),as.numeric(as.Date("2014-10-31"))))), y=Inf, label="E1-1-Pre"), vjust="inward", colour="black",size=5) +
+    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2014-11-10")),as.numeric(as.Date("2014-11-17"))))), y=Inf, label="E1-1"), vjust="inward", colour="black",size=5) +
+    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2014-11-17")),as.numeric(as.Date("2015-01-15"))))), y=Inf, label="E1-2-Pre"), vjust="inward", colour="black",size=5) +
+    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2015-01-15")),as.numeric(as.Date("2015-01-22"))))), y=Inf, label="E1-2"), vjust="inward", colour="black",size=5) +
+    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2015-01-22")),as.numeric(as.Date("2015-04-30"))))), y=Inf, label="E1-Post"), vjust="inward", colour="black",size=5)
   
   return(result)
 }
 
 add.event.vline.exp2 <- function(plot_body){
+  
+  expTextPostion = ggplot_build(plot_body)$layout$panel_ranges[[1]]$y.range[2]
+  # print(expTextPostion)
   result = plot_body + 
     scale_x_date("Timestamp", labels = date_format("%Y-%m"), breaks = date_breaks("month"),limits=c(as.Date("2015-08-01"),as.Date("2016-12-01"))) +
     theme_bw()+
@@ -210,13 +268,17 @@ add.event.vline.exp2 <- function(plot_body){
     geom_vline(aes(xintercept = as.numeric(as.Date("2016-02-01"))),color="gray40", linetype = "longdash") +
     # geom_vline(aes(xintercept = as.numeric(as.Date("2016-05-16"))),color="gray40", linetype = "longdash") +
     geom_vline(aes(xintercept = as.numeric(as.Date("2016-06-13"))),color="gray40", linetype = "longdash") +
-    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2015-10-08")),as.numeric(as.Date("2015-12-01"))))), y=-0.03, label="E2-1"), colour="black",size=3) +
-    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2015-12-01")),as.numeric(as.Date("2016-01-11"))))), y=-0.03, label="E2-2"), colour="black",size=3) +
-    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2016-01-11")),as.numeric(as.Date("2016-02-01"))))), y=-0.03, label="E2-3"), colour="black",size=3) +
-    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2016-02-01")),as.numeric(as.Date("2016-06-13"))))), y=-0.03, label="E2-4"), colour="black",size=3)
+    # annotate("text", x=as.Date(mean(c(as.numeric(as.Date("2015-08-01")),as.numeric(as.Date("2015-10-08"))))), y = Inf, label="E2-Pre") +
+    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2015-08-01")),as.numeric(as.Date("2015-10-08"))))), y=Inf, label="E2-Pre"), vjust="inward", colour="black",size=5) +
+    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2015-10-08")),as.numeric(as.Date("2015-12-01"))))), y=Inf, label="E2-1"), vjust="inward", colour="black",size=5) +
+    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2015-12-01")),as.numeric(as.Date("2016-01-11"))))), y=Inf, label="E2-2"), vjust="inward", colour="black",size=5) +
+    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2016-01-11")),as.numeric(as.Date("2016-02-01"))))), y=Inf, label="E2-3"), vjust="inward", colour="black",size=5) +
+    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2016-02-01")),as.numeric(as.Date("2016-06-13"))))), y=Inf, label="E2-4"), vjust="inward", colour="black",size=5) +
+    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2016-06-13")),as.numeric(as.Date("2016-11-30"))))), y=Inf, label="E2-Post"), vjust="inward", colour="black",size=5)
   
   return(result)
 }
+
 
 add.event.vline.all <- function(plot_body){
   result = plot_body + 
@@ -247,7 +309,7 @@ set.default.theme <- function(plot_body) {
           legend.title = element_blank(),
           legend.key = element_rect(colour="white"),
           legend.key.size = unit(10,"cm"),
-          legend.margin = unit(0, "cm"),
+          # legend.margin = unit(0, "cm"),
           axis.text = element_text(size=20),
           axis.text.x = element_text(size=15, angle = 45, hjust = 1),
           axis.title.x = element_blank(),
@@ -270,11 +332,11 @@ set.colorful.theme <- function(plot_body) {
     theme(axis.line = element_line(colour = "black"),
           legend.text = element_text(size=23, hjust = 1),
           plot.title = element_text(size=23),
-          legend.position = "none",
+          legend.position = "bottom",
           legend.title = element_blank(),
           legend.key = element_rect(colour="white"),
           legend.key.size = unit(10,"cm"),
-          legend.margin = unit(0, "cm"),
+          # legend.margin = unit(0, "cm"),
           axis.text = element_text(size=20),
           axis.text.x = element_text(size=15, angle = 45, hjust = 1),
           axis.title.x = element_blank(),
@@ -291,6 +353,53 @@ set.colorful.theme <- function(plot_body) {
   
   return(result)
 }
+
+get.legend <- function (a.gplot) {
+  tmp <- ggplot_gtable(ggplot_build(a.gplot))
+  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+  legend <- tmp$grobs[[leg]]
+  return(legend)
+}
+
+combined.plot <- function (FUN, dt1, dt2, dt3, expDate, PLOT_PATH, LABEL, individualPlotting = T) {
+  p1 = FUN(dt1, expDate, PLOT_PATH, individualPlotting)
+  p2 = FUN(dt2, expDate, PLOT_PATH, individualPlotting)
+  p3 = FUN(dt3, expDate, PLOT_PATH, individualPlotting)
+  
+  plot_name = "MARG_HCC_UX"
+  
+  if(expDate[length(expDate)] == "2014-11-17"){
+    #exp1-1
+    plot_name = paste('exp1-1', plot_name, sep="_")
+  } else if(expDate[length(expDate)] == "2015-01-22"){
+    #exp1-2
+    plot_name = paste('exp1-2', plot_name, sep="_")
+  } else{
+    #exp3
+    plot_name = paste('exp2', plot_name, sep="_")
+  }
+  
+  for (i in 2:length(strsplit(names(dt1), "_")[[1]])) {
+    plot_name = paste(plot_name, strsplit(names(dt1), "_")[[1]][i], sep="_")
+  }
+  
+  p4 <- grid.arrange(arrangeGrob(p1 + theme(legend.position="none", plot.title = element_blank()),
+                                 p2 + theme(legend.position="none", plot.title = element_blank(), axis.title.y = element_blank()),
+                                 p3 + theme(legend.position="none", plot.title = element_blank(), axis.title.y = element_blank()),
+                                 nrow=1),
+                     get.legend(p1), nrow=2, heights=c(10, 1), top = paste0(plot_name, "\n"))
+  
+  save.plot(paste0(PLOT_PATH, plot_name, "_",LABEL, ".png"), p4, width_ = 24, height_ = 7)
+  
+  print(paste0(PLOT_PATH, plot_name, "_", LABEL, ".png saved"))
+}
+
+# 
+# p4 <- grid.arrange(arrangeGrob(p1 + theme(legend.position="none", plot.title = element_blank()),
+#                                p2 + theme(legend.position="none", plot.title = element_blank(), axis.title.y = element_blank()),
+#                                p3 + theme(legend.position="none", plot.title = element_blank(), axis.title.y = element_blank()),
+#                                nrow=1),
+#                    mylegend, nrow=2, heights=c(10, 1), top = "MARG HCC UX aggDay allDay total")
 
 
 # save plot 

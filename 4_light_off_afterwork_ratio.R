@@ -82,7 +82,7 @@ for(lab in LABS){
 ### Plot: light_off_afterwork_ratio     
 ### -------------------------------- ### 
 
-plot.24hr.lightOn.counting <- function(dt, expDate, PLOT_PATH, light_off_afterwork_ratio_color = "violetred4"){
+plot.24hr.lightOn.counting <- function(dt, expDate, PLOT_PATH, light_off_afterwork_ratio_color = "violetred4", plotting = T){
   
   plot_dt = dt[[1]]
   
@@ -104,8 +104,9 @@ plot.24hr.lightOn.counting <- function(dt, expDate, PLOT_PATH, light_off_afterwo
 
 #   print(plot_name)
   
-  p <- ggplot(plot_dt, aes(x=timestamp)) +
-    geom_point(aes(y=light_off_afterwork_ratio), colour='gray70') +
+  p <-  ggplot() + 
+    geom_path() +
+    geom_point(data = plot_dt, aes(x=timestamp, y=light_off_afterwork_ratio), colour='gray70') +
     ggtitle(paste0(plot_name, "\n"))+
     scale_y_continuous(labels = percent) +
     coord_cartesian(ylim=c(0,1)) +
@@ -126,7 +127,9 @@ plot.24hr.lightOn.counting <- function(dt, expDate, PLOT_PATH, light_off_afterwo
   
   p = set.colorful.theme(p)
 
-  save.plot(paste0(PLOT_PATH, plot_name, ".png"), p)
+  if (plotting) {
+    save.plot(paste0(PLOT_PATH, plot_name, ".png"), p)
+  }
   
   print(paste("plot:", plot_name))
   return(p)
@@ -142,8 +145,12 @@ if(PLOTTING){
   #   plot_24hr_lightOn_counting <- plot.24hr.lightOn.counting(WHOLE_DAY_LIGHT_ON_COUNT_list[lab], get.expDate.1.2(), PLOT_PATH)  
   # }
   
-  for(lab in 1:length(WHOLE_DAY_LIGHT_ON_COUNT_list)){
-    plot_24hr_lightOn_counting <- plot.24hr.lightOn.counting(WHOLE_DAY_LIGHT_ON_COUNT_list[lab], get.expDate.2(), PLOT_PATH)  
+  # for(lab in 1:length(WHOLE_DAY_LIGHT_ON_COUNT_list)){
+  #   plot_24hr_lightOn_counting <- plot.24hr.lightOn.counting(WHOLE_DAY_LIGHT_ON_COUNT_list[lab], get.expDate.2(), PLOT_PATH)  
+  # }
+  
+  for(lab in 1:(length(WHOLE_DAY_LIGHT_ON_COUNT_list)/3)){
+    combined.plot(plot.24hr.lightOn.counting, WHOLE_DAY_LIGHT_ON_COUNT_list[lab], WHOLE_DAY_LIGHT_ON_COUNT_list[lab + (length(WHOLE_DAY_LIGHT_ON_COUNT_list)/3)], WHOLE_DAY_LIGHT_ON_COUNT_list[lab + 2*(length(WHOLE_DAY_LIGHT_ON_COUNT_list)/3)], get.expDate.2(), PLOT_PATH, LABEL, individualPlotting = F)
   }
 }
 
