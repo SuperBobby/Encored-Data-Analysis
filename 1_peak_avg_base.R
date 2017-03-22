@@ -199,12 +199,12 @@ if(PLOTTING){
   # }
   
   for(lab in 1:(length(STATS_list)/3)){
-    combined.plot(plot.stats, STATS_list[lab], STATS_list[lab + (length(STATS_list)/3)], STATS_list[lab + 2*(length(STATS_list)/3)], get.expDate.1.2(), PLOT_PATH, LABEL, individualPlotting = F)
+    combined.plot(plot.stats, STATS_list[lab], STATS_list[lab + (length(STATS_list)/3)], STATS_list[lab + 2*(length(STATS_list)/3)], get.expDate.1.2(), PLOT_PATH, 'peak_avg_base', individualPlotting = F)
     # plot.stats(STATS_list[lab], get.expDate.2(), PLOT_PATH)
   }
   
   for(lab in 1:(length(STATS_list)/3)){
-    combined.plot(plot.stats, STATS_list[lab], STATS_list[lab + (length(STATS_list)/3)], STATS_list[lab + 2*(length(STATS_list)/3)], get.expDate.2(), PLOT_PATH, LABEL, individualPlotting = F)
+    combined.plot(plot.stats, STATS_list[lab], STATS_list[lab + (length(STATS_list)/3)], STATS_list[lab + 2*(length(STATS_list)/3)], get.expDate.2(), PLOT_PATH, 'peak_avg_base', individualPlotting = F)
       # plot.stats(STATS_list[lab], get.expDate.2(), PLOT_PATH)
   }
 

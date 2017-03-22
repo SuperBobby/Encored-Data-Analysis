@@ -161,7 +161,7 @@ if(PLOTTING){
   #   plot_lightOn_duration <- plot.light.On.duration(LIGHT_ON_DURATION_list[lab], get.expDate.2(), PLOT_PATH)  
   # }
   for(lab in 1:(length(LIGHT_ON_DURATION_list)/3)){
-    combined.plot(plot.light.On.duration, LIGHT_ON_DURATION_list[lab], LIGHT_ON_DURATION_list[lab + (length(LIGHT_ON_DURATION_list)/3)], LIGHT_ON_DURATION_list[lab + 2*(length(LIGHT_ON_DURATION_list)/3)], get.expDate.2(), PLOT_PATH, LABEL, individualPlotting = F)
+    combined.plot(plot.light.On.duration, LIGHT_ON_DURATION_list[lab], LIGHT_ON_DURATION_list[lab + (length(LIGHT_ON_DURATION_list)/3)], LIGHT_ON_DURATION_list[lab + 2*(length(LIGHT_ON_DURATION_list)/3)], get.expDate.2(), PLOT_PATH, 'light_on_duration', individualPlotting = F)
   }
 }
 

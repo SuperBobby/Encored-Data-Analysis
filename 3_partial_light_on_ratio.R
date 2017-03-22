@@ -179,7 +179,7 @@ if(PLOTTING){
   # }
   
   for(lab in 1:(length(PARTIAL_LIGHT_ON_RATIO_list)/3)){
-    combined.plot(plot.partial.lightOn, PARTIAL_LIGHT_ON_RATIO_list[lab], PARTIAL_LIGHT_ON_RATIO_list[lab + (length(PARTIAL_LIGHT_ON_RATIO_list)/3)], PARTIAL_LIGHT_ON_RATIO_list[lab + 2*(length(PARTIAL_LIGHT_ON_RATIO_list)/3)], get.expDate.2(), PLOT_PATH, LABEL, individualPlotting = F)
+    combined.plot(plot.partial.lightOn, PARTIAL_LIGHT_ON_RATIO_list[lab], PARTIAL_LIGHT_ON_RATIO_list[lab + (length(PARTIAL_LIGHT_ON_RATIO_list)/3)], PARTIAL_LIGHT_ON_RATIO_list[lab + 2*(length(PARTIAL_LIGHT_ON_RATIO_list)/3)], get.expDate.2(), PLOT_PATH, "partial_light_on_ratio", individualPlotting = F)
   }
 }
 

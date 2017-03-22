@@ -150,7 +150,7 @@ if(PLOTTING){
   # }
   
   for(lab in 1:(length(WHOLE_DAY_LIGHT_ON_COUNT_list)/3)){
-    combined.plot(plot.24hr.lightOn.counting, WHOLE_DAY_LIGHT_ON_COUNT_list[lab], WHOLE_DAY_LIGHT_ON_COUNT_list[lab + (length(WHOLE_DAY_LIGHT_ON_COUNT_list)/3)], WHOLE_DAY_LIGHT_ON_COUNT_list[lab + 2*(length(WHOLE_DAY_LIGHT_ON_COUNT_list)/3)], get.expDate.2(), PLOT_PATH, LABEL, individualPlotting = F)
+    combined.plot(plot.24hr.lightOn.counting, WHOLE_DAY_LIGHT_ON_COUNT_list[lab], WHOLE_DAY_LIGHT_ON_COUNT_list[lab + (length(WHOLE_DAY_LIGHT_ON_COUNT_list)/3)], WHOLE_DAY_LIGHT_ON_COUNT_list[lab + 2*(length(WHOLE_DAY_LIGHT_ON_COUNT_list)/3)], get.expDate.2(), PLOT_PATH, "light_off_afterwork_ratio", individualPlotting = F)
   }
 }
 

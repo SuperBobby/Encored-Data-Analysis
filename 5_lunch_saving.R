@@ -265,7 +265,7 @@ if(PLOTTING){
   #   plot_lunch_saving <- plot.lunch.saving(LUNCH_TIME_SAVING_RATIO_list[lab], get.expDate.2(), PLOT_PATH)
   # }
   for(lab in 1:(length(LUNCH_TIME_SAVING_RATIO_list)/3)){
-    combined.plot(plot.lunch.saving, LUNCH_TIME_SAVING_RATIO_list[lab], LUNCH_TIME_SAVING_RATIO_list[lab + (length(LUNCH_TIME_SAVING_RATIO_list)/3)], LUNCH_TIME_SAVING_RATIO_list[lab + 2*(length(LUNCH_TIME_SAVING_RATIO_list)/3)], get.expDate.2(), PLOT_PATH, LABEL, individualPlotting = F)
+    combined.plot(plot.lunch.saving, LUNCH_TIME_SAVING_RATIO_list[lab], LUNCH_TIME_SAVING_RATIO_list[lab + (length(LUNCH_TIME_SAVING_RATIO_list)/3)], LUNCH_TIME_SAVING_RATIO_list[lab + 2*(length(LUNCH_TIME_SAVING_RATIO_list)/3)], get.expDate.2(), PLOT_PATH, "lunch_time_saving_ratio", individualPlotting = F)
   }
 }
 
