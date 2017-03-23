@@ -307,17 +307,17 @@ for(lab in target_labs){
   }
 }
 
-write.csv(LUNCH_TIME_SAVING_RATIO_list$MARG_aggWeek_allDay_computer_lunch_time_saving_ratio, 
-          '../data/lunchtime_saving_computer_weekly_ratio(Lab_A).csv')
-write.csv(LUNCH_TIME_SAVING_RATIO_list$HCC_aggWeek_allDay_computer_lunch_time_saving_ratio, 
-          '../data/lunchtime_saving_computer_weekly_ratio(Lab_B).csv')
-write.csv(LUNCH_TIME_SAVING_RATIO_list$UX_aggWeek_allDay_computer_lunch_time_saving_ratio, 
-          '../data/lunchtime_saving_computer_weekly_ratio(Lab_C).csv')
-
-write.csv(LUNCH_TIME_SAVING_RATIO_list$MARG_aggWeek_allDay_light_lunch_time_saving_ratio, 
-          '../data/lunchtime_saving_light_weekly_ratio(Lab_A).csv')
-write.csv(LUNCH_TIME_SAVING_RATIO_list$HCC_aggWeek_allDay_light_lunch_time_saving_ratio, 
-          '../data/lunchtime_saving_light_weekly_ratio(Lab_B).csv')
-write.csv(LUNCH_TIME_SAVING_RATIO_list$UX_aggWeek_allDay_light_lunch_time_saving_ratio, 
-          '../data/lunchtime_saving_light_weekly_ratio(Lab_C).csv')
+# write.csv(LUNCH_TIME_SAVING_RATIO_list$MARG_aggWeek_allDay_computer_lunch_time_saving_ratio, 
+#           '../data/lunchtime_saving_computer_weekly_ratio(Lab_A).csv')
+# write.csv(LUNCH_TIME_SAVING_RATIO_list$HCC_aggWeek_allDay_computer_lunch_time_saving_ratio, 
+#           '../data/lunchtime_saving_computer_weekly_ratio(Lab_B).csv')
+# write.csv(LUNCH_TIME_SAVING_RATIO_list$UX_aggWeek_allDay_computer_lunch_time_saving_ratio, 
+#           '../data/lunchtime_saving_computer_weekly_ratio(Lab_C).csv')
+# 
+# write.csv(LUNCH_TIME_SAVING_RATIO_list$MARG_aggWeek_allDay_light_lunch_time_saving_ratio, 
+#           '../data/lunchtime_saving_light_weekly_ratio(Lab_A).csv')
+# write.csv(LUNCH_TIME_SAVING_RATIO_list$HCC_aggWeek_allDay_light_lunch_time_saving_ratio, 
+#           '../data/lunchtime_saving_light_weekly_ratio(Lab_B).csv')
+# write.csv(LUNCH_TIME_SAVING_RATIO_list$UX_aggWeek_allDay_light_lunch_time_saving_ratio, 
+#           '../data/lunchtime_saving_light_weekly_ratio(Lab_C).csv')
 

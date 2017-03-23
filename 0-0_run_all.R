@@ -14,9 +14,7 @@ source("1_peak_avg_base.R")
 # source("2_light_on_duration.R")
 source('3_partial_light_on_ratio.R')
 source("50-3_status2event(light).R")
-
 source("4_light_off_afterwork_ratio.R")
-
 source("5_lunch_saving.R")
 
 

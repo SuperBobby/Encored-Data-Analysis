@@ -321,66 +321,75 @@ PLOT_PATH = "../plots/waste_investigation/tmp/"
     #   
     # 3.1. sec - total
     sec_total_dt = load.total.sec.tidy.data(T_DATE, 'marg')
-    sec_total_dt$dts = as.POSIXct(sec_total_dt$dts)
     
-    sec_plot_dt = sec_total_dt
-    # sec_plot_dt = sec_total_dt[(dts > "2015-09-01 13:30") & (dts < "2015-09-01 15:00")]
-    
-    sec_total_plot <- ggplot(sec_plot_dt, aes(x = dts, y=total/1000/1000)) +
-      # geom_bar(stat = "identity") +
-      geom_line() +
-      geom_point() +
-      ylab("Power consumption of total (kW/sec)\n") +
-      xlab("")+
-      ylim(0, 10) +
-      ggtitle("sec - total \n") +
-      scale_x_datetime(date_breaks = "hours", date_minor_breaks = "hours",
-                       date_labels = "%H:%M\n")
-    # print(sec_total_plot)
-    save.plot(paste0(PLOT_PATH, "sec_total_plot_", T_DATE, ".png"), sec_total_plot)
-    
+    if(!is.null(sec_total_dt)) {
+      sec_total_dt$dts = as.POSIXct(sec_total_dt$dts)
+      
+      sec_plot_dt = sec_total_dt
+      # sec_plot_dt = sec_total_dt[(dts > "2015-09-01 13:30") & (dts < "2015-09-01 15:00")]
+      
+      sec_total_plot <- ggplot(sec_plot_dt, aes(x = dts, y=total/1000/1000)) +
+        # geom_bar(stat = "identity") +
+        geom_line() +
+        geom_point() +
+        ylab("Power consumption of total (kW/sec)\n") +
+        xlab("")+
+        ylim(0, 10) +
+        ggtitle("sec - total \n") +
+        scale_x_datetime(date_breaks = "hours", date_minor_breaks = "hours",
+                         date_labels = "%H:%M\n")
+      # print(sec_total_plot)
+      save.plot(paste0(PLOT_PATH, "sec_total_plot_", T_DATE, ".png"), sec_total_plot)
+    }
     
     # 3.2. sec - light
     sec_light_dt = load.light.sec.tidy.data(T_DATE, 'marg')
-    sec_light_dt$dts = as.POSIXct(sec_light_dt$dts)
     
-    sec_plot_dt = sec_light_dt
-    # sec_plot_dt = sec_light_dt[(dts > "2015-10-06 13:18:50") & (dts < "2015-10-06 13:19:00")]
-    
-    sec_light_plot <- ggplot(sec_plot_dt, aes(x = dts, y=light/1000/1000)) +
-      geom_line() +
-      geom_point() +
-      ylab("Power consumption of light (kW/sec)\n") +
-      xlab("")+
-      # ylim(0, 0.7) +
-      ggtitle("sec - light \n") +
-      scale_x_datetime(date_breaks = "hours", date_minor_breaks = "hours",
-                       date_labels = "%H:%M\n")
-    # scale_x_datetime(date_breaks = "secs", date_minor_breaks = "secs",
-    #                  date_labels = "%H:%M:%S\n")
-    # print(sec_light_plot)
-    save.plot(paste0(PLOT_PATH, "sec_light_plot_", T_DATE, ".png"), sec_light_plot)
-    
+    if(!is.null(sec_light_dt)) {
+      
+      sec_light_dt$dts = as.POSIXct(sec_light_dt$dts)
+      
+      sec_plot_dt = sec_light_dt
+      # sec_plot_dt = sec_light_dt[(dts > "2015-10-06 13:18:50") & (dts < "2015-10-06 13:19:00")]
+      
+      sec_light_plot <- ggplot(sec_plot_dt, aes(x = dts, y=light/1000/1000)) +
+        geom_line() +
+        geom_point() +
+        ylab("Power consumption of light (kW/sec)\n") +
+        xlab("")+
+        # ylim(0, 0.7) +
+        ggtitle("sec - light \n") +
+        scale_x_datetime(date_breaks = "hours", date_minor_breaks = "hours",
+                         date_labels = "%H:%M\n")
+      # scale_x_datetime(date_breaks = "secs", date_minor_breaks = "secs",
+      #                  date_labels = "%H:%M:%S\n")
+      # print(sec_light_plot)
+      save.plot(paste0(PLOT_PATH, "sec_light_plot_", T_DATE, ".png"), sec_light_plot)
+    }
     
     # 3.3. sec - com
     sec_com_dt = load.com.sec.tidy.data(T_DATE, 'marg', 'com')
-    sec_com_dt$dts = as.POSIXct(sec_com_dt$dts)
     
-    sec_plot_dt = sec_com_dt
-    # sec_plot_dt = sec_com_dt[(dts > "2015-09-01 13:30") & (dts < "2015-09-01 15:00")]
-    
-    sec_com_plot <- ggplot(sec_plot_dt, aes(x = dts, y=com1/1000/1000)) +
-      # geom_bar(stat = "identity") +
-      geom_line() +
-      geom_point() +
-      ylab("Power consumption of com (kW/sec)\n") +
-      xlab("")+
-      # ylim(0, 0.5) +
-      ggtitle("sec - com \n") +
-      scale_x_datetime(date_breaks = "hours", date_minor_breaks = "hours",
-                       date_labels = "%H:%M\n")
-    # print(sec_com_plot)
-    save.plot(paste0(PLOT_PATH, "sec_com_plot_", T_DATE, ".png"), sec_com_plot)
+    if(!is.null(sec_com_dt)) {
+      
+      sec_com_dt$dts = as.POSIXct(sec_com_dt$dts)
+      
+      sec_plot_dt = sec_com_dt
+      # sec_plot_dt = sec_com_dt[(dts > "2015-09-01 13:30") & (dts < "2015-09-01 15:00")]
+      
+      sec_com_plot <- ggplot(sec_plot_dt, aes(x = dts, y=com1/1000/1000)) +
+        # geom_bar(stat = "identity") +
+        geom_line() +
+        geom_point() +
+        ylab("Power consumption of com (kW/sec)\n") +
+        xlab("")+
+        # ylim(0, 0.5) +
+        ggtitle("sec - com \n") +
+        scale_x_datetime(date_breaks = "hours", date_minor_breaks = "hours",
+                         date_labels = "%H:%M\n")
+      # print(sec_com_plot)
+      save.plot(paste0(PLOT_PATH, "sec_com_plot_", T_DATE, ".png"), sec_com_plot)
+    }
     
     ## Loop until the END_DATE
     if(T_DATE == END_DATE){
