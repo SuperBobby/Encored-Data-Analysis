@@ -247,11 +247,11 @@ add.event.vline.exp1.2 <- function(plot_body){
     geom_vline(aes(xintercept = as.numeric(as.Date("2014-11-17"))),color="gray40", linetype = "longdash") +
     geom_vline(aes(xintercept = as.numeric(as.Date("2015-01-15"))),color="gray40", linetype = "longdash") +
     geom_vline(aes(xintercept = as.numeric(as.Date("2015-01-22"))),color="gray40", linetype = "longdash") +
-    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2014-10-01")),as.numeric(as.Date("2014-10-31"))))), y=Inf, label="E1-1-Pre"), vjust="inward", colour="black",size=5) +
-    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2014-11-10")),as.numeric(as.Date("2014-11-17"))))), y=Inf, label="E1-1"), vjust="inward", colour="black",size=5) +
-    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2014-11-17")),as.numeric(as.Date("2015-01-15"))))), y=Inf, label="E1-2-Pre"), vjust="inward", colour="black",size=5) +
-    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2015-01-15")),as.numeric(as.Date("2015-01-22"))))), y=Inf, label="E1-2"), vjust="inward", colour="black",size=5) +
-    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2015-01-22")),as.numeric(as.Date("2015-04-30"))))), y=Inf, label="E1-Post"), vjust="inward", colour="black",size=5)
+    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2014-10-01")),as.numeric(as.Date("2014-10-31"))))), y=Inf, label="\nE1-1-Pre"), vjust="inward", colour="gray40",size=7) +
+    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2014-11-10")),as.numeric(as.Date("2014-11-17"))))), y=Inf, label="E1-1"), vjust="inward", colour="black",size=7, fontface = "bold") +
+    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2014-11-17")),as.numeric(as.Date("2015-01-15"))))), y=Inf, label="\nE1-2-Pre"), vjust="inward", colour="gray40",size=7) +
+    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2015-01-15")),as.numeric(as.Date("2015-01-22"))))), y=Inf, label="E1-2"), vjust="inward", colour="black",size=7, fontface = "bold") +
+    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2015-01-22")),as.numeric(as.Date("2015-04-30"))))), y=Inf, label="\nE1-Post"), vjust="inward", colour="gray40",size=7)
   
   return(result)
 }
@@ -270,12 +270,12 @@ add.event.vline.exp2 <- function(plot_body){
     # geom_vline(aes(xintercept = as.numeric(as.Date("2016-05-16"))),color="gray40", linetype = "longdash") +
     geom_vline(aes(xintercept = as.numeric(as.Date("2016-06-13"))),color="gray40", linetype = "longdash") +
     # annotate("text", x=as.Date(mean(c(as.numeric(as.Date("2015-08-01")),as.numeric(as.Date("2015-10-08"))))), y = Inf, label="E2-Pre") +
-    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2015-08-01")),as.numeric(as.Date("2015-10-08"))))), y=Inf, label="E2-Pre"), vjust="inward", colour="black",size=5) +
-    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2015-10-08")),as.numeric(as.Date("2015-12-01"))))), y=Inf, label="E2-1"), vjust="inward", colour="black",size=5) +
-    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2015-12-01")),as.numeric(as.Date("2016-01-11"))))), y=Inf, label="E2-2"), vjust="inward", colour="black",size=5) +
-    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2016-01-11")),as.numeric(as.Date("2016-02-01"))))), y=Inf, label="E2-3"), vjust="inward", colour="black",size=5) +
-    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2016-02-01")),as.numeric(as.Date("2016-06-13"))))), y=Inf, label="E2-4"), vjust="inward", colour="black",size=5) +
-    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2016-06-13")),as.numeric(as.Date("2016-11-30"))))), y=Inf, label="E2-Post"), vjust="inward", colour="black",size=5)
+    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2015-08-01")),as.numeric(as.Date("2015-10-08"))))), y=Inf, label="\nE2-Pre"), vjust="inward", colour="gray40",size=7) +
+    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2015-10-08")),as.numeric(as.Date("2015-12-01"))))), y=Inf, label="E2-1"), vjust="inward", colour="black",size=7, fontface = "bold") +
+    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2015-12-01")),as.numeric(as.Date("2016-01-11"))))), y=Inf, label="\nE2-2"), vjust="inward", colour="black",size=7, fontface = "bold") +
+    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2016-01-11")),as.numeric(as.Date("2016-02-01"))))), y=Inf, label="E2-3"), vjust="inward", colour="black",size=7, fontface = "bold") +
+    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2016-02-01")),as.numeric(as.Date("2016-06-13"))))), y=Inf, label="\nE2-4"), vjust="inward", colour="black",size=7, fontface = "bold") +
+    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2016-06-13")),as.numeric(as.Date("2016-11-30"))))), y=Inf, label="\nE2-Post"), vjust="inward", colour="gray40",size=7)
   
   return(result)
 }
