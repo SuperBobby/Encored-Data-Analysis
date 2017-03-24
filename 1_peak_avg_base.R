@@ -137,9 +137,9 @@ plot.stats <- function(dt, expDate, PLOT_PATH, plotting = T) {
     ylab("Power comsumption (Watt/15min)\n") +
     scale_linetype_discrete(breaks=c("peak", "avg", "base"))
   
+  stats = add.window.line(stats, plot_dt, "avg", windowingWeek, expDate, shadowing=T)
   stats = add.window.line(stats, plot_dt, "peak", windowingWeek, expDate)
   stats = add.window.line(stats, plot_dt, "base", windowingWeek, expDate)
-  stats = add.window.line(stats, plot_dt, "avg", windowingWeek, expDate, shadowing=T)
   
   # feeder = strsplit(plot_name, "_")[[1]][5]
   # if (feeder == "computer") {
