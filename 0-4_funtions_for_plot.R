@@ -138,9 +138,9 @@ add.window.line <- function(plot_body, data, target, windowingWeek, expDate, sha
   if (shadowing==TRUE) {
     if (shadowingDirection == "below") {
       standard = quantile(window_df[timestamp < expDate[1]]$mean, 0.1, na.rm = T)
-      shadowingStandard_10 = quantile(window_df[timestamp < expDate[1]]$mean, 0.1, na.rm = T) * 0.90
-      shadowingStandard_5 = (shadowingStandard_10 / 0.90) * 0.95
-      shadow_boundary_10 = get.rect.boundary(window_df, expDate, shadowingStandard_10, 0, shadowingDirection)
+      shadowingStandard_10 = standard * 0.90
+      shadowingStandard_5 = standard * 0.95
+      shadow_boundary_10 = get.rect.boundary(window_df, expDate, shadowingStandard_10, min(window_df$mean), shadowingDirection)
       shadow_boundary_5 = get.rect.boundary(window_df, expDate, shadowingStandard_5, shadowingStandard_10, shadowingDirection)
       # shadow_boundary_5 = get.rect.boundary(window_df, expDate, shadowingStandard_5, 0, shadowingDirection)
       
@@ -149,8 +149,8 @@ add.window.line <- function(plot_body, data, target, windowingWeek, expDate, sha
       
     } else {
       standard = quantile(window_df[timestamp < expDate[1]]$mean, 0.9, na.rm = T)
-      shadowingStandard_10 = min(quantile(window_df[timestamp < expDate[1]]$mean, 0.9, na.rm = T) * 1.10, 1)
-      shadowingStandard_5 = min(quantile(window_df[timestamp < expDate[1]]$mean, 0.9, na.rm = T) * 1.05, 1)
+      shadowingStandard_10 = min(standard * 1.10, 1)
+      shadowingStandard_5 = min(standard * 1.05, 1)
       shadow_boundary_10 = get.rect.boundary(window_df, expDate, shadowingStandard_10, max(window_df$mean), shadowingDirection)
       shadow_boundary_5 = get.rect.boundary(window_df, expDate, shadowingStandard_5, shadowingStandard_10, shadowingDirection)
       
@@ -166,7 +166,7 @@ add.window.line <- function(plot_body, data, target, windowingWeek, expDate, sha
       for (period_index in 1:nrow(shadow_boundary_5)) {
         # print(shadow_boundary[period_index])
         plot_xmin = shadow_boundary_5[period_index]$rect_start
-        plot_xmax = shadow_boundary_5[period_index]$rect_end
+        plot_xmax = min(shadow_boundary_5[period_index]$rect_end, max(shadow_boundary_5[period_index]$rect_end) - 1)
 
         if (plot_xmax - plot_xmin < 1) {
           result = result +
@@ -250,7 +250,7 @@ add.window.line <- function(plot_body, data, target, windowingWeek, expDate, sha
     
     result = result + 
       # geom_hline(aes_string(yintercept = shadowingStandard_5), linetype = "longdash", color="darkorchid1") +
-      geom_hline(aes_string(yintercept = standard), linetype = "longdash", color="darkorchid4")
+      geom_hline(aes_string(yintercept = shadowingStandard_5), linetype = "longdash", color="darkorchid4")
   }
   
   
@@ -342,7 +342,7 @@ add.event.vline.exp2 <- function(plot_body){
   expTextPostion = ggplot_build(plot_body)$layout$panel_ranges[[1]]$y.range[2]
   # print(expTextPostion)
   result = plot_body + 
-    scale_x_date("Timestamp", labels = date_format("%Y-%m"), breaks = date_breaks("month"),limits=c(as.Date("2015-08-01"),as.Date("2016-12-01"))) +
+    scale_x_date("Timestamp", labels = date_format("%Y-%m"), breaks = date_breaks("month"),limits=c(as.Date("2015-08-01"),as.Date("2016-12-02"))) +
     theme_bw()+
     geom_vline(aes(xintercept = as.numeric(as.Date("2015-10-08"))),color="gray40", linetype = "longdash") +
     geom_vline(aes(xintercept = as.numeric(as.Date("2015-12-01"))),color="gray40", linetype = "longdash") +
@@ -356,7 +356,7 @@ add.event.vline.exp2 <- function(plot_body){
     geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2015-12-01")),as.numeric(as.Date("2016-01-11"))))), y=Inf, label="\nE2-2"), vjust="inward", colour="black",size=7, fontface = "bold") +
     geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2016-01-11")),as.numeric(as.Date("2016-02-01"))))), y=Inf, label="E2-3"), vjust="inward", colour="black",size=7, fontface = "bold") +
     geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2016-02-01")),as.numeric(as.Date("2016-06-13"))))), y=Inf, label="\nE2-4"), vjust="inward", colour="black",size=7, fontface = "bold") +
-    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2016-06-13")),as.numeric(as.Date("2016-11-30"))))), y=Inf, label="\nE2-Post"), vjust="inward", colour="gray40",size=7)
+    geom_text(aes(x=as.Date(mean(c(as.numeric(as.Date("2016-06-13")),as.numeric(as.Date("2016-12-01"))))), y=Inf, label="\nE2-Post"), vjust="inward", colour="gray40",size=7)
   
   return(result)
 }
