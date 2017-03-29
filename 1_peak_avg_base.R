@@ -58,14 +58,15 @@ get.four.stats <- function(usage, thre_peak, thre_base){
 # 3. types of day (working day?)
 # 4. target feeder
 
-LABS = c("MARG", "HCC", "UX")                                  # lab
-# LABS = c("MARG", "HCC", "UX", "All_Labs")                    # lab
+# LABS = c("MARG", "HCC", "UX")                                  # lab
+LABS = c("MARG", "HCC", "UX", "All_Labs")                    # lab
 AGG_UNITS = c("aggDay")                                        # agg_unit
 # AGG_UNITS = c("aggWeek", "aggDay")                           # agg_unit
 # TYPES_OF_DAY = c("allDay", "workingday", "nonworkingday")      # day_type
 TYPES_OF_DAY = c("allDay")      # day_type
 
-FEEDERS = c("total", "total_woHVAC", "computer", "light", "hvac")                         # feeder
+FEEDERS = c("total_woHVAC", "computer", "light", "hvac")
+# FEEDERS = c("total", "total_woHVAC", "computer", "light", "hvac")                         # feeder
 # FEEDERS = c("total", "total_woHVAC", "total_woETC", "computer", "light", "hvac")            # feeder
 
 
@@ -206,6 +207,16 @@ if(PLOTTING){
   for(lab in 1:(length(STATS_list)/3)){
     combined.plot(plot.stats, STATS_list[lab], STATS_list[lab + (length(STATS_list)/3)], STATS_list[lab + 2*(length(STATS_list)/3)], get.expDate.2(), PLOT_PATH, 'peak_avg_base', individualPlotting = F)
       # plot.stats(STATS_list[lab], get.expDate.2(), PLOT_PATH)
+  }
+  
+  for(lab in 1:(length(STATS_list)/3)){
+    combined.plot(plot.stats, STATS_list[lab], STATS_list[lab + (length(STATS_list)/3)], STATS_list[lab + 2*(length(STATS_list)/3)], get.expDate.1.2(), PLOT_PATH, 'peak_avg_base', individualPlotting = F)
+    # plot.stats(STATS_list[lab], get.expDate.2(), PLOT_PATH)
+  }
+  
+  for(lab in 1:(length(STATS_list)/3)){
+    combined.plot(plot.stats, STATS_list[lab], STATS_list[lab + (length(STATS_list)/3)], STATS_list[lab + 2*(length(STATS_list)/3)], get.expDate.2(), PLOT_PATH, 'peak_avg_base', individualPlotting = F)
+    # plot.stats(STATS_list[lab], get.expDate.2(), PLOT_PATH)
   }
 
 }
