@@ -12,7 +12,8 @@ STATUS_AGG_PATH = "../data/status/aggregated/"
 PLOT_PATH = "../plots/"
 PLOT_END_DATE = "2016-12-01"
 
-LAB_LABLES = c("marg", "hcc", "ux") 
+LAB_LABLES = c("marg", "hcc", "ux")
+# LAB_LABLES = c("marg")
 
 DAY_LABEL = as.Date(seq(as.Date("2015-09-01"), as.Date(PLOT_END_DATE), by = "days"))
 DAY_LABEL = data.table(timestamp = DAY_LABEL)
@@ -234,8 +235,11 @@ for(lab in LAB_LABLES){
   agg_event_dt = agg_event_dt[dts < PLOT_END_DATE]
   print(file_name)
   
-  denominator = quantile(agg_event_dt$light_usage, 1)/2
+  denominator = quantile(agg_event_dt$light_usage, 1)/2 ## divided by 2, because the half of the lab is the "full light switch on" event  
   print(denominator)
+  
+  agg_event_dt[light_usage_diff >= denominator, ':='(light_usage_diff = denominator)]
+  agg_event_dt[light_usage_diff <= -denominator, ':='(light_usage_diff = -denominator)]
   
   # # # dinner time OFF event counting 
   max_initial_light_on_dt = agg_event_dt[initial_on == 1 & event=='ON', 
@@ -244,6 +248,7 @@ for(lab in LAB_LABLES){
   max_initial_light_on_dt[, timestamp := as.Date(timestamp)]
   
   max_initial_light_on_dt = merge(DAY_LABEL, max_initial_light_on_dt, by = "timestamp", all.x = T)
+  max_initial_light_on_dt$initial_light_switch_on_ratio = na.locf(max_initial_light_on_dt$initial_light_switch_on_ratio)
   
   p <- ggplot() + 
     geom_path() +
