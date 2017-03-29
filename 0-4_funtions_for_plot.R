@@ -66,7 +66,7 @@ windowingByExpDate <- function(data, target, windowingWeek, expDate){
   return (windowing)
 }
 
-get.rect.boundary <- function (data, expDate, threshold, threshold2, shadowingDirection) {
+get.rect.boundary <- function (data, expDate, threshold, shadowingDirection) {
   
   aggDay = F
   boundary = data.table(rect_start = integer(),
@@ -79,9 +79,9 @@ get.rect.boundary <- function (data, expDate, threshold, threshold2, shadowingDi
   }
   
   if (shadowingDirection == "below") {
-    targetDays = data[timestamp >= expDate[1] & mean <= threshold & mean >= threshold2]$timestamp
+    targetDays = data[timestamp >= expDate[1] & mean <= threshold]$timestamp
   } else {
-    targetDays = data[timestamp >= expDate[1] & mean >= threshold & mean <= threshold2]$timestamp
+    targetDays = data[timestamp >= expDate[1] & mean >= threshold]$timestamp
   }
   
   if (aggDay) {
@@ -140,8 +140,8 @@ add.window.line <- function(plot_body, data, target, windowingWeek, expDate, sha
       standard = quantile(window_df[timestamp < expDate[1]]$mean, 0.1, na.rm = T)
       shadowingStandard_10 = standard * 0.90
       shadowingStandard_5 = standard * 0.95
-      shadow_boundary_10 = get.rect.boundary(window_df, expDate, shadowingStandard_10, min(window_df$mean), shadowingDirection)
-      shadow_boundary_5 = get.rect.boundary(window_df, expDate, shadowingStandard_5, shadowingStandard_10, shadowingDirection)
+      shadow_boundary_10 = get.rect.boundary(window_df, expDate, shadowingStandard_10, shadowingDirection)
+      shadow_boundary_5 = get.rect.boundary(window_df, expDate, shadowingStandard_5, shadowingDirection)
       # shadow_boundary_5 = get.rect.boundary(window_df, expDate, shadowingStandard_5, 0, shadowingDirection)
       
       gradientColors <- colorRampPalette(c("#009919", "yellow", "red"))
@@ -151,8 +151,8 @@ add.window.line <- function(plot_body, data, target, windowingWeek, expDate, sha
       standard = quantile(window_df[timestamp < expDate[1]]$mean, 0.9, na.rm = T)
       shadowingStandard_10 = min(standard * 1.10, 1)
       shadowingStandard_5 = min(standard * 1.05, 1)
-      shadow_boundary_10 = get.rect.boundary(window_df, expDate, shadowingStandard_10, max(window_df$mean), shadowingDirection)
-      shadow_boundary_5 = get.rect.boundary(window_df, expDate, shadowingStandard_5, shadowingStandard_10, shadowingDirection)
+      shadow_boundary_10 = get.rect.boundary(window_df, expDate, shadowingStandard_10, shadowingDirection)
+      shadow_boundary_5 = get.rect.boundary(window_df, expDate, shadowingStandard_5, shadowingDirection)
       
       gradientColors <- colorRampPalette(c("red", "yellow", "#009919"))
       # gradientColors <- colorRampPalette(c("yellow", "#009919", "#006B10"))
@@ -168,13 +168,17 @@ add.window.line <- function(plot_body, data, target, windowingWeek, expDate, sha
         plot_xmin = shadow_boundary_5[period_index]$rect_start
         plot_xmax = min(shadow_boundary_5[period_index]$rect_end, max(shadow_boundary_5[period_index]$rect_end) - 1)
 
-        if (plot_xmax - plot_xmin < 1) {
-          result = result +
-            geom_vline(aes_string(xintercept = as.numeric(plot_xmin)), alpha=shadow_5_alpha, color = shadow_5_color, size = 0.5)
-        } else {
-          result = result +
-            geom_rect(aes_string(xmin = plot_xmin, xmax = (plot_xmax + 1), ymin = -Inf, ymax = Inf), alpha=shadow_5_alpha, fill = shadow_5_color)
-        }
+        result = result +
+          geom_rect(aes_string(xmin = plot_xmin, xmax = (plot_xmax + 1), ymin = -Inf, ymax = Inf), alpha=shadow_5_alpha, fill = shadow_5_color)
+        
+        
+        # if (plot_xmax - plot_xmin < 1) {
+        #   result = result +
+        #     geom_vline(aes_string(xintercept = as.numeric(plot_xmin)), alpha=shadow_5_alpha, color = shadow_5_color, size = 0.5)
+        # } else {
+        #   result = result +
+        #     geom_rect(aes_string(xmin = plot_xmin, xmax = (plot_xmax + 1), ymin = -Inf, ymax = Inf), alpha=shadow_5_alpha, fill = shadow_5_color)
+        # }
       }
     }
 
@@ -186,14 +190,17 @@ add.window.line <- function(plot_body, data, target, windowingWeek, expDate, sha
         # print(shadow_boundary[period_index])
         plot_xmin = shadow_boundary_10[period_index]$rect_start
         plot_xmax = shadow_boundary_10[period_index]$rect_end
+        
+        result = result +
+          geom_rect(aes_string(xmin = plot_xmin, xmax = (plot_xmax + 1), ymin = -Inf, ymax = Inf), alpha=shadow_10_alpha, fill = shadow_10_color)
 
-        if (plot_xmax - plot_xmin < 1) {
-          result = result +
-            geom_vline(aes_string(xintercept = as.numeric(plot_xmin)), alpha=shadow_10_alpha, color = shadow_10_color, size = 0.5)
-        } else {
-          result = result +
-            geom_rect(aes_string(xmin = plot_xmin, xmax = (plot_xmax + 1), ymin = -Inf, ymax = Inf), alpha=shadow_10_alpha, fill = shadow_10_color)
-        }
+        # if (plot_xmax - plot_xmin < 1) {
+        #   result = result +
+        #     geom_vline(aes_string(xintercept = as.numeric(plot_xmin)), alpha=shadow_10_alpha, color = shadow_10_color, size = 0.5)
+        # } else {
+        #   result = result +
+        #     geom_rect(aes_string(xmin = plot_xmin, xmax = (plot_xmax + 1), ymin = -Inf, ymax = Inf), alpha=shadow_10_alpha, fill = shadow_10_color)
+        # }
       }
     }
 
@@ -242,17 +249,15 @@ add.window.line <- function(plot_body, data, target, windowingWeek, expDate, sha
     # #     geom_rect(aes_string(xmin = last_day, xmax = as.Date("2016-12-01", tz="Asia/Seoul"), ymin = -Inf, ymax = Inf), alpha=shadow_5_alpha, fill = "white")
     # #   
     # # }
-    
    
-   result = result +
-     geom_line(data=window_df, aes_string(x = "timestamp", y = "mean", linetype = shQuote(target)), size=1) +
-     geom_ribbon(data=window_df, aes(x = timestamp, ymin = mean - sd, ymax = mean + sd), alpha = 0.2)
-    
     result = result + 
       # geom_hline(aes_string(yintercept = shadowingStandard_5), linetype = "longdash", color="darkorchid1") +
-      geom_hline(aes_string(yintercept = shadowingStandard_5), linetype = "longdash", color="darkorchid4")
+      geom_hline(aes_string(yintercept = standard), linetype = "longdash", color="darkorchid4")
   }
   
+  result = result +
+    geom_line(data=window_df, aes_string(x = "timestamp", y = "mean", linetype = shQuote(target)), size=1) +
+    geom_ribbon(data=window_df, aes(x = timestamp, ymin = mean - sd, ymax = mean + sd), alpha = 0.2)
   
   
   return (result)
